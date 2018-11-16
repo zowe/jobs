@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 /target/
+=======
+target/
+.history/
+>>>>>>> 81d09f8... first commit
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
@@ -22,4 +27,8 @@
 /nbbuild/
 /dist/
 /nbdist/
+<<<<<<< HEAD
 /.nb-gradle/
+=======
+/.nb-gradle/
+>>>>>>> 81d09f8... first commit
