@@ -1,0 +1,25 @@
+#TODO Pass in keystore details - share with Mfaas?
+spring:
+    application:
+        name: jobs
+    output:
+        ansi:
+            enabled: always
+
+logging:
+    level:
+        ROOT: INFO
+        org.springframework: INFO
+        org.zowe: DEBUG
+
+server:
+  port: ${server.port}
+  ssl:
+    keyStore: ${server.ssl.keyStore}
+    keyStorePassword: ${server.ssl.keyStorePassword}
+    keyStoreType: ${server.ssl.keyStoreType}
+    keyAlias: ${server.ssl.keyAlias}
+    
+zosmf:
+  ipAddress: ${zosmf.ipAddress}
+  httpsPort: ${zosmf.httpsPort}
