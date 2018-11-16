@@ -14,12 +14,13 @@
 
   <artifactId>jobs-tests</artifactId>
   <packaging>jar</packaging>
-
   <name>jobs-tests</name>
   	<description>Functional/Integration test of the Jobs API spring boot microservice</description>
+  <artifactId>jobs-model</artifactId>
+  <packaging>jar</packaging>
+  <name>unix-files-model</name>
 
 	<parent>
-		<groupId>org.zowe</groupId>
 		<artifactId>api-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../api-parent</relativePath> <!-- TODO: lookup parent from repository? -->

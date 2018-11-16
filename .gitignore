@@ -1,10 +1,16 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 /target/
 =======
 target/
 .history/
 >>>>>>> 81d09f8... first commit
 !.mvn/wrapper/maven-wrapper.jar
+=======
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.history/
+>>>>>>> 99f5671... first commit
 
 ### STS ###
 .apt_generated
@@ -28,7 +34,11 @@ target/
 /dist/
 /nbdist/
 <<<<<<< HEAD
+<<<<<<< HEAD
 /.nb-gradle/
 =======
 /.nb-gradle/
 >>>>>>> 81d09f8... first commit
+=======
+/.nb-gradle/
+>>>>>>> 99f5671... first commit
