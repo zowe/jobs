@@ -24,6 +24,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import static org.junit.Assert.assertEquals;
+
 public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
     static final String JOBS_ROOT_ENDPOINT = "jobs";
