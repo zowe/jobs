@@ -1,0 +1,6 @@
+rootProject.name = 'explorer-jobs'
+
+include 'jobs-api-server'
+include 'jobs-model'
+include 'jobs-tests'
+
