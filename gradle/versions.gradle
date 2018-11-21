@@ -12,6 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.12"
+    explorerApiCommonVersion = "0.0.1-SNAPSHOT"
 
     libraries = [
         lombok                             : "org.projectlombok:lombok:${lombokVersion}",
@@ -41,6 +42,8 @@ ext {
         mockito_core                       : "org.mockito:mockito-core:${mockitoCoreVersion}",
 
         junit                              : "junit:junit:${junitVersion}",
-      
+
+        explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
+        explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}"
     ]
 }

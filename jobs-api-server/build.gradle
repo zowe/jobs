@@ -12,10 +12,12 @@ dependencies {
     compile libraries.springFoxSwagger2
     compile libraries.springFoxSwaggerUI
     compile libraries.lombok
+    compile libraries.explorer_api_common
 
     testCompile libraries.spring_boot_starter_test
     testCompile libraries.powermock_api_mockito2
     testCompile libraries.power_mock_junit4
     testCompile libraries.power_mock_junit4_rule
     testCompile libraries.mockito_core
+    testCompile libraries.explorer_api_common_test
 }
