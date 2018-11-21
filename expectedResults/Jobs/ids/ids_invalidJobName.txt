@@ -1,1 +1,0 @@
-Request for job from z/OSMF failed for prefix 'FAKEJOBNAME' and owner '${ATLAS.USERNAME}'
