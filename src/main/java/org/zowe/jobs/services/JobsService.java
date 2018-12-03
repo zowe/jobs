@@ -26,7 +26,7 @@ public interface JobsService {
 //
 //	Job submitJobFile(String file);
 
-	Job submitJobString(String jcl);
+	Job submitJobString(String jclString);
 //
 //	List<JobFile> getJobFiles(String jobName, String jobId);
 //

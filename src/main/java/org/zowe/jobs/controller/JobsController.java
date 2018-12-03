@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -137,16 +136,13 @@ public class JobsController {
 	@ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
 			"JES job APIs", })
 	@ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
-	public ResponseEntity<?> submitJob(@RequestBody SubmitJobStringRequest request) {
+	public ResponseEntity<?> submitJob(@RequestBody @Valid SubmitJobStringRequest request) {
 
-		String jcl = request.getJcl();
-		if (StringUtils.isEmpty(jcl)) {
-			// TODO - throw exception
-			// String error = Messages.getString("Jobs.InvalidSubmitData");
-			// throw createNotFoundException(error);
-			throw new IllegalArgumentException();
-		}
-		Job job = jobsService.submitJobString(jcl);
+//		if (result.hasErrors()) {
+//			throw new InvalidOwnerException("gibberjabber");
+//		}
+
+		Job job = jobsService.submitJobString(request.getJcl());
 
 		URI location = createSubmitJobLocationHeader(job);
 		return ResponseEntity.created(location).body(job);

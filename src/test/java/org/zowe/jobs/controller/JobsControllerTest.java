@@ -41,6 +41,7 @@ import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
 @RunWith(PowerMockRunner.class)
@@ -161,6 +162,25 @@ public class JobsControllerTest extends ZoweApiTest {
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn();
 
 		verify(jobsService, times(1)).getJobs("TESTNAME", invalidOwner, JobStatus.ALL);
+		verifyNoMoreInteractions(jobsService);
+		JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
+
+	}
+
+	@Test
+	public void submit_jcl_string_with_invalid_jcl_should_be_converted_to_error_message() throws Exception {
+		ApiError expectedError = ApiError.builder()
+				.message(MessageFormat.format("Invalid field {0} supplied to object {1} - {2}", "jcl",
+						"submitJobStringRequest", "JCL string can't be empty"))
+				.status(HttpStatus.BAD_REQUEST).build();
+		String expectedJsonString = JsonUtils.convertToJsonString(expectedError);
+
+		MvcResult result = mockMvc
+				.perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+						.content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(""))))
+				.andExpect(status().isBadRequest())
+				.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn();
+
 		verifyNoMoreInteractions(jobsService);
 		JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
 

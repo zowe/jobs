@@ -117,8 +117,6 @@ public class ZosmfJobsService implements JobsService {
 
 	@Override
 	public Job submitJobString(String jcl) {
-
-		jcl = jcl.replaceAll("\\\\n", "\n"); // Convert to real line breaks for zosmf
 		String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
 
 		String requestUrl = zosmfconnector.getFullUrl(urlPath);
