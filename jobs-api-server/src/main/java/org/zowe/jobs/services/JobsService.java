@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2018
  */
 package org.zowe.jobs.services;
 
@@ -25,7 +25,7 @@ public interface JobsService {
 //
 //    Job submitJobFile(String file);
 
-    Job submitJobString(String jcl);
+    Job submitJobString(String jclString);
 //
 //    List<JobFile> getJobFiles(String jobName, String jobId);
 //

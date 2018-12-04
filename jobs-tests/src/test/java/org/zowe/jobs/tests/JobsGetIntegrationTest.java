@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2016, 2018
  */
 package org.zowe.jobs.tests;
 
@@ -31,8 +31,7 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
     @AfterClass
     public static void purgeJob() throws Exception {
-        // TODO - not implemented yet
-        // purgeJob(job);
+        purgeJob(job);
     }
 
     /**

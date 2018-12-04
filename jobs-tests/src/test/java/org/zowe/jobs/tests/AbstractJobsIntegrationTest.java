@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2016, 2018
  */
 package org.zowe.jobs.tests;
 
@@ -62,20 +62,29 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 //    }
 
     public static Job submitJobString(String jobFile) throws Exception {
-        String jcl = new String(Files.readAllBytes(Paths.get("testFiles/" + jobFile)));
-        JsonObject body = new JsonObject();
-        body.addProperty("jcl", jcl);
-        return sendPostRequest(JOBS_ROOT_ENDPOINT, body).shouldHaveStatusCreated().getEntityAs(Job.class);
-    }
+		return submitJobJclStringFromFile(jobFile).shouldHaveStatusCreated().getEntityAs(Job.class);
+	}
+
+	static IntegrationTestResponse submitJobJclStringFromFile(String jobFile) throws Exception {
+		String jcl = new String(Files.readAllBytes(Paths.get("testFiles/" + jobFile)));
+		return submitJobJclString(jcl);
+	}
+
+	static IntegrationTestResponse submitJobJclString(String jclString) throws Exception {
+		JsonObject body = new JsonObject();
+		body.addProperty("jcl", jclString);
+		return sendPostRequest(JOBS_ROOT_ENDPOINT, body);
+	}
 
 //    public static Job submitJobFile(String jobFile) throws Exception {
 //        String jobFileString = "'" + getTestJclMemberPath(jobFile) + "'";
 //        return submitJobByFile(jobFileString).shouldHaveStatusCreated().getEntityAs(Job.class);
 //    }
 
-//    public static IntegrationTestResponse purgeJob(Job job) throws Exception {
-//        return sendDeleteRequest2(getJobUri(job));
-//    }
+	public static IntegrationTestResponse purgeJob(Job job) throws Exception {
+		// TODO LATER - purge not implemented yet
+		return null;// return sendDeleteRequest2(getJobUri(job));
+	}
 
 //    protected static String getJobUri(Job job) {
 //        return JOBS_ROOT_ENDPOINT + "/" + job.getJobName() + "/" + job.getJobId();

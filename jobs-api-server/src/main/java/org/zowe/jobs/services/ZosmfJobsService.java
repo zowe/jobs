@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2018
  */
 package org.zowe.jobs.services;
 
@@ -124,8 +124,6 @@ public class ZosmfJobsService implements JobsService {
 
     @Override
     public Job submitJobString(String jcl) {
-
-        jcl = jcl.replaceAll("\\\\n", "\n"); // Convert to real line breaks for zosmf
         String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
 
         String requestUrl = zosmfconnector.getFullUrl(urlPath);

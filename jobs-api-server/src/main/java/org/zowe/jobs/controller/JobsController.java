@@ -5,18 +5,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2016, 2018
  */
 package org.zowe.jobs.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.*;
+import java.net.URI;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.model.Job;
@@ -24,11 +33,13 @@ import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.util.List;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
@@ -49,18 +60,18 @@ public class JobsController {
         this.request = request;
     }
 
-    @GetMapping(value = "/username", produces = {"application/json"})
+    @GetMapping(value = "/username", produces = { "application/json" })
     @ApiOperation(value = "Get current userid", nickname = "getCurrentUserName", notes = "This API returns the caller's current TSO userid.", response = String.class, tags = {
-            "System APIs",})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Ok", response = String.class)})
+            "System APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = String.class) })
     public String getCurrentUserName() {
         return ZosUtils.getUsername();
     }
 
-    @GetMapping(value = "", produces = {"application/json"})
+    @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Ok", response = Job.class, responseContainer = "List")})
+            @ApiResponse(code = 200, message = "Ok", response = Job.class, responseContainer = "List") })
     public List<Job> getJobs(
             @ApiParam(value = "Job name prefix. If omitted, defaults to '*'.", defaultValue = "*") @Valid @RequestParam(value = "prefix", required = false, defaultValue = "*") String prefix,
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
@@ -121,20 +132,13 @@ public class JobsController {
 //    }
 
     // TODO - this isn't properly tested - just added for the get integration tests
-    @PostMapping(value = "", produces = {"application/json"})
+    @PostMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
-            "JES job APIs",})
-    @ApiResponses(value = {@ApiResponse(code = 201, message = "Job successfully created", response = Job.class)})
-    public ResponseEntity<?> submitJob(@RequestBody SubmitJobStringRequest request) {
+            "JES job APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
+    public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
 
-        String jcl = request.getJcl();
-        if (StringUtils.isEmpty(jcl)) {
-            // TODO - throw exception
-            // String error = Messages.getString("Jobs.InvalidSubmitData");
-            // throw createNotFoundException(error);
-            throw new IllegalArgumentException();
-        }
-        Job job = jobsService.submitJobString(jcl);
+        Job job = jobsService.submitJobString(request.getJcl());
 
         URI location = createSubmitJobLocationHeader(job);
         return ResponseEntity.created(location).body(job);

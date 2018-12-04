@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2018
  */
 package org.zowe.jobs.model;
 
@@ -20,5 +20,6 @@ import lombok.NoArgsConstructor;
 public class SubmitJobStringRequest {
 
     @ApiModelProperty(value = "The jcl to be submitted, with \\n for new lines", dataType = "string", required = true, example = "//TESTJOBX JOB (),MSGCLASS=H\n// EXEC PGM=IEFBR14")
+    @ValidJclString
     private String jcl;
 }

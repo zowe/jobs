@@ -5,11 +5,26 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright Contributors to the Zowe Project.
+ * Copyright IBM Corporation 2018
  */
 package org.zowe.jobs.controller;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -31,20 +46,11 @@ import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ZosUtils.class})
+@PrepareForTest({ ZosUtils.class })
 public class JobsControllerTest extends ZoweApiTest {
 
     private static final String DUMMY_USER = "A_USER";
@@ -164,5 +170,45 @@ public class JobsControllerTest extends ZoweApiTest {
         verifyNoMoreInteractions(jobsService);
         JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
 
+    }
+
+    @Test
+    public void submit_jcl_string_works() throws Exception {
+        Job dummyJob = Job.builder().jobId("TESTID11").jobName("TESTNAME").status(JobStatus.ACTIVE).build();
+        String expectedJsonString = JsonUtils.convertToJsonString(dummyJob);
+
+        String dummyJcl = "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440\n" + "//*        TEST JOB\n"
+                + "//UNIT     EXEC PGM=IEFBR14";
+        SubmitJobStringRequest request = new SubmitJobStringRequest(dummyJcl);
+
+        when(jobsService.submitJobString(dummyJcl)).thenReturn(dummyJob);
+
+        MvcResult result = mockMvc
+                .perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .content(JsonUtils.convertToJsonString(request)))
+                .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andReturn();
+
+        verify(jobsService, times(1)).submitJobString(dummyJcl);
+        verifyNoMoreInteractions(jobsService);
+        JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
+    }
+
+    @Test
+    @Ignore("Re-visit validation later")
+    public void submit_jcl_string_with_invalid_jcl_should_be_converted_to_error_message() throws Exception {
+        ApiError expectedError = ApiError.builder()
+                .message(MessageFormat.format("Invalid field {0} supplied to object {1} - {2}", "jcl",
+                        "submitJobStringRequest", "JCL string can't be empty"))
+                .status(HttpStatus.BAD_REQUEST).build();
+        String expectedJsonString = JsonUtils.convertToJsonString(expectedError);
+
+        MvcResult result = mockMvc
+                .perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                        .content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(""))))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn();
+        verifyNoMoreInteractions(jobsService);
+        JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
     }
 }
