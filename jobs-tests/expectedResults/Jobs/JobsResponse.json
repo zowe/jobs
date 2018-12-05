@@ -1,1 +1,11 @@
-{"owner":"${ATLAS.USERNAME}","jobId":"${JOBID}","subsystem":"JES2","type":"JOB","executionClass":"A","returnCode":"${ANY}","jobName":"${JOBNAME}","status":"ALL","phaseName":"${ANY}"}
+{
+	"owner": "${ATLAS.USERNAME}",
+	"jobId": "${JOBID}",
+	"subsystem": "JES2",
+	"type": "JOB",
+	"executionClass": "A",
+	"returnCode": "${ANY}",
+	"jobName": "${JOBNAME}",
+	"status": "ALL",
+	"phaseName": "${ANY}"
+}

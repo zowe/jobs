@@ -1,1 +1,15 @@
-[{"name":"${JOBNAME}", "jobInstances":[{"jobId":"${JOBID}","jobName":"${JOBNAME}","owner":"${ATLAS.USERNAME}","type":"JOB", "status":"ACTIVE","returnCode":null}]}]
+[
+	{
+		"name": "${JOBNAME}",
+		"jobInstances": [
+			{
+				"jobId": "${JOBID}",
+				"jobName": "${JOBNAME}",
+				"owner": "${ATLAS.USERNAME}",
+				"type": "JOB",
+				"status": "ACTIVE",
+				"returnCode": null
+			}
+		]
+	}
+]

@@ -11,7 +11,9 @@ package org.zowe.jobs.services;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -135,7 +137,7 @@ public class ZosmfJobsService implements JobsService {
             requestBuilder.addHeader("X-IBM-Intrdr-Recfm", "F");
             requestBuilder.addHeader("X-IBM-Intrdr-Lrecl", "80");
             requestBuilder.addHeader("X-IBM-Intrdr-Mode", "TEXT");
-            requestBuilder.addHeader("Accept", ContentType.TEXT_PLAIN.getMimeType());
+            // requestBuilder.addHeader("Accept", ContentType.TEXT_PLAIN.getMimeType());
             requestBuilder.addHeader("Content-type", ContentType.TEXT_PLAIN.getMimeType());
 
             HttpResponse response = zosmfconnector.request(requestBuilder);
@@ -179,7 +181,7 @@ public class ZosmfJobsService implements JobsService {
             }
         } catch (
 
-                IOException e) {
+        IOException e) {
             // TODO - error handle
             e.printStackTrace();
         }

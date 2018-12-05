@@ -11,6 +11,7 @@ package org.zowe.jobs.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -44,12 +45,16 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class,
-        ContentType.class})
+@PrepareForTest({ ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class,
+        ContentType.class })
 public class ZosmfJobsServiceTest extends ZoweApiTest {
 
     private static final String BASE_URL = "https://dummy.com/zosmf/";
@@ -148,8 +153,32 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         checkExceptionThrownAndVerifyCalls(prefix, owner, expectedException, response);
     }
 
+    @Test
+    public void submit_job_string_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String jclString = "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440\n" + "//*        TEST JOB\n"
+                + "//UNIT     EXEC PGM=IEFBR14\n";
+
+        Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
+                "Job is on the hard copy queue", "CANCELED");
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
+
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", jclString);
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.submitJobString(jclString));
+
+        verifyInteractions(requestBuilder);
+        verify(requestBuilder).addHeader("Content-type", ContentType.TEXT_PLAIN.getMimeType());
+        verify(requestBuilder).addHeader("X-IBM-Intrdr-Class", "A");
+        verify(requestBuilder).addHeader("X-IBM-Intrdr-Recfm", "F");
+        verify(requestBuilder).addHeader("X-IBM-Intrdr-Lrecl", "80");
+        verify(requestBuilder).addHeader("X-IBM-Intrdr-Mode", "TEXT");
+    }
+
     private void checkExceptionThrownAndVerifyCalls(String prefix, String owner, Exception expectedException,
-                                                    HttpResponse response) throws IOException, Exception {
+            HttpResponse response) throws IOException, Exception {
 
         String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
         RequestBuilder requestBuilder = mockGetBuilder(path);
@@ -167,7 +196,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     private static Job createJob(String id, String jobName, String owner, String type, JobStatus status, String phase,
-                                 String returnCode) {
+            String returnCode) {
         return Job.builder().jobId(id) // $NON-NLS-1$
                 .jobName(jobName) // $NON-NLS-1$
                 .owner(owner) // $NON-NLS-1$
@@ -192,6 +221,19 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
         when(RequestBuilder.delete(BASE_URL + relativeUri)).thenReturn(builder);
+        return builder;
+    }
+
+    private RequestBuilder mockPutBuilder(String relativeUri, String string) throws Exception {
+        RequestBuilder builder = mock(RequestBuilder.class);
+
+        StringEntity stringEntity = mock(StringEntity.class);
+        PowerMockito.whenNew(StringEntity.class).withArguments(string).thenReturn(stringEntity);
+
+        mockStatic(RequestBuilder.class);
+        when(RequestBuilder.put(BASE_URL + relativeUri)).thenReturn(builder);
+        when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
+        when(builder.setEntity(stringEntity)).thenReturn(builder);
         return builder;
     }
 

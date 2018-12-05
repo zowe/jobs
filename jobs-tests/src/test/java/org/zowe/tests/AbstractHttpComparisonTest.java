@@ -11,6 +11,7 @@ package org.zowe.tests;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,7 +20,12 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -31,7 +37,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,7 +94,7 @@ public abstract class AbstractHttpComparisonTest {
      *                               body will be skipped
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
-                                        int expectedReturnCode) {
+            int expectedReturnCode) {
         runAndVerifyHTTPRequest(relativeURI, HTTPmethodType, expectedResultFilePath, expectedReturnCode, null, false,
                 false, null);
     }
@@ -106,7 +116,7 @@ public abstract class AbstractHttpComparisonTest {
      *                               body will be skipped
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
-                                        int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex) {
+            int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex) {
         runAndVerifyHTTPRequest(relativeURI, HTTPmethodType, expectedResultFilePath, expectedReturnCode,
                 substitutionVars, treatExpectedValueAsRegex, false, null);
     }
@@ -128,8 +138,8 @@ public abstract class AbstractHttpComparisonTest {
      *                               body will be skipped
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
-                                        int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
-                                        StringEntity jsonContent) {
+            int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
+            StringEntity jsonContent) {
         runAndVerifyHTTPRequest(relativeURI, HTTPmethodType, expectedResultFilePath, expectedReturnCode,
                 substitutionVars, treatExpectedValueAsRegex, false, jsonContent);
     }
@@ -164,29 +174,29 @@ public abstract class AbstractHttpComparisonTest {
      *                                  for array order
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
-                                        int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
-                                        boolean allowUnorderedJSONArrays, StringEntity jsonContent) {
+            int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
+            boolean allowUnorderedJSONArrays, StringEntity jsonContent) {
         try {
             System.out.println("\tRunning test: " + getClass().getSimpleName() + ". Expected Result File: "
                     + expectedResultFilePath + ". Using: " + HTTPmethodType + " for URI path: " + relativeURI);
 
             HttpResponse resp = null;
             switch (HTTPmethodType) {
-                case HttpGet.METHOD_NAME:
-                    resp = sendGetRequest(relativeURI);
-                    break;
-                case HttpPost.METHOD_NAME:
-                    resp = sendPostRequest(relativeURI, jsonContent);
-                    break;
-                case HttpPut.METHOD_NAME:
-                    resp = sendPutRequest(relativeURI, jsonContent);
-                    break;
-                case HttpDelete.METHOD_NAME:
-                    resp = sendDeleteRequest(relativeURI);
-                    break;
-                default:
-                    Assert.fail("Unknown HTTP method: " + HTTPmethodType);
-                    break;
+            case HttpGet.METHOD_NAME:
+                resp = sendGetRequest(relativeURI);
+                break;
+            case HttpPost.METHOD_NAME:
+                resp = sendPostRequest(relativeURI, jsonContent);
+                break;
+            case HttpPut.METHOD_NAME:
+                resp = sendPutRequest(relativeURI, jsonContent);
+                break;
+            case HttpDelete.METHOD_NAME:
+                resp = sendDeleteRequest(relativeURI);
+                break;
+            default:
+                Assert.fail("Unknown HTTP method: " + HTTPmethodType);
+                break;
             }
 
             if (expectedReturnCode <= 0)
@@ -298,7 +308,7 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     private static HttpResponse buildAndExecuteClientMethod(HttpEntityEnclosingRequestBase method, String relativeURI,
-                                                            StringEntity jsonContent) throws Exception {
+            StringEntity jsonContent) throws Exception {
 
         // allow self-signed certificates and allow server hostnames that do not match
         // the hostname in the certificate
@@ -329,7 +339,7 @@ public abstract class AbstractHttpComparisonTest {
 
     /**
      * @return A client object for subsequent REST calls to z/OSMF. This method
-     * bypasses the self-signed certificate issue with z/OSMF
+     *         bypasses the self-signed certificate issue with z/OSMF
      * @throws Exception
      */
     public static HttpClient createIgnoreSSLClient() throws Exception {
@@ -337,7 +347,7 @@ public abstract class AbstractHttpComparisonTest {
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(USER, PASSWORD));
 
         SSLContext sslcontext = SSLContext.getInstance("TLS");
-        sslcontext.init(null, new TrustManager[]{new X509TrustManager() {
+        sslcontext.init(null, new TrustManager[] { new X509TrustManager() {
             @Override
             public void checkClientTrusted(X509Certificate[] arg0, String arg1) throws CertificateException {
             }
@@ -400,11 +410,11 @@ public abstract class AbstractHttpComparisonTest {
      * @param actualResultsBody      - the string content to compare against the
      *                               expected result file contents
      * @return - a string describing the comparison error, if any. Returns null if
-     * comparison succeeds
+     *         comparison succeeds
      * @throws IOException
      */
     public static String compareToExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,
-                                                      Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedJSONArrays)
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedJSONArrays)
             throws IOException {
         // if the expected result file ends with .json, use a JSON-specific comparison
         if (expectedResultFileDataPath.endsWith(".json"))
@@ -422,11 +432,11 @@ public abstract class AbstractHttpComparisonTest {
      * @param actualResultsBody      - the string content to compare against the
      *                               expected result file contents
      * @return - a string describing the comparison error, if any. Returns null if
-     * comparison succeeds
+     *         comparison succeeds
      * @throws IOException
      */
     public static String compareToJSONExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,
-                                                          Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays)
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays)
             throws IOException {
 
         JsonElement jsArtifact1 = JsonUtils.readFileAsJsonElement(Paths.get(expectedResultFileDataPath));
@@ -448,11 +458,11 @@ public abstract class AbstractHttpComparisonTest {
      * @param actualResultsBody      - the string content to compare against the
      *                               expected result file contents
      * @return - a string describing the comparison error, if any. Returns null if
-     * comparison succeeds
+     *         comparison succeeds
      * @throws IOException
      */
     public static String compareToTextExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,
-                                                          Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex) throws IOException {
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex) throws IOException {
         String expectedResultBody = textFromFile(new File(expectedResultFileDataPath));
 
         // replace test-specific substitution variables in the expected result file with
