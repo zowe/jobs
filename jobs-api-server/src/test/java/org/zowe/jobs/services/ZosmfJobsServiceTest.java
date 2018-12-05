@@ -11,7 +11,6 @@ package org.zowe.jobs.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
