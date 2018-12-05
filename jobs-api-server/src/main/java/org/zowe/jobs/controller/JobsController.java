@@ -9,11 +9,11 @@
  */
 package org.zowe.jobs.controller;
 
-import java.net.URI;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +33,10 @@ import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.validation.Valid;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
@@ -50,15 +47,6 @@ public class JobsController {
 
     @Autowired
     private JobsService jobsService;
-
-    private final ObjectMapper objectMapper;
-    private final HttpServletRequest request;
-
-    @Autowired
-    public JobsController(ObjectMapper objectMapper, HttpServletRequest request) {
-        this.objectMapper = objectMapper;
-        this.request = request;
-    }
 
     @GetMapping(value = "/username", produces = { "application/json" })
     @ApiOperation(value = "Get current userid", nickname = "getCurrentUserName", notes = "This API returns the caller's current TSO userid.", response = String.class, tags = {
@@ -101,7 +89,7 @@ public class JobsController {
 //            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
 //        return jobsService.getJob(jobName, jobId);
 //    }
-//
+
 //    @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
 //    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This api purges a Job", tags = {
 //            "JES job APIs", })
@@ -112,7 +100,7 @@ public class JobsController {
 //        jobsService.purgeJob(jobName, jobId);
 //        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 //    }
-//
+
 //    @PostMapping(value = "", produces = { "application/json" })
 //    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For non fully qualified use TEST.CNTL(TESTJOBX). For Unix files use /u/myjobs/job1.", tags = {
 //            "JES job APIs", })

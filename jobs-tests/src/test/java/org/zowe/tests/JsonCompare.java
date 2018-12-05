@@ -30,8 +30,8 @@ public class JsonCompare {
     public static final boolean STRICT_EQUAL = false;
 
     public static String compare(JsonElement expectedResult, JsonElement actualResult,
-                                 Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
-                                 boolean useStrictArrayOrderCompare) {
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
+            boolean useStrictArrayOrderCompare) {
         String result = null;
         result = compareJsonArtifacts(expectedResult, actualResult);
         if (null != result)
@@ -47,7 +47,7 @@ public class JsonCompare {
     }
 
     private static String compareValues(String baseLocation, Object expectedResultValue, Object actualResultValue,
-                                        Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
         if (expectedResultValue instanceof JsonObject) {
             if (!(actualResultValue instanceof JsonObject)) {
                 return "JSON types don't match: " + baseLocation + ". Value: \"" + expectedResultValue
@@ -84,17 +84,17 @@ public class JsonCompare {
 
                 return matcher.matches() ? null
                         : "JSON objects not equal: " + baseLocation + ". Expected Result value is: \""
-                        + expectedResultValue + "\" but Actual Result is: \"" + actualResultValue + "\"";
+                                + expectedResultValue + "\" but Actual Result is: \"" + actualResultValue + "\"";
 
             } else {
                 return (expectedResultValue).equals(actualResultValue) ? null
                         : "JSON objects not equal: " + baseLocation + ". Expected Result value is: \""
-                        + expectedResultValue + "\" but Actual Result is: \"" + actualResultValue + "\"";
+                                + expectedResultValue + "\" but Actual Result is: \"" + actualResultValue + "\"";
             }
         } else if (expectedResultValue == null) {
             return actualResultValue == null ? null
                     : "JSON objects not equal: " + baseLocation
-                    + ". Expected Result value is null but Actual Result is: \"" + actualResultValue + "\"";
+                            + ". Expected Result value is null but Actual Result is: \"" + actualResultValue + "\"";
         } else {
             return "Expected Result file JSONArtifact contains invalid object for key: " + baseLocation
                     + ". \nObject class is: " + expectedResultValue.getClass().getSimpleName() + "\"";
@@ -102,7 +102,7 @@ public class JsonCompare {
     }
 
     public static String compareJsonArrays(JsonArray expectedResult, JsonArray actualResult,
-                                           Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
         int i = 0;
 
         // if JSON arrays are allowed to be unordered, just sort them and let the
@@ -142,7 +142,7 @@ public class JsonCompare {
 
     @SuppressWarnings("unchecked")
     public static String compareJsonObjects(JsonObject expectedResult, JsonObject actualResult,
-                                            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
+            Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex, boolean allowUnorderedArrays) {
         int bSize = expectedResult.size();
         int tSize = actualResult.size();
         boolean subset = false;

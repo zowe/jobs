@@ -8,32 +8,32 @@
  * Copyright IBM Corporation 2018
  */
 
- package org.zowe.jobs.model;
+package org.zowe.jobs.model;
+
+import org.springframework.util.StringUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.util.StringUtils;
-
 public class JclStringValidator implements ConstraintValidator<ValidJclString, String> {
 
-	@Override
-	public void initialize(ValidJclString jclString) {
-	}
+    @Override
+    public void initialize(ValidJclString jclString) {
+    }
 
-	@Override
-	public boolean isValid(String jcl, ConstraintValidatorContext constraintContext) {
-		if (!StringUtils.hasText(jcl)) {
-			addError(constraintContext, "JCL string can't be empty");
-			return false;
-		}
+    @Override
+    public boolean isValid(String jcl, ConstraintValidatorContext constraintContext) {
+        if (!StringUtils.hasText(jcl)) {
+            addError(constraintContext, "JCL string can't be empty");
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private void addError(ConstraintValidatorContext constraintContext, String message) {
-		constraintContext.disableDefaultConstraintViolation();
-		constraintContext.buildConstraintViolationWithTemplate(message).addConstraintViolation();
-	}
+    private void addError(ConstraintValidatorContext constraintContext, String message) {
+        constraintContext.disableDefaultConstraintViolation();
+        constraintContext.buildConstraintViolationWithTemplate(message).addConstraintViolation();
+    }
 
 }

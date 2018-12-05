@@ -9,20 +9,6 @@
  */
 package org.zowe.jobs.controller;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -48,6 +34,20 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ZosUtils.class })
@@ -210,5 +210,28 @@ public class JobsControllerTest extends ZoweApiTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn();
         verifyNoMoreInteractions(jobsService);
         JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
+    }
+
+    @Test
+    public void submit_jcl_string_with_exception_should_be_converted_to_error_message() throws Exception {
+
+        String invalidOwner = "DUMMY_OWNER";
+
+        ApiError expectedError = ApiError.builder()
+                .message(MessageFormat.format("An invalid job owner of ''{0}'' was supplied", invalidOwner))
+                .status(HttpStatus.BAD_REQUEST).build();
+        String expectedJsonString = JsonUtils.convertToJsonString(expectedError);
+
+        InvalidOwnerException zoweException = new InvalidOwnerException(invalidOwner);
+        when(jobsService.getJobs("TESTNAME", invalidOwner, JobStatus.ALL)).thenThrow(zoweException);
+
+        MvcResult result = mockMvc.perform(get("/api/v1/jobs?prefix={prefix}&owner={owner}", "TESTNAME", invalidOwner))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andReturn();
+
+        verify(jobsService, times(1)).getJobs("TESTNAME", invalidOwner, JobStatus.ALL);
+        verifyNoMoreInteractions(jobsService);
+        JSONAssert.assertEquals(expectedJsonString, result.getResponse().getContentAsString(), false);
+
     }
 }

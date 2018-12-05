@@ -1,1 +1,10 @@
-{"owner":"${ATLAS.USERNAME}","jobId":"${JOBID}","subsystem":"CICS","type":"JOB","executionClass":"A","jobName":"${JOBNAME}","status":"${STATUS}", "phaseName":"${ANY}"}
+{
+	"owner": "${ATLAS.USERNAME}",
+	"jobId": "${JOBID}",
+	"subsystem": "CICS",
+	"type": "JOB",
+	"executionClass": "A",
+	"jobName": "${JOBNAME}",
+	"status": "${STATUS}",
+	"phaseName": "${ANY}"
+}
