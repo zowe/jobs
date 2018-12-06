@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +32,10 @@ import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
-import javax.validation.Valid;
-
 import java.net.URI;
 import java.util.List;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/jobs")

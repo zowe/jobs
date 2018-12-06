@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 
 // @EnableApiDiscovery
-@ComponentScan({"org.zowe"})
+@ComponentScan({ "org.zowe" })
 public class JesJobsApplication {
 
     public static void main(String[] args) {

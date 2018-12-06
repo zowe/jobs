@@ -11,9 +11,7 @@ package org.zowe.jobs.services;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
