@@ -12,7 +12,6 @@ package org.zowe.jobs.tests;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonObject;
-
 import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;

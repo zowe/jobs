@@ -11,7 +11,6 @@ package org.zowe.tests;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,12 +36,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -54,6 +47,12 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -289,7 +288,7 @@ public abstract class AbstractHttpComparisonTest {
 
         // add user credentials to the request
         ensureAuthenticationCredentials(method, localContext);
-
+        System.out.println(BASE_URL);
         URI uri = new URI(BASE_URL + relativeURI);
         method.setURI(uri);
         Header[] headers = method.getAllHeaders();
@@ -318,6 +317,7 @@ public abstract class AbstractHttpComparisonTest {
         // add user credentials to the request
         ensureAuthenticationCredentials(method, localContext);
 
+        System.out.println(BASE_URL);
         URI uri = new URI(BASE_URL + relativeURI);
         method.setURI(uri);
         Header[] headers = method.getAllHeaders();
