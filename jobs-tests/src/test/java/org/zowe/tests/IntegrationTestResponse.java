@@ -106,7 +106,7 @@ public class IntegrationTestResponse {
 
     public void shouldReturnError(ApiError expected) throws Exception {
         shouldHaveStatus(expected.getStatus().value());
-        shouldHaveEntity(expected.getMessage());
+        shouldHaveEntity(expected);
     }
 
 }

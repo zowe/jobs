@@ -97,7 +97,7 @@ public class ZosmfJobsService implements JobsService {
                         } else {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
-                                // TODO - improve this if we ever hit
+                                // TODO MAYBE - wrap these exceptions with our own?
                                 throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
                             }
                             // TODO - improve this if we ever hit
@@ -152,24 +152,12 @@ public class ZosmfJobsService implements JobsService {
                     String mimeType = contentType.getMimeType();
                     if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
                         JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
-                        /*
-                         * if (statusCode == HttpStatus.SC_BAD_REQUEST) { if
-                         * (jsonResponse.has("message")) { String zosmfMessage =
-                         * jsonResponse.get("message").getAsString(); if
-                         * ("Value of prefix query parameter is not valid".equals(zosmfMessage)) { throw
-                         * new InvalidPrefixException(queryPrefix); } else if
-                         * ("Value of owner query parameter is not valid".equals(zosmfMessage)) { throw
-                         * new InvalidOwnerException(queryOwner); } else // TODO - improve this if we
-                         * ever hit throw new BadRequestException(zosmfMessage); } else // TODO -
-                         * improve this if we ever hit throw new
-                         * BadRequestException(jsonResponse.toString()); } else {
-                         */
+                        // TODO MAYBE - wrap these exceptions with our own?
                         if (jsonResponse.has("message")) {
                             String zosmfMessage = jsonResponse.get("message").getAsString();
-                            // TODO - improve this if we ever hit
                             throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
                         }
-                        // TODO - improve this if we ever hit
+                        // TODO LATER - improve this if we ever hit
                         throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
                                 jsonResponse.toString());
                     } else {
@@ -179,11 +167,9 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (
-
-        IOException e) {
-            // TODO - error handle
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("submitJobString", e);
+            throw new ServerErrorException(e);
         }
         return job;
     }

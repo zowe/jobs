@@ -27,6 +27,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseUtils;
@@ -136,7 +137,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
             throws Exception {
 
         HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
-        checkExceptionThrownAndVerifyCalls(prefix, owner, expectedException, response);
+        checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
     }
 
     @Test
@@ -150,7 +151,19 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         Exception expectedException = new NoZosmfResponseEntityException(status, path);
 
         HttpResponse response = mockResponse(status.value());
-        checkExceptionThrownAndVerifyCalls(prefix, owner, expectedException, response);
+        checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
+    }
+
+    private void checkExceptionThrownForGetJobsAndVerifyCalls(String prefix, String owner, Exception expectedException,
+            HttpResponse response) throws IOException, Exception {
+
+        String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
+        RequestBuilder requestBuilder = mockGetBuilder(path);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, JobStatus.ALL));
+
+        verifyInteractions(requestBuilder);
     }
 
     @Test
@@ -177,15 +190,39 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verify(requestBuilder).addHeader("X-IBM-Intrdr-Mode", "TEXT");
     }
 
-    private void checkExceptionThrownAndVerifyCalls(String prefix, String owner, Exception expectedException,
-            HttpResponse response) throws IOException, Exception {
+    @Test
+    public void submit_job_string_with_no_slash_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Submit input data does not start with a slash");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls("junkJCL\n", "zosmf_submitJcl_noSlash.json",
+                expectedException);
+    }
 
-        String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
-        RequestBuilder requestBuilder = mockGetBuilder(path);
+    @Test
+    public void submit_job_string_with_bad_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Job input was not recognized by system as a job");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls("//But still junkJCL\n", "zosmf_submitJcl_invalid.json",
+                expectedException);
+    }
+
+    @Test
+    public void submit_job_string_with_too_long_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Job submission error. Record length 103 too long for JCL submission, maxlen=80");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls(
+                "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440//*        TEST JOB//UNIT     EXEC PGM=IEFBR14",
+                "zosmf_submitJcl_tooLong.json", expectedException);
+    }
+
+    private void checkExceptionThrownForSubmitJclStringAndVerifyCalls(String badJcl, String responsePath,
+            Exception expectedException) throws IOException, Exception {
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
-        shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, JobStatus.ALL));
-
+        shouldThrow(expectedException, () -> jobsService.submitJobString(badJcl));
         verifyInteractions(requestBuilder);
     }
 
