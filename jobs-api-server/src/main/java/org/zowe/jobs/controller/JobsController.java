@@ -122,7 +122,6 @@ public class JobsController {
 //        return ResponseEntity.created(location).build();
 //    }
 
-    // TODO - this isn't properly tested - just added for the get integration tests
     @PostMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
             "JES job APIs", })

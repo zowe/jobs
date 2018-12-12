@@ -15,7 +15,6 @@ import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -38,12 +37,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
     static final String TEST_JCL_PDS = USER.toUpperCase() + ".TEST.JCL";
 
-    @BeforeClass
-    public static void setUpJobDatasetsIfRequired() throws Exception {
-        // TODO - fix AbstractDatasetsIntegrationTest.initialiseDatasetsIfNescessary();
-
-    }
-
     static Job submitJobAndPoll(String testJobName) throws Exception {
         return submitJobAndPoll(testJobName, null);
     }
@@ -56,11 +49,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         assertPoll(jobName, jobId, waitForState);
         return job;
     }
-
-    // TODO - work out better solution?
-//    static String getTestJclMemberPath(String member) {
-//        return USER.toUpperCase() + ".TEST.JCL(" + member + ")";
-//    }
 
     public static Job submitJobString(String jobFile) throws Exception {
         return submitJobJclStringFromFile(jobFile).shouldHaveStatusCreated().getEntityAs(Job.class);

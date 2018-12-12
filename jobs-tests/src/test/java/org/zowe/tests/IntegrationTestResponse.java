@@ -17,6 +17,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
 import org.zowe.api.common.errors.ApiError;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.JsonUtils;
 
 import java.io.IOException;
@@ -107,6 +108,10 @@ public class IntegrationTestResponse {
     public void shouldReturnError(ApiError expected) throws Exception {
         shouldHaveStatus(expected.getStatus().value());
         shouldHaveEntity(expected);
+    }
+
+    public void shouldReturnException(ZoweApiRestException exception) throws Exception {
+        shouldReturnError(exception.getApiError());
     }
 
 }
