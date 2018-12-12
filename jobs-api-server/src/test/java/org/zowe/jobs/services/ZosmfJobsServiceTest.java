@@ -11,6 +11,7 @@ package org.zowe.jobs.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -32,6 +33,8 @@ import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
+import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -166,6 +169,57 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     @Test
+    public void get_job_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String jobName = "AJOB";
+        String jobId = "Job12345";
+
+        Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
+                "Job is on the hard copy queue", "CANCELED");
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobResponse.json"));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.getJob(jobName, jobId));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_for_non_existing_jobname_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        checkExceptionAndVerify(jobName, jobId, expectedException, "zosmf_getJob_noJobNameResponse.json");
+    }
+
+    @Test
+    public void get_job_for_non_existing_jobid_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "JOBhjh4";
+
+        Exception expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        checkExceptionAndVerify(jobName, jobId, expectedException, "zosmf_getJob_noJobIdResponse.json");
+    }
+
+    private void checkExceptionAndVerify(String jobName, String jobId, Exception expectedException, String file)
+            throws IOException, Exception {
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(file));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJob(jobName, jobId));
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
     public void submit_job_string_should_call_zosmf_and_parse_response_correctly() throws Exception {
         String jclString = "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440\n" + "//*        TEST JOB\n"
                 + "//UNIT     EXEC PGM=IEFBR14\n";
@@ -212,6 +266,23 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         checkExceptionThrownForSubmitJclStringAndVerifyCalls(
                 "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440//*        TEST JOB//UNIT     EXEC PGM=IEFBR14",
                 "zosmf_submitJcl_tooLong.json", expectedException);
+    }
+
+    // TODO NOW - fix once CIM problem resolved on 3b
+    @Test
+    public void purge_job_string_should_call_zosmf_correctly() throws Exception {
+        String jobName = "AJOB";
+        String jobId = "Job12345";
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
+
+        RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        jobsService.purgeJob(jobName, jobId);
+
+        verifyInteractions(requestBuilder);
     }
 
     private void checkExceptionThrownForSubmitJclStringAndVerifyCalls(String badJcl, String responsePath,

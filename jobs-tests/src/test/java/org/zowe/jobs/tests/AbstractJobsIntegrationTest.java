@@ -12,6 +12,9 @@ package org.zowe.jobs.tests;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonObject;
+
+import org.apache.http.HttpStatus;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;
@@ -50,9 +53,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         Job job = submitJobString(testJobName);
         String jobName = job.getJobName();
         String jobId = job.getJobId();
-        // TODO - HACK whilst no get implemented
-        Thread.sleep(5000);
-        // assertPoll(jobName, jobId, waitForState);
+        assertPoll(jobName, jobId, waitForState);
         return job;
     }
 
@@ -82,40 +83,49 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 //    }
 
     public static IntegrationTestResponse purgeJob(Job job) throws Exception {
-        // TODO LATER - purge not implemented yet
-        return null;// return sendDeleteRequest2(getJobUri(job));
+        return sendDeleteRequest(getJobUri(job));
     }
 
-//    protected static String getJobUri(Job job) {
-//        return JOBS_ROOT_ENDPOINT + "/" + job.getJobName() + "/" + job.getJobId();
-//    }
+    public static IntegrationTestResponse getJob(Job job) throws Exception {
+        return sendGetRequest2(getJobUri(job));
+    }
 
-//    private static void assertPoll(String jobName, String jobId, JobStatus waitForState) throws Exception {
-//        Assert.assertTrue("Failed to verify job submit, jobname:" + jobName + ", jobid:" + jobId,
-//                pollJob(jobName, jobId, waitForState));
-//    }
+    public static IntegrationTestResponse getJob(String jobName, String jobId) throws Exception {
+        return sendGetRequest2(getJobUri(jobName, jobId));
+    }
 
-//    public static boolean pollJob(String jobName, String jobId, JobStatus waitForState) throws Exception {
-//        String uri = JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId;
-//
-//        for (int i = 0; i < 20; i++) {
-//            IntegrationTestResponse response = new IntegrationTestResponse(sendGetRequest(uri));
-//            System.out.println("Response status is: " + response.getStatus());
-//            if (response.getStatus() == HttpStatus.SC_OK) {
-//                if (waitForState != null) {
-//                    Job jobResponse = response.getEntityAs(Job.class);
-//                    System.out.println("Job status is: " + jobResponse.getStatus());
-//                    if (waitForState == jobResponse.getStatus()) {
-//                        return true;
-//                    }
-//                } else {
-//                    return true;
-//                }
-//            }
-//            Thread.sleep(1200);
-//        }
-//        return false;
-//    }
+    private static String getJobUri(String jobName, String jobId) {
+        return JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId;
+    }
+
+    private static String getJobUri(Job job) {
+        return getJobUri(job.getJobName(), job.getJobId());
+    }
+
+    private static void assertPoll(String jobName, String jobId, JobStatus waitForState) throws Exception {
+        Assert.assertTrue("Failed to verify job submit, jobname:" + jobName + ", jobid:" + jobId,
+                pollJob(jobName, jobId, waitForState));
+    }
+
+    public static boolean pollJob(String jobName, String jobId, JobStatus waitForState) throws Exception {
+        for (int i = 0; i < 20; i++) {
+            IntegrationTestResponse response = getJob(jobName, jobId);
+            System.out.println("Response status is: " + response.getStatus());
+            if (response.getStatus() == HttpStatus.SC_OK) {
+                if (waitForState != null) {
+                    Job jobResponse = response.getEntityAs(Job.class);
+                    System.out.println("Job status is: " + jobResponse.getStatus());
+                    if (waitForState == jobResponse.getStatus()) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            Thread.sleep(1200);
+        }
+        return false;
+    }
 
     static HashMap<String, String> getSubstitutionVars(Job job) {
         HashMap<String, String> substitutionVars = new HashMap<>();

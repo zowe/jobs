@@ -1,1 +1,4 @@
-{"message":"Could not find any steps in jobname '$MASCOMM' with jobid = 'STC00001'","status":"fail"}
+{
+	"message": "Could not find any steps in jobname '$MASCOMM' with jobid = 'STC00001'",
+	"status": "fail"
+}

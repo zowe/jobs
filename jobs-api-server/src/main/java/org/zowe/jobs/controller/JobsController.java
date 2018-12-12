@@ -14,12 +14,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,10 +36,10 @@ import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
+import javax.validation.Valid;
+
 import java.net.URI;
 import java.util.List;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
@@ -80,25 +84,25 @@ public class JobsController {
         return owner;
     }
 
-//    @GetMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
-//    @ApiOperation(value = "Get the details of a job for a given job name and identifier", nickname = "getJobByNameAndId", notes = "This API returns the details of a job for a given job name and identifier.", response = Job.class)
-//    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = Job.class) })
-//    public Job getJobByNameAndId(
-//            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-//            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-//        return jobsService.getJob(jobName, jobId);
-//    }
+    @GetMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
+    @ApiOperation(value = "Get the details of a job for a given job name and identifier", nickname = "getJobByNameAndId", notes = "This API returns the details of a job for a given job name and identifier.", response = Job.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = Job.class) })
+    public Job getJobByNameAndId(
+            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+        return jobsService.getJob(jobName, jobId);
+    }
 
-//    @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
-//    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This api purges a Job", tags = {
-//            "JES job APIs", })
-//    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purge succesfully requested") })
-//    public ResponseEntity<Void> purgeJob(
-//            @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
-//            @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
-//        jobsService.purgeJob(jobName, jobId);
-//        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-//    }
+    @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
+    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This api purges a Job", tags = {
+            "JES job APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purge succesfully requested") })
+    public ResponseEntity<Void> purgeJob(
+            @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
+        jobsService.purgeJob(jobName, jobId);
+        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+    }
 
 //    @PostMapping(value = "", produces = { "application/json" })
 //    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For non fully qualified use TEST.CNTL(TESTJOBX). For Unix files use /u/myjobs/job1.", tags = {

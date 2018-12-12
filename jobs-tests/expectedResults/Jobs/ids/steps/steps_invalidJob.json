@@ -1,1 +1,4 @@
-{"message":"Could not find any steps in jobname 'FAKEJOB' with jobid = 'FAKEID'","status":"fail"}
+{
+	"message": "Could not find any steps in jobname 'FAKEJOB' with jobid = 'FAKEID'",
+	"status": "fail"
+}
