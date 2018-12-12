@@ -10,6 +10,7 @@
 
 package org.zowe.jobs.tests;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
@@ -17,6 +18,11 @@ import org.zowe.tests.IntegrationTestResponse;
 
 //TODO LATER - fix to use RestAssured
 public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
+
+    @BeforeClass
+    public static void setUpJobDatasetsIfRequired() throws Exception {
+        // TODO - fix AbstractDatasetsIntegrationTest.initialiseDatasetsIfNescessary();
+    }
 
     @Test
     public void testSubmitJobByString() throws Exception {
@@ -40,7 +46,6 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testSubmitJobByStringWithBadJcl() throws Exception {
-        // TODO - consider passing in exception?
         ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
                 .message("Job input was not recognized by system as a job").build();
         submitJobJclString("//Some bad jcl").shouldReturnError(expected);
@@ -48,7 +53,6 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testSubmitJobByStringWithEmptyJcl() throws Exception {
-        // TODO - consider passing in exception?
         ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
                 .message("Invalid field jcl supplied to object submitJobStringRequest - JCL string can't be empty")
                 .build();
