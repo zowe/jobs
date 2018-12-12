@@ -12,6 +12,7 @@ package org.zowe.tests;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
@@ -105,7 +106,7 @@ public class IntegrationTestResponse {
 
     public void shouldReturnError(ApiError expected) throws Exception {
         shouldHaveStatus(expected.getStatus().value());
-        shouldHaveEntity(expected.getMessage());
+        shouldHaveEntity(expected);
     }
 
 }

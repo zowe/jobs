@@ -11,7 +11,9 @@ package org.zowe.jobs.services;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -28,6 +30,8 @@ import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.BadRequestException;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
+import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -43,7 +47,7 @@ public class ZosmfJobsService implements JobsService {
     @Autowired
     ZosmfConnector zosmfconnector;
 
-    // TODO - review error handling, serviceability
+    // TODO - review error handling, serviceability, refactor out error handling?
 
     @Override
     public List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
@@ -95,7 +99,7 @@ public class ZosmfJobsService implements JobsService {
                         } else {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
-                                // TODO - improve this if we ever hit
+                                // TODO MAYBE - wrap these exceptions with our own?
                                 throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
                             }
                             // TODO - improve this if we ever hit
@@ -116,11 +120,72 @@ public class ZosmfJobsService implements JobsService {
         return jobs;
     }
 
-//    @Override
-//    public Job getJob(String jobName, String jobId) {
-//        return null;
-//    }
-//
+    @Override
+    public Job getJob(String jobName, String jobId) {
+
+        String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
+        String requestUrl = zosmfconnector.getFullUrl(urlPath);
+        Job job = null;
+        try {
+            HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode == HttpStatus.SC_OK) {
+                JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
+                job = getJobFromJson(jsonResponse.getAsJsonObject());
+            } else {
+                HttpEntity entity = response.getEntity();
+                // TODO - work out how to tidy when brain is sharper
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
+                                        .equals(zosmfMessage)) {
+                                    throw new JobNameNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
+                                    throw new JobIdNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("getJob", e);
+            throw new ServerErrorException(e);
+        }
+        return job;
+    }
 
     @Override
     public Job submitJobString(String jcl) {
@@ -150,24 +215,12 @@ public class ZosmfJobsService implements JobsService {
                     String mimeType = contentType.getMimeType();
                     if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
                         JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
-                        /*
-                         * if (statusCode == HttpStatus.SC_BAD_REQUEST) { if
-                         * (jsonResponse.has("message")) { String zosmfMessage =
-                         * jsonResponse.get("message").getAsString(); if
-                         * ("Value of prefix query parameter is not valid".equals(zosmfMessage)) { throw
-                         * new InvalidPrefixException(queryPrefix); } else if
-                         * ("Value of owner query parameter is not valid".equals(zosmfMessage)) { throw
-                         * new InvalidOwnerException(queryOwner); } else // TODO - improve this if we
-                         * ever hit throw new BadRequestException(zosmfMessage); } else // TODO -
-                         * improve this if we ever hit throw new
-                         * BadRequestException(jsonResponse.toString()); } else {
-                         */
+                        // TODO MAYBE - wrap these exceptions with our own?
                         if (jsonResponse.has("message")) {
                             String zosmfMessage = jsonResponse.get("message").getAsString();
-                            // TODO - improve this if we ever hit
                             throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
                         }
-                        // TODO - improve this if we ever hit
+                        // TODO LATER - improve this if we ever hit
                         throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
                                 jsonResponse.toString());
                     } else {
@@ -177,18 +230,62 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (
-
-        IOException e) {
-            // TODO - error handle
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.error("submitJobString", e);
+            throw new ServerErrorException(e);
         }
         return job;
     }
 
-//    @Override
-//    public void purgeJob(String jobName, String jobId) {
-//    }
+    @Override
+    public void purgeJob(String jobName, String jobId) {
+        String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
+        String requestUrl = zosmfconnector.getFullUrl(urlPath);
+        try {
+            HttpResponse response = zosmfconnector.request(RequestBuilder.delete(requestUrl));
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode != HttpStatus.SC_ACCEPTED) {
+                HttpEntity entity = response.getEntity();
+                // TODO - work out how to tidy when brain is sharper
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
+                                        .equals(zosmfMessage)) {
+                                    throw new JobNameNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("purgeJob", e);
+            throw new ServerErrorException(e);
+        }
+    }
 //
 //    @Override
 //    public Job submitJob(String file) {

@@ -39,10 +39,19 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     @Test
+    public void testSubmitJobByStringWithBadJcl() throws Exception {
+        // TODO - consider passing in exception?
+        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
+                .message("Job input was not recognized by system as a job").build();
+        submitJobJclString("//Some bad jcl").shouldReturnError(expected);
+    }
+
+    @Test
     public void testSubmitJobByStringWithEmptyJcl() throws Exception {
         // TODO - consider passing in exception?
         ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                .message("No jcl supplied").build();
+                .message("Invalid field jcl supplied to object submitJobStringRequest - JCL string can't be empty")
+                .build();
         submitJobJclString("").shouldReturnError(expected);
     }
 

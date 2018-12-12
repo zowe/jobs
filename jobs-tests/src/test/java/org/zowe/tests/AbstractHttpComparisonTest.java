@@ -11,6 +11,7 @@ package org.zowe.tests;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -36,6 +37,12 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -47,12 +54,6 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -136,7 +137,7 @@ public abstract class AbstractHttpComparisonTest {
      *                               verification of the return code and response
      *                               body will be skipped
      */
-    public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
+    private void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
             int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
             StringEntity jsonContent) {
         runAndVerifyHTTPRequest(relativeURI, HTTPmethodType, expectedResultFilePath, expectedReturnCode,
@@ -172,7 +173,7 @@ public abstract class AbstractHttpComparisonTest {
      *                                  array elements are otherwise the same except
      *                                  for array order
      */
-    public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
+    private void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
             int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
             boolean allowUnorderedJSONArrays, StringEntity jsonContent) {
         try {
@@ -191,7 +192,7 @@ public abstract class AbstractHttpComparisonTest {
                 resp = sendPutRequest(relativeURI, jsonContent);
                 break;
             case HttpDelete.METHOD_NAME:
-                resp = sendDeleteRequest(relativeURI);
+                resp = sendDeleteRequest2(relativeURI);
                 break;
             default:
                 Assert.fail("Unknown HTTP method: " + HTTPmethodType);
@@ -268,12 +269,12 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     // TODO - rename once we move everything over to ITR
-    public static IntegrationTestResponse sendDeleteRequest2(String relativeURI) throws Exception {
+    public static IntegrationTestResponse sendDeleteRequest(String relativeURI) throws Exception {
         HttpResponse response = buildAndExecuteClientMethod(new HttpDelete(), relativeURI);
         return new IntegrationTestResponse(response);
     }
 
-    public HttpResponse sendDeleteRequest(String relativeURI) throws Exception {
+    public HttpResponse sendDeleteRequest2(String relativeURI) throws Exception {
         HttpDelete method = new HttpDelete();
         return buildAndExecuteClientMethod(method, relativeURI);
     }

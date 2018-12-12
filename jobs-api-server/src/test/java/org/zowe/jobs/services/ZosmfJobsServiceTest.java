@@ -11,6 +11,7 @@ package org.zowe.jobs.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -26,11 +27,14 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
+import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -135,7 +139,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
             throws Exception {
 
         HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
-        checkExceptionThrownAndVerifyCalls(prefix, owner, expectedException, response);
+        checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
     }
 
     @Test
@@ -149,7 +153,72 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         Exception expectedException = new NoZosmfResponseEntityException(status, path);
 
         HttpResponse response = mockResponse(status.value());
-        checkExceptionThrownAndVerifyCalls(prefix, owner, expectedException, response);
+        checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
+    }
+
+    private void checkExceptionThrownForGetJobsAndVerifyCalls(String prefix, String owner, Exception expectedException,
+            HttpResponse response) throws IOException, Exception {
+
+        String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
+        RequestBuilder requestBuilder = mockGetBuilder(path);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, JobStatus.ALL));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String jobName = "AJOB";
+        String jobId = "Job12345";
+
+        Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
+                "Job is on the hard copy queue", "CANCELED");
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobResponse.json"));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.getJob(jobName, jobId));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_for_non_existing_jobname_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        checkGetJobExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_BAD_REQUEST,
+                "zosmf_getJob_noJobNameResponse.json");
+    }
+
+    @Test
+    public void get_job_for_non_existing_jobid_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "JOBhjh4";
+
+        Exception expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        checkGetJobExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "zosmf_getJob_noJobIdResponse.json");
+    }
+
+    private void checkGetJobExceptionAndVerify(String jobName, String jobId, Exception expectedException,
+            int statusCode, String file) throws IOException, Exception {
+        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJob(jobName, jobId));
+        verifyInteractions(requestBuilder);
     }
 
     @Test
@@ -176,15 +245,74 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verify(requestBuilder).addHeader("X-IBM-Intrdr-Mode", "TEXT");
     }
 
-    private void checkExceptionThrownAndVerifyCalls(String prefix, String owner, Exception expectedException,
-            HttpResponse response) throws IOException, Exception {
+    @Test
+    public void submit_job_string_with_no_slash_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Submit input data does not start with a slash");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls("junkJCL\n", "zosmf_submitJcl_noSlash.json",
+                expectedException);
+    }
 
-        String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
-        RequestBuilder requestBuilder = mockGetBuilder(path);
+    @Test
+    public void submit_job_string_with_bad_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Job input was not recognized by system as a job");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls("//But still junkJCL\n", "zosmf_submitJcl_invalid.json",
+                expectedException);
+    }
+
+    @Test
+    public void submit_job_string_with_too_long_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
+        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Job submission error. Record length 103 too long for JCL submission, maxlen=80");
+        checkExceptionThrownForSubmitJclStringAndVerifyCalls(
+                "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440//*        TEST JOB//UNIT     EXEC PGM=IEFBR14",
+                "zosmf_submitJcl_tooLong.json", expectedException);
+    }
+
+    // TODO NOW - fix once CIM problem resolved on 3b
+    @Test
+    public void purge_job_string_should_call_zosmf_correctly() throws Exception {
+        String jobName = "AJOB";
+        String jobId = "Job12345";
+
+        HttpResponse response = mockResponse(HttpStatus.SC_ACCEPTED);
+
+        RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
-        shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, JobStatus.ALL));
+        jobsService.purgeJob(jobName, jobId);
 
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void purge_job_for_non_existing_job_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST,
+                loadTestFile("zosmf_getJob_noJobNameResponse.json"));
+
+        RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.purgeJob(jobName, jobId));
+        verifyInteractions(requestBuilder);
+    }
+
+    private void checkExceptionThrownForSubmitJclStringAndVerifyCalls(String badJcl, String responsePath,
+            Exception expectedException) throws IOException, Exception {
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.submitJobString(badJcl));
         verifyInteractions(requestBuilder);
     }
 

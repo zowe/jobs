@@ -19,9 +19,9 @@ public interface JobsService {
 
     List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
 
-//    Job getJob(String jobName, String jobId);
-//
-//    void purgeJob(String jobName, String jobId);
+    Job getJob(String jobName, String jobId);
+
+    void purgeJob(String jobName, String jobId);
 //
 //    Job submitJobFile(String file);
 

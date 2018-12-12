@@ -1,1 +1,6 @@
-{"status":"success","data":{"steps":[]}}
+{
+	"status": "success",
+	"data": {
+		"steps": []
+	}
+}

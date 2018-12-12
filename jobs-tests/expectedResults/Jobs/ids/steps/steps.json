@@ -1,1 +1,7 @@
-[{"program":"TSTP0001","name":"UNIT","step":1}]
+[
+	{
+		"program": "TSTP0001",
+		"name": "UNIT",
+		"step": 1
+	}
+]
