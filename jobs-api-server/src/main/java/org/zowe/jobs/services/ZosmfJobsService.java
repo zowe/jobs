@@ -243,11 +243,48 @@ public class ZosmfJobsService implements JobsService {
         String requestUrl = zosmfconnector.getFullUrl(urlPath);
         try {
             HttpResponse response = zosmfconnector.request(RequestBuilder.delete(requestUrl));
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode != HttpStatus.SC_ACCEPTED) {
+                HttpEntity entity = response.getEntity();
+                // TODO - work out how to tidy when brain is sharper
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
+                                        .equals(zosmfMessage)) {
+                                    throw new JobNameNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
         } catch (IOException e) {
             log.error("purgeJob", e);
             throw new ServerErrorException(e);
         }
-
     }
 //
 //    @Override

@@ -194,7 +194,8 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         Exception expectedException = new JobNameNotFoundException(jobName, jobId);
 
-        checkExceptionAndVerify(jobName, jobId, expectedException, "zosmf_getJob_noJobNameResponse.json");
+        checkGetJobExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_BAD_REQUEST,
+                "zosmf_getJob_noJobNameResponse.json");
     }
 
     @Test
@@ -204,12 +205,13 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         Exception expectedException = new JobIdNotFoundException(jobName, jobId);
 
-        checkExceptionAndVerify(jobName, jobId, expectedException, "zosmf_getJob_noJobIdResponse.json");
+        checkGetJobExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "zosmf_getJob_noJobIdResponse.json");
     }
 
-    private void checkExceptionAndVerify(String jobName, String jobId, Exception expectedException, String file)
-            throws IOException, Exception {
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(file));
+    private void checkGetJobExceptionAndVerify(String jobName, String jobId, Exception expectedException,
+            int statusCode, String file) throws IOException, Exception {
+        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
@@ -274,7 +276,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         String jobName = "AJOB";
         String jobId = "Job12345";
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
+        HttpResponse response = mockResponse(HttpStatus.SC_ACCEPTED);
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
@@ -282,6 +284,24 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         jobsService.purgeJob(jobName, jobId);
 
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void purge_job_for_non_existing_job_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST,
+                loadTestFile("zosmf_getJob_noJobNameResponse.json"));
+
+        RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.purgeJob(jobName, jobId));
         verifyInteractions(requestBuilder);
     }
 

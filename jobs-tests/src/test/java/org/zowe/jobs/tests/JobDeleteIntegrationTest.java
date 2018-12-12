@@ -10,16 +10,13 @@
 
 package org.zowe.jobs.tests;
 
-import org.apache.http.HttpStatus;
 import org.junit.Test;
+import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 
-    /**
-     * DELETE /api/v1/jobs
-     */
     @Test
     public void testDeleteJob() throws Exception {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
@@ -29,6 +26,9 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
     @Test
     public void testDeleteJobInvalidJob() throws Exception {
         Job job = Job.builder().jobName("DUMMYJOB").jobId("JOB00000").build();
-        purgeJob(job).shouldHaveStatus(HttpStatus.SC_BAD_REQUEST);
+        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), job.getJobId()))
+                .build();
+        purgeJob(job).shouldReturnError(expected);
     }
 }
