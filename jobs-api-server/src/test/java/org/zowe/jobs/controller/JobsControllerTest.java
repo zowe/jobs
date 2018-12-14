@@ -31,6 +31,7 @@ import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
@@ -238,7 +239,7 @@ public class JobsControllerTest extends ZoweApiTest {
 
         when(jobsService.submitJobString(dummyJcl)).thenReturn(dummyJob);
 
-        mockMvc.perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        mockMvc.perform(post("/api/v1/jobs/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(request))).andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)));
@@ -254,7 +255,7 @@ public class JobsControllerTest extends ZoweApiTest {
                 "submitJobStringRequest", "JCL string can't be empty");
         ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.BAD_REQUEST).build();
 
-        mockMvc.perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        mockMvc.perform(post("/api/v1/jobs/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(""))))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
@@ -272,12 +273,50 @@ public class JobsControllerTest extends ZoweApiTest {
 
         when(jobsService.submitJobString(dummyJcl)).thenThrow(new ZoweApiErrorException(expectedError));
 
-        mockMvc.perform(post("/api/v1/jobs").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+        mockMvc.perform(post("/api/v1/jobs/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(dummyJcl))))
                 .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
                 .andExpect(jsonPath("$.message").value(errorMessage));
 
         verify(jobsService, times(1)).submitJobString(dummyJcl);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    @Ignore("WIP")
+    public void submit_jcl_dataset_works() throws Exception {
+        Job dummyJob = Job.builder().jobId("TESTID11").jobName("TESTNAME").status(JobStatus.ACTIVE).build();
+
+        String dummyDataSet = "STEVENH.TEST.JCL(IEFBR14)";
+        SubmitJobFileRequest request = new SubmitJobFileRequest(dummyDataSet);
+
+        when(jobsService.submitJobFile(dummyDataSet)).thenReturn(dummyJob);
+
+        mockMvc.perform(post("/api/v1/jobs/dataset").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(JsonUtils.convertToJsonString(request))).andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)));
+
+        verify(jobsService, times(1)).submitJobFile(dummyDataSet);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    @Ignore("WIP")
+    public void submit_jcl_dataset_should_be_converted_to_error_message() throws Exception {
+
+        String dummyDataSet = "INVALID.TEST.JCL(IEFBR14)";
+        String errorMessage = "Some nonsense about submit failing";
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.I_AM_A_TEAPOT).build();
+
+        when(jobsService.submitJobFile(dummyDataSet)).thenThrow(new ZoweApiErrorException(expectedError));
+
+        mockMvc.perform(post("/api/v1/jobs/dataset").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .content(JsonUtils.convertToJsonString(new SubmitJobFileRequest(dummyDataSet))))
+                .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+                .andExpect(jsonPath("$.message").value(errorMessage));
+
+        verify(jobsService, times(1)).submitJobFile(dummyDataSet);
         verifyNoMoreInteractions(jobsService);
     }
 }

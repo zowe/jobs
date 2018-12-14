@@ -10,11 +10,17 @@
 
 package org.zowe.jobs.tests;
 
+import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
 import org.zowe.tests.IntegrationTestResponse;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.junit.Assert.assertEquals;
 
 //TODO LATER - fix to use RestAssured
 public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
@@ -31,17 +37,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     private void submitJclStringAndVerifyJob(String fileString) throws Exception {
         IntegrationTestResponse submitResponse = submitJobJclStringFromFile(fileString).shouldHaveStatusCreated();
-
-        Job actualJob = submitResponse.getEntityAs(Job.class);
-
-        try {
-            verifyJobIsAsExpected("expectedResults/Jobs/JobsResponse.json", actualJob);
-            String expectedLocation = BASE_URL + JOBS_ROOT_ENDPOINT + "/" + actualJob.getJobName() + "/"
-                    + actualJob.getJobId();
-            submitResponse.shouldHaveLocationHeader(expectedLocation);
-        } finally {
-            purgeJob(actualJob);
-        }
+        verifyJob(submitJobJclStringFromFile(fileString));
     }
 
     @Test
@@ -59,34 +55,32 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         submitJobJclString("").shouldReturnError(expected);
     }
 
-//    // TODO LATER - test submitting other invalid JCL (eg line > 72)
-//
+//     TODO LATER - test submitting other invalid JCL (eg line > 72)
+
+    @Test
+    public void testSubmitJobDataSet() throws Exception {
+        String dataSetPath = getTestJclMemberPath(JOB_IEFBR14);
+        submitAndVerifySuccessfulJob("'" + dataSetPath + "'");
+    }
+
+    @Test
+    public void testPostJobInvalidJobDataSet() throws Exception {
+        submitErrorJobByFileName("'ATLAS.TEST.JCL(INVALID)'", HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "expectedResults/Jobs/Jobs_invalidDataset.txt");
+    }
+
 //    @Test
-//    public void testSubmitJob() throws Exception {
-//        String dataSetPath = getTestJclMemberPath(JOB_IEFBR14);
-//        submitAndVerifySuccessfulJob("'" + dataSetPath + "'");
-//    }
-//
-//    @Test
-//    public void testPostJobNotFullyQualified() throws Exception {
-//        String dataSetPath = getTestJclMemberPath(JOB_IEFBR14).replaceAll(HLQ + ".", "");
-//        submitAndVerifySuccessfulJob(dataSetPath);
-//    }
-//
-//    @Test
-//    public void testPostJobInvalidJob() throws Exception {
-//        submitErrorJobByFileName("'ATLAS.TEST.JCL(INVALID)'", HttpStatus.SC_INTERNAL_SERVER_ERROR,
-//                "expectedResults/Jobs/Jobs_invalidDataset.txt");
-//    }
-//
-//    @Test
-//    @Ignore("https://github.com/gizafoundation/giza-issues/issues/66")
 //    public void testPostJobFromUSS() throws Exception {
 //        String submitJobUssPath = USER_DIRECTORY + "/submitJob";
 //        createUssFileWithJobIfNescessary(submitJobUssPath);
 //        submitAndVerifySuccessfulJob(submitJobUssPath);
 //    }
-//
+
+    // TODO - work out better solution?
+    static String getTestJclMemberPath(String member) {
+        return USER.toUpperCase() + ".TEST.JCL(" + member + ")";
+    }
+
 //    private void createUssFileWithJobIfNescessary(String submitJobUssPath) throws Exception {
 //        if (getAttributes(submitJobUssPath).getStatus() != HttpStatus.SC_OK) {
 //            createFile(submitJobUssPath, null);
@@ -95,33 +89,36 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 //        }
 //    }
 //
-//    private void submitAndVerifySuccessfulJob(String fileName) throws Exception {
-//        submitAndVerifyJob(fileName, "expectedResults/Jobs/JobsResponse.json");
-//    }
-//
-//    private void submitAndVerifyJob(String fileString, String expectedResultFilePath) throws Exception {
-//        IntegrationTestResponse submitResponse = submitJobByFile(fileString).shouldHaveStatusCreated();
-//        Job actualJob = submitResponse.getEntityAs(Job.class);
-//
-//        try {
-//            verifyJobIsAsExpected(expectedResultFilePath, actualJob);
-//            String expectedLocation = baseAtlasURI + JOBS_ROOT_ENDPOINT + "/" + actualJob.getJobName() + "/"
-//                    + actualJob.getJobId();
-//            submitResponse.shouldHaveLocationHeader(expectedLocation);
-//        } finally {
-//            purgeJob(actualJob);
-//        }
-//    }
-//
-//    private void submitErrorJobByFileName(String fileString, int expectedStatus, String expectedErrorFilePath)
-//            throws Exception {
-//        String actualError = submitJobByFile(fileString).shouldHaveStatus(expectedStatus).getEntity();
-//        String expectedError = new String(Files.readAllBytes(Paths.get(expectedErrorFilePath)));
-//
-//        assertEquals(expectedError, actualError);
-//    }
+    private void submitAndVerifySuccessfulJob(String fileName) throws Exception {
+        submitAndVerifyJob(fileName, "expectedResults/Jobs/JobsResponse.json");
+    }
 
-    // TEST sending JCL as string
+    private void submitAndVerifyJob(String fileString, String expectedResultFilePath) throws Exception {
+        verifyJob(submitJobByFile(fileString), expectedResultFilePath);
+    }
 
-    // Test sending null JCL as string
+    private void verifyJob(IntegrationTestResponse submitResponse) throws Exception {
+        verifyJob(submitResponse, "expectedResults/Jobs/JobsResponse.json");
+    }
+
+    private void verifyJob(IntegrationTestResponse submitResponse, String expectedResultFilePath) throws Exception {
+        submitResponse.shouldHaveStatusCreated();
+        Job actualJob = submitResponse.getEntityAs(Job.class);
+        try {
+            verifyJobIsAsExpected(expectedResultFilePath, actualJob);
+            String expectedLocation = BASE_URL + JOBS_ROOT_ENDPOINT + "/" + actualJob.getJobName() + "/"
+                    + actualJob.getJobId();
+            submitResponse.shouldHaveLocationHeader(expectedLocation);
+        } finally {
+            purgeJob(actualJob);
+        }
+    }
+
+    private void submitErrorJobByFileName(String fileString, int expectedStatus, String expectedErrorFilePath)
+            throws Exception {
+        String actualError = submitJobByFile(fileString).shouldHaveStatus(expectedStatus).getEntity();
+        String expectedError = new String(Files.readAllBytes(Paths.get(expectedErrorFilePath)));
+
+        assertEquals(expectedError, actualError);
+    }
 }

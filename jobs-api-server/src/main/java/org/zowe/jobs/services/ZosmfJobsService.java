@@ -238,6 +238,11 @@ public class ZosmfJobsService implements JobsService {
     }
 
     @Override
+    public Job submitJobFile(String file) {
+        return null;
+    }
+
+    @Override
     public void purgeJob(String jobName, String jobId) {
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
         String requestUrl = zosmfconnector.getFullUrl(urlPath);
@@ -286,11 +291,7 @@ public class ZosmfJobsService implements JobsService {
             throw new ServerErrorException(e);
         }
     }
-//
-//    @Override
-//    public Job submitJob(String file) {
-//        return null;
-//    }
+
 //
 //    @Override
 //    public List<JobFile> getJobFiles(String jobName, String jobId) {

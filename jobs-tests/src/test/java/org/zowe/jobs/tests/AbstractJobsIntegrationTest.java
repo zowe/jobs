@@ -62,13 +62,8 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
     static IntegrationTestResponse submitJobJclString(String jclString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("jcl", jclString);
-        return sendPostRequest(JOBS_ROOT_ENDPOINT, body);
+        return sendPostRequest(JOBS_ROOT_ENDPOINT + "string/", body);
     }
-
-//    public static Job submitJobFile(String jobFile) throws Exception {
-//        String jobFileString = "'" + getTestJclMemberPath(jobFile) + "'";
-//        return submitJobByFile(jobFileString).shouldHaveStatusCreated().getEntityAs(Job.class);
-//    }
 
     public static IntegrationTestResponse purgeJob(Job job) throws Exception {
         return sendDeleteRequest(getJobUri(job));
