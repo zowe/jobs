@@ -367,7 +367,60 @@ public class ZosmfJobsService implements JobsService {
 
     @Override
     public List<JobFile> getJobFiles(String jobName, String jobId) {
-        return null;
+        String urlPath = String.format("restjobs/jobs/%s/%s/files", jobName, jobId); //$NON-NLS-1$
+        String requestUrl = zosmfconnector.getFullUrl(urlPath);
+        List<JobFile> jobFiles = new ArrayList<>();
+        try {
+            HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode == HttpStatus.SC_OK) {
+                JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
+
+                for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
+                    jobFiles.add(getJobFileFromJson(jsonElement.getAsJsonObject()));
+                }
+            } else {
+                HttpEntity entity = response.getEntity();
+                // TODO - work out how to tidy when brain is sharper
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
+                                        .equals(zosmfMessage)) {
+                                    throw new JobNameNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO LATER - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("getJob", e);
+            throw new ServerErrorException(e);
+        }
+        return jobFiles;
     }
 
 //    @Override
@@ -391,6 +444,13 @@ public class ZosmfJobsService implements JobsService {
                 .subsystem(returned.get("subsystem").getAsString()) //$NON-NLS-1$
                 .executionClass(returned.get("class").getAsString()) //$NON-NLS-1$
                 .phaseName(returned.get("phase-name").getAsString()) //$NON-NLS-1$
+                .build();
+    }
+
+    private static JobFile getJobFileFromJson(JsonObject returned) {
+        return JobFile.builder().id(returned.get("id").getAsLong()).ddname(returned.get("ddname").getAsString())
+                .recfm(returned.get("recfm").getAsString()).lrecl(returned.get("lrecl").getAsLong())
+                .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
                 .build();
     }
 

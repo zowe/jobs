@@ -1,0 +1,50 @@
+[
+    {
+        "byte-count": 1103,
+        "class": "X",
+        "ddname": "JESMSGLG",
+        "id": 2,
+        "job-correlator": "J0024197WINMVS3BD560D516.......:",
+        "jobid": "JOB24197",
+        "jobname": "ATLJ0000",
+        "lrecl": 133,
+        "procstep": null,
+        "recfm": "UA",
+        "record-count": 20,
+        "records-url": "https://winmvs3b.hursley.ibm.com:32070/zosmf/restjobs/jobs/J0024197WINMVS3BD560D516.......%3A/files/2/records",
+        "stepname": "JES2",
+        "subsystem": "JES2"
+    },
+    {
+        "byte-count": 182,
+        "class": "X",
+        "ddname": "JESJCL",
+        "id": 3,
+        "job-correlator": "J0024197WINMVS3BD560D516.......:",
+        "jobid": "JOB24197",
+        "jobname": "ATLJ0000",
+        "lrecl": 136,
+        "procstep": null,
+        "recfm": "V",
+        "record-count": 3,
+        "records-url": "https://winmvs3b.hursley.ibm.com:32070/zosmf/restjobs/jobs/J0024197WINMVS3BD560D516.......%3A/files/3/records",
+        "stepname": "JES2",
+        "subsystem": "JES2"
+    },
+    {
+        "byte-count": 820,
+        "class": "X",
+        "ddname": "JESYSMSG",
+        "id": 4,
+        "job-correlator": "J0024197WINMVS3BD560D516.......:",
+        "jobid": "JOB24197",
+        "jobname": "ATLJ0000",
+        "lrecl": 137,
+        "procstep": null,
+        "recfm": "VA",
+        "record-count": 13,
+        "records-url": "https://winmvs3b.hursley.ibm.com:32070/zosmf/restjobs/jobs/J0024197WINMVS3BD560D516.......%3A/files/4/records",
+        "stepname": "JES2",
+        "subsystem": "JES2"
+    }
+]
