@@ -11,6 +11,7 @@ package org.zowe.jobs.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -31,6 +32,7 @@ import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.jobs.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
@@ -270,7 +272,64 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
                 "zosmf_submitJcl_tooLong.json", expectedException);
     }
 
-    // TODO NOW - fix once CIM problem resolved on 3b
+    @Test
+    public void submit_job_data_set_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String dataSet = "STEVENH.TEST.JCL(IEFBR14)";
+
+        Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
+                "Job is on the hard copy queue", "CANCELED");
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
+
+        // TODO MAYBE map zosmf model object?
+        JsonObject body = new JsonObject();
+        body.addProperty("file", "//'" + dataSet + "'");
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.submitJobFile(dataSet));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void submit_job_data_set_with_no_member_call_zosmf_parse_and_throw_exception() throws Exception {
+        String dataSet = "STEVENH.TEST.JCL(INVALID)";
+
+        Exception expectedException = new DataSetNotFoundException(dataSet);
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                loadTestFile("zosmf_submitJobByFile_noDatasetMember.json"));
+
+        JsonObject body = new JsonObject();
+        body.addProperty("file", "//'" + dataSet + "'");
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.submitJobFile(dataSet));
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void submit_job_data_set_with_no_data_set_call_zosmf_parse_and_throw_exception() throws Exception {
+        String dataSet = "INVALID.TEST.JCL(IEFBR14)";
+
+        // TODO create exception for this?
+        Exception expectedException = new DataSetNotFoundException(dataSet);
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST,
+                loadTestFile("zosmf_submitJobByFile_noDataset.json"));
+
+        JsonObject body = new JsonObject();
+        body.addProperty("file", "//'" + dataSet + "'");
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.submitJobFile(dataSet));
+        verifyInteractions(requestBuilder);
+    }
+
     @Test
     public void purge_job_string_should_call_zosmf_correctly() throws Exception {
         String jobName = "AJOB";
@@ -352,10 +411,21 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     private RequestBuilder mockPutBuilder(String relativeUri, String string) throws Exception {
-        RequestBuilder builder = mock(RequestBuilder.class);
-
         StringEntity stringEntity = mock(StringEntity.class);
         PowerMockito.whenNew(StringEntity.class).withArguments(string).thenReturn(stringEntity);
+        return mockPutBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPutBuilder(String relativeUri, JsonObject json) throws Exception {
+        StringEntity stringEntity = mock(StringEntity.class);
+        PowerMockito.whenNew(StringEntity.class).withArguments(json.toString(), ContentType.APPLICATION_JSON)
+                .thenReturn(stringEntity);
+
+        return mockPutBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPutBuilder(String relativeUri, StringEntity stringEntity) throws Exception {
+        RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
         when(RequestBuilder.put(BASE_URL + relativeUri)).thenReturn(builder);

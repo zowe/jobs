@@ -65,7 +65,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testPostJobInvalidJobDataSet() throws Exception {
-        submitErrorJobByFileName("'ATLAS.TEST.JCL(INVALID)'", HttpStatus.SC_INTERNAL_SERVER_ERROR,
+        submitErrorJobByFileName("'ATLAS.TEST.JCL(INVALID)'", HttpStatus.SC_NOT_FOUND,
                 "expectedResults/Jobs/Jobs_invalidDataset.txt");
     }
 

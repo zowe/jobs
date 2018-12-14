@@ -62,7 +62,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
     static IntegrationTestResponse submitJobJclString(String jclString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("jcl", jclString);
-        return sendPostRequest(JOBS_ROOT_ENDPOINT + "string/", body);
+        return sendPostRequest(JOBS_ROOT_ENDPOINT + "/string", body);
     }
 
     public static IntegrationTestResponse purgeJob(Job job) throws Exception {
@@ -155,6 +155,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         JsonObject body = new JsonObject();
         body.addProperty("file", fileString);
 
-        return sendPostRequest(JOBS_ROOT_ENDPOINT, body);
+        return sendPostRequest(JOBS_ROOT_ENDPOINT + "/dataset", body);
     }
 }

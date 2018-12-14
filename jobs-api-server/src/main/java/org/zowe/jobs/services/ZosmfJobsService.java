@@ -28,6 +28,7 @@ import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.BadRequestException;
+import org.zowe.jobs.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
@@ -48,6 +49,8 @@ public class ZosmfJobsService implements JobsService {
     ZosmfConnector zosmfconnector;
 
     // TODO - review error handling, serviceability, refactor out error handling?
+    // TODO - use the zomsf error categories to work out errors
+    // https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.izua700/IZUHPINFO_API_Error_Categories.htm?
 
     @Override
     public List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
@@ -238,8 +241,77 @@ public class ZosmfJobsService implements JobsService {
     }
 
     @Override
-    public Job submitJobFile(String file) {
-        return null;
+    public Job submitJobFile(String dataSet) {
+        String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
+
+        String requestUrl = zosmfconnector.getFullUrl(urlPath);
+        Job job = null;
+        try {
+
+            JsonObject body = new JsonObject();
+            body.addProperty("file", "//'" + dataSet + "'");
+
+            StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
+            RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(requestEntity);
+
+            HttpResponse response = zosmfconnector.request(requestBuilder);
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode == HttpStatus.SC_CREATED) {
+                JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
+                job = getJobFromJson(jsonResponse.getAsJsonObject());
+            } else {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        // TODO MAYBE - wrap these exceptions with our own?
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("Data set not found: %s", dataSet).equals(zosmfMessage)) {
+                                    throw new DataSetNotFoundException(dataSet);
+                                } else
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("Error opening input data set: //'%s'", dataSet)
+                                        .equals(zosmfMessage)) {
+                                    throw new DataSetNotFoundException(dataSet);
+                                } else
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO LATER - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("submitJobFile", e);
+            throw new ServerErrorException(e);
+        }
+        return job;
     }
 
     @Override

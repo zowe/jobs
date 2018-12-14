@@ -22,6 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.api.common.exceptions.ZoweApiErrorException;
 import org.zowe.api.common.exceptions.ZoweRestExceptionHandler;
@@ -35,12 +38,14 @@ import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
+import java.net.URI;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -49,11 +54,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ZosUtils.class })
+@PrepareForTest({ ZosUtils.class, ServletUriComponentsBuilder.class })
 public class JobsControllerTest extends ZoweApiTest {
 
     private static final String DUMMY_USER = "A_USER";
@@ -231,7 +237,10 @@ public class JobsControllerTest extends ZoweApiTest {
 
     @Test
     public void submit_jcl_string_works() throws Exception {
-        Job dummyJob = Job.builder().jobId("TESTID11").jobName("TESTNAME").status(JobStatus.ACTIVE).build();
+
+        String jobId = "TESTID11";
+        String jobName = "TESTNAME";
+        Job dummyJob = Job.builder().jobId(jobId).jobName(jobName).status(JobStatus.ACTIVE).build();
 
         String dummyJcl = "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440\n" + "//*        TEST JOB\n"
                 + "//UNIT     EXEC PGM=IEFBR14";
@@ -239,10 +248,14 @@ public class JobsControllerTest extends ZoweApiTest {
 
         when(jobsService.submitJobString(dummyJcl)).thenReturn(dummyJob);
 
+        URI locationUri = new URI("https://jobURI/jobs/" + jobName + "/" + jobId);
+        mockJobUriConstruction(jobName, jobId, locationUri);
+
         mockMvc.perform(post("/api/v1/jobs/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(request))).andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)));
+                .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
+                .andExpect(header().string("Location", locationUri.toString()));
 
         verify(jobsService, times(1)).submitJobString(dummyJcl);
         verifyNoMoreInteractions(jobsService);
@@ -283,26 +296,29 @@ public class JobsControllerTest extends ZoweApiTest {
     }
 
     @Test
-    @Ignore("WIP")
     public void submit_jcl_dataset_works() throws Exception {
-        Job dummyJob = Job.builder().jobId("TESTID11").jobName("TESTNAME").status(JobStatus.ACTIVE).build();
+        String jobId = "TESTID11";
+        String jobName = "TESTNAME";
+        Job dummyJob = Job.builder().jobId(jobId).jobName(jobName).status(JobStatus.ACTIVE).build();
 
         String dummyDataSet = "STEVENH.TEST.JCL(IEFBR14)";
         SubmitJobFileRequest request = new SubmitJobFileRequest(dummyDataSet);
 
         when(jobsService.submitJobFile(dummyDataSet)).thenReturn(dummyJob);
+        URI locationUri = new URI("https://jobURI/jobs/" + jobName + "/" + jobId);
+        mockJobUriConstruction(jobName, jobId, locationUri);
 
         mockMvc.perform(post("/api/v1/jobs/dataset").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(request))).andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)));
+                .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
+                .andExpect(header().string("Location", locationUri.toString()));
 
         verify(jobsService, times(1)).submitJobFile(dummyDataSet);
         verifyNoMoreInteractions(jobsService);
     }
 
     @Test
-    @Ignore("WIP")
     public void submit_jcl_dataset_should_be_converted_to_error_message() throws Exception {
 
         String dummyDataSet = "INVALID.TEST.JCL(IEFBR14)";
@@ -318,5 +334,16 @@ public class JobsControllerTest extends ZoweApiTest {
 
         verify(jobsService, times(1)).submitJobFile(dummyDataSet);
         verifyNoMoreInteractions(jobsService);
+    }
+
+    private void mockJobUriConstruction(String jobName, String jobId, URI uriValue) {
+        ServletUriComponentsBuilder servletUriBuilder = mock(ServletUriComponentsBuilder.class);
+        PowerMockito.mockStatic(ServletUriComponentsBuilder.class);
+        when(ServletUriComponentsBuilder.fromCurrentContextPath()).thenReturn(servletUriBuilder);
+        UriComponentsBuilder uriBuilder = mock(UriComponentsBuilder.class);
+        when(servletUriBuilder.path("/api/v1/jobs/{jobName}/{jobID}")).thenReturn(uriBuilder);
+        UriComponents uriComponents = mock(UriComponents.class);
+        when(uriBuilder.buildAndExpand(jobName, jobId)).thenReturn(uriComponents);
+        when(uriComponents.toUri()).thenReturn(uriValue);
     }
 }

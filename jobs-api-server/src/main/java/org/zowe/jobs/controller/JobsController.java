@@ -106,32 +106,33 @@ public class JobsController {
     }
 
     @PostMapping(value = "string", produces = { "application/json" })
-    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
+    @ApiOperation(value = "Submit a job given a string of JCL", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
             "JES job APIs", })
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
     public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
 
         Job job = jobsService.submitJobString(request.getJcl());
 
-        URI location = createSubmitJobLocationHeader(job);
+        URI location = getJobUri(job);
         return ResponseEntity.created(location).body(job);
     }
 
     @PostMapping(value = "dataset", produces = { "application/json" })
-    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.", tags = {
+    @ApiOperation(value = "Submit a job given a data set", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.", tags = {
             "JES job APIs", })
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
-    public ResponseEntity<?> submitJob(@ApiParam(value = "JSON format input body") SubmitJobFileRequest request) {
+    public ResponseEntity<?> submitJob(@RequestBody SubmitJobFileRequest request) {
 
         String file = request.getFile();
         Job job = jobsService.submitJobFile(file);
 
-        URI location = createSubmitJobLocationHeader(job);
-        return ResponseEntity.created(location).build();
+        URI location = getJobUri(job);
+        return ResponseEntity.created(location).body(job);
     }
 
-    URI createSubmitJobLocationHeader(Job job) {
-        return ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{jobName}/{jobID}")
+    // TODO - work out how to not have to pass controller base path in
+    URI getJobUri(Job job) {
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/jobs/{jobName}/{jobID}")
                 .buildAndExpand(job.getJobName(), job.getJobId()).toUri();
     }
 //
