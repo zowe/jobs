@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
@@ -135,18 +136,18 @@ public class JobsController {
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/jobs/{jobName}/{jobID}")
                 .buildAndExpand(job.getJobName(), job.getJobId()).toUri();
     }
-//
-//    @GetMapping(value = "/{jobName}/ids/{jobId}/files", produces = { "application/json" })
-//    @ApiOperation(value = "Get a list of output file names for a job", nickname = "getJobOutputFiles", notes = "This API returns the output file names for a given job.", response = JobFile.class, responseContainer = "List", tags = {
-//            "JES job APIs", })
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Ok", response = JobFile.class, responseContainer = "List") })
-//    public List<JobFile> getJobOutputFiles(
-//            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-//            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-//
-//        return jobsService.getJobFiles(jobName, jobId);
-//    }
+
+    @GetMapping(value = "/{jobName}/{jobId}/files", produces = { "application/json" })
+    @ApiOperation(value = "Get a list of output file names for a job", nickname = "getJobOutputFiles", notes = "This API returns the output file names for a given job.", response = JobFile.class, responseContainer = "List", tags = {
+            "JES job APIs", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Ok", response = JobFile.class, responseContainer = "List") })
+    public List<JobFile> getJobOutputFiles(
+            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+
+        return jobsService.getJobFiles(jobName, jobId);
+    }
 //
 //    // TODO - do we want to support start and end immediately?
 //    @GetMapping(value = "/{jobName}/ids/{jobId}/files/{fileId}", produces = { "application/json" })

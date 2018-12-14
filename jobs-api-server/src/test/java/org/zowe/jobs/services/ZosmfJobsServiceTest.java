@@ -39,6 +39,7 @@ import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
@@ -220,6 +221,63 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> jobsService.getJob(jobName, jobId));
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_files_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+        JobFile jesmsglg = JobFile.builder().id(2).ddname("JESMSGLG").recfm("UA").lrecl(133).byteCount(1103)
+                .recordCount(20).build();
+        JobFile jesjcl = JobFile.builder().id(3).ddname("JESJCL").recfm("V").lrecl(136).byteCount(182).recordCount(3)
+                .build();
+        JobFile jesysmsg = JobFile.builder().id(4).ddname("JESYSMSG").recfm("VA").lrecl(137).byteCount(820)
+                .recordCount(13).build();
+        List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s/files", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.getJobFiles(jobName, jobId));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_files_for_non_existing_jobname_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        checkGetJobFilesExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_BAD_REQUEST,
+                "zosmf_getJob_noJobNameResponse.json");
+    }
+
+    @Test
+    public void get_job_files_for_non_existing_job_id_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "z000000";
+
+        Exception expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        checkGetJobFilesExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "zosmf_getJobFiles_noJobIdResponse.json");
+    }
+
+    private void checkGetJobFilesExceptionAndVerify(String jobName, String jobId, Exception expectedException,
+            int statusCode, String file) throws IOException, Exception {
+        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+
+        RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s/files", jobName, jobId));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJobFiles(jobName, jobId));
         verifyInteractions(requestBuilder);
     }
 
