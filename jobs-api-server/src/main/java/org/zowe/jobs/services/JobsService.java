@@ -22,10 +22,10 @@ public interface JobsService {
     Job getJob(String jobName, String jobId);
 
     void purgeJob(String jobName, String jobId);
-//
-//    Job submitJobFile(String file);
 
     Job submitJobString(String jclString);
+
+    Job submitJobFile(String file);
 //
 //    List<JobFile> getJobFiles(String jobName, String jobId);
 //

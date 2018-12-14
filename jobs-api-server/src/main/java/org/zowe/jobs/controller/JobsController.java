@@ -33,6 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
@@ -104,25 +105,7 @@ public class JobsController {
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
 
-//    @PostMapping(value = "", produces = { "application/json" })
-//    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For non fully qualified use TEST.CNTL(TESTJOBX). For Unix files use /u/myjobs/job1.", tags = {
-//            "JES job APIs", })
-//    @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
-//    public ResponseEntity<?> submitJob(@ApiParam(value = "JSON format input body") SubmitJobFileRequest request) {
-//
-//        String file = request.getFile();
-//        if (StringUtils.isEmpty(file)) {
-//            // TODO - throw exception
-//            // String error = Messages.getString("Jobs.InvalidSubmitData");
-//            // throw createNotFoundException(error);
-//        }
-//        Job job = jobsService.submitJob(file);
-//
-//        URI location = createSubmitJobLocationHeader(job);
-//        return ResponseEntity.created(location).build();
-//    }
-
-    @PostMapping(value = "", produces = { "application/json" })
+    @PostMapping(value = "string", produces = { "application/json" })
     @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
             "JES job APIs", })
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
@@ -132,6 +115,19 @@ public class JobsController {
 
         URI location = createSubmitJobLocationHeader(job);
         return ResponseEntity.created(location).body(job);
+    }
+
+    @PostMapping(value = "dataset", produces = { "application/json" })
+    @ApiOperation(value = "Submit a job", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.", tags = {
+            "JES job APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
+    public ResponseEntity<?> submitJob(@ApiParam(value = "JSON format input body") SubmitJobFileRequest request) {
+
+        String file = request.getFile();
+        Job job = jobsService.submitJobFile(file);
+
+        URI location = createSubmitJobLocationHeader(job);
+        return ResponseEntity.created(location).build();
     }
 
     URI createSubmitJobLocationHeader(Job job) {
