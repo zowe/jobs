@@ -35,6 +35,7 @@ import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
@@ -364,12 +365,11 @@ public class ZosmfJobsService implements JobsService {
         }
     }
 
-//
-//    @Override
-//    public List<JobFile> getJobFiles(String jobName, String jobId) {
-//        return null;
-//    }
-//
+    @Override
+    public List<JobFile> getJobFiles(String jobName, String jobId) {
+        return null;
+    }
+
 //    @Override
 //    public OutputFile getJobFileRecordsByRange(String jobName, String jobId, String fileId, Integer start,
 //            Integer end) {
