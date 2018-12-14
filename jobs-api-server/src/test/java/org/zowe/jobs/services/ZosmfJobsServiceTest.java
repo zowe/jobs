@@ -258,6 +258,17 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
                 "zosmf_getJob_noJobNameResponse.json");
     }
 
+    @Test
+    public void get_job_files_for_non_existing_job_id_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "z000000";
+
+        Exception expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        checkGetJobFilesExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "zosmf_getJobFiles_noJobIdResponse.json");
+    }
+
     private void checkGetJobFilesExceptionAndVerify(String jobName, String jobId, Exception expectedException,
             int statusCode, String file) throws IOException, Exception {
         HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));

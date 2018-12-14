@@ -42,7 +42,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobOutputFiles() throws Exception {
         System.out.println("> testGetJobOutputFiles()");
 
-        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files";
+        String relativeURI = "jobs/" + job.getJobName() + "/" + job.getJobId() + "/files";
         String httpMethodType = HttpGet.METHOD_NAME;
         String expectedResultFilePath = "expectedResults/Jobs/ids/files/files_regex.txt";
         int expectedReturnCode = HttpStatus.SC_OK;
@@ -63,8 +63,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobOutputFilesInvalidJobNameAndId() throws Exception {
         // TODO MAYBE - use exception?
         ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000"))
-                .build();
+                .message(String.format("No job with name '%s' and id '%s' was found", "z", "z000000")).build();
 
         getJobFiles("z", "z000000").shouldReturnError(expected);
     }

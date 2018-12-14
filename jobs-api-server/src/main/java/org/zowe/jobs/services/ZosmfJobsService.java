@@ -399,6 +399,17 @@ public class ZosmfJobsService implements JobsService {
                             } else
                                 // TODO LATER - improve this if we ever hit
                                 throw new BadRequestException(jsonResponse.toString());
+                        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
+                                    throw new JobIdNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
                         } else {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
