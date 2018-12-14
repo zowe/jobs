@@ -77,7 +77,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         return sendGetRequest2(getJobUri(jobName, jobId));
     }
 
-    private static String getJobUri(String jobName, String jobId) {
+    protected static String getJobUri(String jobName, String jobId) {
         return JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId;
     }
 
