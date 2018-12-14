@@ -284,7 +284,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         // TODO MAYBE map zosmf model object?
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + dataSet + "'");
-        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body.toString());
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
 
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
@@ -304,7 +304,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + dataSet + "'");
-        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body.toString());
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> jobsService.submitJobFile(dataSet));
@@ -323,7 +323,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + dataSet + "'");
-        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body.toString());
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> jobsService.submitJobFile(dataSet));
@@ -411,10 +411,21 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     private RequestBuilder mockPutBuilder(String relativeUri, String string) throws Exception {
-        RequestBuilder builder = mock(RequestBuilder.class);
-
         StringEntity stringEntity = mock(StringEntity.class);
         PowerMockito.whenNew(StringEntity.class).withArguments(string).thenReturn(stringEntity);
+        return mockPutBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPutBuilder(String relativeUri, JsonObject json) throws Exception {
+        StringEntity stringEntity = mock(StringEntity.class);
+        PowerMockito.whenNew(StringEntity.class).withArguments(json.toString(), ContentType.APPLICATION_JSON)
+                .thenReturn(stringEntity);
+
+        return mockPutBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPutBuilder(String relativeUri, StringEntity stringEntity) throws Exception {
+        RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
         when(RequestBuilder.put(BASE_URL + relativeUri)).thenReturn(builder);

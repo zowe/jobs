@@ -251,7 +251,8 @@ public class ZosmfJobsService implements JobsService {
             JsonObject body = new JsonObject();
             body.addProperty("file", "//'" + dataSet + "'");
 
-            RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(new StringEntity(body.toString()));
+            StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
+            RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(requestEntity);
 
             HttpResponse response = zosmfconnector.request(requestBuilder);
             int statusCode = ResponseUtils.getStatus(response);
