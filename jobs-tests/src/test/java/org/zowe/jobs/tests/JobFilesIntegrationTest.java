@@ -75,17 +75,50 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     /**
      * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
      */
-//    @Test
-//    public void testGetJobOutputFileFieldId() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldId()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
-//    }
+    @Test
+    public void testGetJobOutputFileContents() throws Exception {
+        System.out.println("> testGetJobOutputFileFieldId()");
+
+        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2";
+        String httpMethodType = HttpGet.METHOD_NAME;
+        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
+        int expectedReturnCode = HttpStatus.SC_OK;
+
+        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
+    }
+
+    @Test
+    public void testGetJobOutputFileContentsInvalidJobId() throws Exception {
+        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000"))
+                .build();
+
+        getJobFileContent(job.getJobName(), "z000000", 2).shouldReturnError(expected);
+    }
+
+    @Test
+    public void testGetJobOutputFileContentsInvalidJobName() throws Exception {
+        // TODO MAYBE - use exception?
+        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .message(String.format("No job with name '%s' and id '%s' was found", "z", "z000000")).build();
+
+        getJobFileContent("z", "z000000", 2).shouldReturnError(expected);
+    }
+
+    @Test
+    public void testGetJobOutputFileContentsInvalidJobFileId() throws Exception {
+        // TODO MAYBE - use exception?
+        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND).message(String
+                .format("No job file with id '%s' was found for job %s(%s)", 999, job.getJobName(), job.getJobId()))
+                .build();
+
+        getJobFileContent(job.getJobName(), job.getJobId(), 999).shouldReturnError(expected);
+    }
+
+    public static IntegrationTestResponse getJobFileContent(String jobName, String jobId, int fileId) throws Exception {
+        return sendGetRequest2(getJobUri(jobName, jobId) + "/files/" + fileId + "/content");
+    }
+
 //
 //    /**
 //     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
