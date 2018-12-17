@@ -79,7 +79,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobOutputFileContents() throws Exception {
         System.out.println("> testGetJobOutputFileFieldId()");
 
-        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2";
+        String relativeURI = "jobs/" + job.getJobName() + "/" + job.getJobId() + "/files/2/content";
         String httpMethodType = HttpGet.METHOD_NAME;
         String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
         int expectedReturnCode = HttpStatus.SC_OK;
@@ -109,7 +109,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobOutputFileContentsInvalidJobFileId() throws Exception {
         // TODO MAYBE - use exception?
         ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND).message(String
-                .format("No job file with id '%s' was found for job %s(%s)", 999, job.getJobName(), job.getJobId()))
+                .format("No spool file with id '%s' was found for job %s(%s)", 999, job.getJobName(), job.getJobId()))
                 .build();
 
         getJobFileContent(job.getJobName(), job.getJobId(), 999).shouldReturnError(expected);

@@ -150,6 +150,7 @@ public class JobsController {
         return jobsService.getJobFiles(jobName, jobId);
     }
 
+    // TODO - name endpoint records/content? return list of records?
     // TODO - support start and end later
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
     @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = JobFileContent.class, tags = {
