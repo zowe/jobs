@@ -34,6 +34,7 @@ import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
@@ -244,6 +245,48 @@ public class JobsControllerTest extends ZoweApiTest {
                 .andExpect(jsonPath("$.message").value(errorMessage));
 
         verify(jobsService, times(1)).getJobFiles(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    public void test_get_job_file_content() throws Exception {
+
+        JobFileContent jobFileContent = new JobFileContent(
+                "1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\n          //*        TEST JOB\n        2 //UNIT     EXEC PGM=IEFBR14\n");
+
+        String jobName = "TESTNAME";
+        String jobId = "TESTID11";
+        String fileId = "3";
+        when(jobsService.getJobFileContent(jobName, jobId, fileId)).thenReturn(jobFileContent);
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent)));
+
+        verify(jobsService, times(1)).getJobFileContent(jobName, jobId, fileId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    // TODO - refactor with purge with exception?
+    public void get_job_file_content_with_exception_should_be_converted_to_error_message() throws Exception {
+        String errorMessage = "FileId could not be found";
+
+        String jobId = "jobId";
+        String jobName = "jobName";
+        String fileId = "999";
+
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.I_AM_A_TEAPOT).build();
+
+        doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).getJobFileContent(jobName, jobId, fileId);
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId))
+                .andExpect(status().isIAmATeapot())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+                .andExpect(jsonPath("$.message").value(errorMessage));
+
+        verify(jobsService, times(1)).getJobFileContent(jobName, jobId, fileId);
         verifyNoMoreInteractions(jobsService);
     }
 

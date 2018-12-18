@@ -33,6 +33,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
@@ -148,21 +149,20 @@ public class JobsController {
 
         return jobsService.getJobFiles(jobName, jobId);
     }
-//
-//    // TODO - do we want to support start and end immediately?
-//    @GetMapping(value = "/{jobName}/ids/{jobId}/files/{fileId}", produces = { "application/json" })
-//    @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = OutputFile.class, tags = {
-//            "JES job APIs", })
-//    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = OutputFile.class) })
-//    public OutputFile getJobOutputFile(
-//            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-//            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
-//            @ApiParam(value = "Job file id number.", required = true) @PathVariable("fileId") String fileId,
-//            @ApiParam(value = "Optional starting relative record number to read.") @Valid @RequestParam(value = "start", required = false) Integer start,
-//            @ApiParam(value = "Optional ending relative record number to read. If omitted, all records are returned.") @Valid @RequestParam(value = "end", required = false) Integer end) {
-//
-//        return jobsService.getJobFileRecordsByRange(jobName, jobId, fileId, start, end);
-//    }
+
+    // TODO - name endpoint records/content? return list of records?
+    // TODO - support start and end later
+    @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
+    @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = JobFileContent.class, tags = {
+            "JES job APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = JobFileContent.class) })
+    public JobFileContent getJobOutputFile(
+            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
+            @ApiParam(value = "Job file id.", required = true) @PathVariable("fileId") String fileId) {
+
+        return jobsService.getJobFileContent(jobName, jobId, fileId);
+    }
 //
 //    @GetMapping(value = "/{jobName}/ids/{jobId}/steps", produces = { "application/json" })
 //    @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = Step.class, responseContainer = "List", tags = {

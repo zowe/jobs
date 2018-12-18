@@ -12,6 +12,7 @@ package org.zowe.jobs.services;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
 import java.util.List;
@@ -29,8 +30,8 @@ public interface JobsService {
     Job submitJobFile(String file);
 
     List<JobFile> getJobFiles(String jobName, String jobId);
-//
-//    OutputFile getJobFileRecordsByRange(String jobName, String jobId, String fileId, Integer start, Integer end);
+
+    JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
 //
 //    OutputFile getJobJcl(String jobName, String jobId);
 

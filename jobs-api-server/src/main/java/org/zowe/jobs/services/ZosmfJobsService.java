@@ -31,11 +31,13 @@ import org.zowe.jobs.exceptions.BadRequestException;
 import org.zowe.jobs.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
+import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
@@ -407,9 +409,10 @@ public class ZosmfJobsService implements JobsService {
                                 } else
                                     // TODO LATER - improve this if we ever hit
                                     throw new BadRequestException(zosmfMessage);
-                            } else
+                            } else {
                                 // TODO LATER - improve this if we ever hit
                                 throw new BadRequestException(jsonResponse.toString());
+                            }
                         } else {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
@@ -434,14 +437,78 @@ public class ZosmfJobsService implements JobsService {
         return jobFiles;
     }
 
-//    @Override
-//    public OutputFile getJobFileRecordsByRange(String jobName, String jobId, String fileId, Integer start,
-//            Integer end) {
-//        return null;
-//    }
+    @Override
+    public JobFileContent getJobFileContent(String jobName, String jobId, String fileId) {
+        String urlPath = String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId); //$NON-NLS-1$
+        String requestUrl = zosmfconnector.getFullUrl(urlPath);
+        JobFileContent jobFileContent;
+        try {
+            HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
+            int statusCode = ResponseUtils.getStatus(response);
+            if (statusCode == HttpStatus.SC_OK) {
+                jobFileContent = new JobFileContent(ResponseUtils.getEntity(response));
+            } else {
+                HttpEntity entity = response.getEntity();
+                // TODO - work out how to tidy when brain is sharper
+                if (entity != null) {
+                    ContentType contentType = ContentType.get(entity);
+                    String mimeType = contentType.getMimeType();
+                    if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
+                        JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
+                                        .equals(zosmfMessage)) {
+                                    throw new JobNameNotFoundException(jobName, jobId);
+                                } else if (String.format("Job '%s(%s)' does not contain spool file id %s", jobName,
+                                        jobId, fileId).equals(zosmfMessage)) {
+                                    throw new JobFileIdNotFoundException(jobName, jobId, fileId);
+                                } else {
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                                }
+                            } else {
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                            }
+                        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
+                                    throw new JobIdNotFoundException(jobName, jobId);
+                                } else
+                                    // TODO LATER - improve this if we ever hit
+                                    throw new BadRequestException(zosmfMessage);
+                            } else
+                                // TODO LATER - improve this if we ever hit
+                                throw new BadRequestException(jsonResponse.toString());
+                        } else {
+                            if (jsonResponse.has("message")) {
+                                String zosmfMessage = jsonResponse.get("message").getAsString();
+                                // TODO MAYBE - wrap these exceptions with our own?
+                                throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                            }
+                            // TODO LATER - improve this if we ever hit
+                            throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode),
+                                    jsonResponse.toString());
+                        }
+                    } else {
+                        throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                    }
+                } else {
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("getJobFileContent", e);
+            throw new ServerErrorException(e);
+        }
+        return jobFileContent;
+    }
 //
 //    @Override
-//    public OutputFile getJobJcl(String jobName, String jobId) {
+//    public JobFileContent getJobJcl(String jobName, String jobId) {
 //        return null;
 //    }
 
