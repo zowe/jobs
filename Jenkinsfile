@@ -95,7 +95,7 @@ if (BRANCH_NAME == MASTER_BRANCH) {
     // twice in quick succession
     opts.push(disableConcurrentBuilds())
 } else {
-    if (BRANCH_NAME.equals("add_integration_command")){
+    if (BRANCH_NAME.equals("issue-15")){
         RELEASE_BRANCH = true   
     }
     // Only keep 5 builds on other branches
@@ -300,9 +300,9 @@ pipeline {
                     expression {
                         return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
                     }
-                    // expression {
-                    //     return BRANCH_NAME.equals(MASTER_BRANCH) || RELEASE_BRANCH;   
-                    // }
+                    expression {
+                        return BRANCH_NAME.equals(MASTER_BRANCH) || RELEASE_BRANCH;   
+                    }
                 }
             }
             steps {
