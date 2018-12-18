@@ -2,21 +2,6 @@
 //System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "")
 
 /**
- * The root results folder for items configurable by environmental variables
- */
-def TEST_RESULTS_FOLDER = "not_configured"
-
-/**
- * The location of the unit test results
- */
-def UNIT_RESULTS = "${TEST_RESULTS_FOLDER}/not_configured"
-
-/**
- * The location of the integration test results
- */
-def INTEGRATION_RESULTS = "${TEST_RESULTS_FOLDER}/not_configured"
-
-/**
  * The name of the master branch
  */
 def MASTER_BRANCH = "master"
@@ -47,39 +32,9 @@ def BUILD_UNSTABLE = 'UNSTABLE'
 def BUILD_FAILURE = 'FAILURE'
 
 /**
- * The user's name for git commits
- */
-def GIT_USER_NAME = 'zowe-robot'
-
-/**
- * The user's email address for git commits
- */
-def GIT_USER_EMAIL = 'zowe.robot@gmail.com'
-
-/**
- * The base repository url for github
- */
-def GIT_REPO_URL = 'github.com/zowe/jobs.git'
-
-/**
- * The credentials id field for the authorization token for GitHub stored in Jenkins
- */
-def GIT_CREDENTIALS_ID = 'zowe-robot-github'
-
-/**
- * A command to be run that gets the current revision pulled down
- */
-def GIT_REVISION_LOOKUP = 'git log -n 1 --pretty=format:%h'
-
-/**
  * The credentials id field for the artifactory username and password
  */
 def ARTIFACTORY_CREDENTIALS_ID = 'GizaArtifactory'
-
-/**
- * The email address for the artifactory
- */
-def ARTIFACTORY_EMAIL = GIT_USER_EMAIL
 
 
 // Setup conditional build options. Would have done this in the options of the declarative pipeline, but it is pretty
