@@ -158,6 +158,55 @@ pipeline {
         /************************************************************************
          * STAGE
          * -----
+         * Run unit test, generate and publish coverage report
+         *
+         * TIMEOUT
+         * -------
+         * 30 Minutes
+         *
+         * EXECUTION CONDITIONS
+         * --------------------
+         * - SHOULD_BUILD is true
+         * - The build is still successful and not unstable
+         ************************************************************************/
+        stage('Test') {
+            when {
+                allOf {
+                    expression {
+                        return SHOULD_BUILD == 'true'
+                    }
+                    expression {
+                        return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
+                    }
+                }
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh './gradlew coverage'
+
+                   publishHTML(target: [
+                       allowMissing         : false,
+                       alwaysLinkToLastBuild: false,
+                       keepAll              : true,
+                       reportDir            : 'build/reports/jacoco/jacocoFullReport/html',
+                       reportFiles          : 'index.html',
+                       reportName           : "Java Coverage Report"
+                   ])
+                    publishHTML(target: [
+                        allowMissing         : false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll              : true,
+                        reportDir            : 'api-catalog-ui/frontend/coverage/lcov-report',
+                        reportFiles          : 'index.html',
+                        reportName           : "UI JavaScript Test Coverage"
+                    ])
+                }
+            }
+        }
+
+        /************************************************************************
+         * STAGE
+         * -----
          * Run integration tests [ TODO: DISABLED ]
          *
          * TIMEOUT

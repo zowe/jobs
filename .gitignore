@@ -32,3 +32,6 @@ target/
 #Gradle
 .gradle/
 bin/
+
+### Mac ###
+.DS_Store
