@@ -192,6 +192,16 @@ pipeline {
                        reportFiles          : 'index.html',
                        reportName           : "Java Coverage Report"
                    ])
+                    publishHTML(target: [
+                        allowMissing         : false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll              : true,
+                        reportDir            : 'jobs-api-server/build/reports/tests/test',
+                        reportFiles          : 'index.html',
+                        reportName           : "Unit Test Results"
+                    ])
+
+                    junit allowEmptyResults: true, testResults: '**/test-results/**/*.xml'
                 }
             }
         }
