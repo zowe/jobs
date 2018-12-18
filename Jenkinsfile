@@ -277,9 +277,9 @@ pipeline {
                     expression {
                         return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
                     }
-                    expression {
-                        return BRANCH_NAME.equals(MASTER_BRANCH) || RELEASE_BRANCH;   
-                    }
+                    // expression {
+                    //     return BRANCH_NAME.equals(MASTER_BRANCH) || RELEASE_BRANCH;   
+                    // }
                 }
             }
             steps {
