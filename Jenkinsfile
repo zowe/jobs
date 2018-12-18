@@ -12,11 +12,6 @@ def MASTER_BRANCH = "master"
 def RELEASE_BRANCH = false
 
 /**
- * List of people who will get all emails for master builds
- */
-def MASTER_RECIPIENTS_LIST = "cc:mark.ackert@broadcom.com"
-
-/**
  * The result string for a successful build
  */
 def BUILD_SUCCESS = 'SUCCESS'
