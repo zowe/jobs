@@ -63,10 +63,10 @@ configure(subprojects.findAll { it.name in projectsToPublish }) {
 
 //noinspection GroovyAssignabilityCheck
 task publishArtifacts {
-    group 'Zoe Publishing'
-    description 'Publish jobs-api-server libraries to Zoe Artifactory'
+    group 'Zowe Publishing'
+    description 'Publish jobs-api-server libraries to Zowe Artifactory'
     doLast {
-        println 'Publish jobs-api-server libraries to Zoe Artifactory'
+        println 'Publish jobs-api-server libraries to Zowe Artifactory'
     }
 }
 
