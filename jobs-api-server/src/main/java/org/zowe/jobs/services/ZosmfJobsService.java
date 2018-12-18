@@ -33,6 +33,7 @@ import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
@@ -506,11 +507,16 @@ public class ZosmfJobsService implements JobsService {
         }
         return jobFileContent;
     }
-//
-//    @Override
-//    public JobFileContent getJobJcl(String jobName, String jobId) {
-//        return null;
-//    }
+
+    @Override
+    public JobFileContent getJobJcl(String jobName, String jobId) {
+        try {
+            return getJobFileContent(jobName, jobId, "3");
+        } catch (JobFileIdNotFoundException e) {
+            log.error("getJobJcl", e);
+            throw new JobJesjclNotFoundException(jobName, jobId);
+        }
+    }
 
     private static Job getJobFromJson(JsonObject returned) {
         return Job.builder().jobId(returned.get("jobid").getAsString()) //$NON-NLS-1$
