@@ -2,21 +2,6 @@
 //System.setProperty("hudson.model.DirectoryBrowserSupport.CSP", "")
 
 /**
- * The root results folder for items configurable by environmental variables
- */
-def TEST_RESULTS_FOLDER = "not_configured"
-
-/**
- * The location of the unit test results
- */
-def UNIT_RESULTS = "${TEST_RESULTS_FOLDER}/not_configured"
-
-/**
- * The location of the integration test results
- */
-def INTEGRATION_RESULTS = "${TEST_RESULTS_FOLDER}/not_configured"
-
-/**
  * The name of the master branch
  */
 def MASTER_BRANCH = "master"
@@ -25,11 +10,6 @@ def MASTER_BRANCH = "master"
 * Is this a release branch? Temporary workaround that won't break everything horribly if we merge.
 */ 
 def RELEASE_BRANCH = false
-
-/**
- * List of people who will get all emails for master builds
- */
-def MASTER_RECIPIENTS_LIST = "cc:mark.ackert@broadcom.com"
 
 /**
  * The result string for a successful build
@@ -47,39 +27,9 @@ def BUILD_UNSTABLE = 'UNSTABLE'
 def BUILD_FAILURE = 'FAILURE'
 
 /**
- * The user's name for git commits
- */
-def GIT_USER_NAME = 'zowe-robot'
-
-/**
- * The user's email address for git commits
- */
-def GIT_USER_EMAIL = 'zowe.robot@gmail.com'
-
-/**
- * The base repository url for github
- */
-def GIT_REPO_URL = 'github.com/zowe/jobs.git'
-
-/**
- * The credentials id field for the authorization token for GitHub stored in Jenkins
- */
-def GIT_CREDENTIALS_ID = 'zowe-robot-github'
-
-/**
- * A command to be run that gets the current revision pulled down
- */
-def GIT_REVISION_LOOKUP = 'git log -n 1 --pretty=format:%h'
-
-/**
  * The credentials id field for the artifactory username and password
  */
 def ARTIFACTORY_CREDENTIALS_ID = 'GizaArtifactory'
-
-/**
- * The email address for the artifactory
- */
-def ARTIFACTORY_EMAIL = GIT_USER_EMAIL
 
 
 // Setup conditional build options. Would have done this in the options of the declarative pipeline, but it is pretty
@@ -95,7 +45,7 @@ if (BRANCH_NAME == MASTER_BRANCH) {
     // twice in quick succession
     opts.push(disableConcurrentBuilds())
 } else {
-    if (BRANCH_NAME.equals("add_integration_command")){
+    if (BRANCH_NAME.equals("issue-15")){
         RELEASE_BRANCH = true   
     }
     // Only keep 5 builds on other branches
@@ -151,6 +101,80 @@ pipeline {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
                     sh './gradlew build'
+                }
+            }
+        }
+
+        /************************************************************************
+         * STAGE
+         * -----
+         * Run unit test, generate and publish coverage report
+         *
+         * TIMEOUT
+         * -------
+         * 30 Minutes
+         *
+         * EXECUTION CONDITIONS
+         * --------------------
+         * - SHOULD_BUILD is true
+         * - The build is still successful and not unstable
+         ************************************************************************/
+        stage('Test') {
+            when {
+                allOf {
+                    expression {
+                        return SHOULD_BUILD == 'true'
+                    }
+                    expression {
+                        return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
+                    }
+                }
+            }
+            steps {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh './gradlew coverage'
+
+                   publishHTML(target: [
+                       allowMissing         : false,
+                       alwaysLinkToLastBuild: false,
+                       keepAll              : true,
+                       reportDir            : 'build/reports/jacoco/jacocoFullReport/html',
+                       reportFiles          : 'index.html',
+                       reportName           : "Java Coverage Report"
+                   ])
+                    publishHTML(target: [
+                        allowMissing         : false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll              : true,
+                        reportDir            : 'jobs-api-server/build/reports/tests/test',
+                        reportFiles          : 'index.html',
+                        reportName           : "Unit Test Results"
+                    ])
+                }
+            }
+        }
+
+        /************************************************************************
+        * STAGE
+        * -----
+        * SonarQube Scanner
+        *
+        * EXECUTION CONDITIONS
+        * --------------------
+        * - SHOULD_BUILD is true
+        * - The build is still successful and not unstable
+        *
+        * DESCRIPTION
+        * -----------
+        * Runs the sonar-scanner analysis tool, which submits the source, test resutls,
+        *  and coverage results for analysis in our SonarQube server.
+        * TODO: This step does not yet support branch or PR submissions properly.
+        ***********************************************************************/
+        stage('sonar') {
+            steps {
+                withSonarQubeEnv('sonar-default-server') {
+                    // Per Sonar Doc - It's important to add --info because of SONARJNKNS-281
+                    sh "./gradlew --info sonarqube -Psonar.host.url=${SONAR_HOST_URL}"
                 }
             }
         }
@@ -236,7 +260,7 @@ pipeline {
                     echo 'Publish Artifacts'
                     // Get the registry that we need to publish to
                     withCredentials([usernamePassword(credentialsId: ARTIFACTORY_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "./gradlew publishArtifacts -Pdeploy.username=$USERNAME -Pdeploy.password=$PASSWORD"
+                        sh "./gradlew publishArtifacts --info -Pdeploy.username=$USERNAME -Pdeploy.password=$PASSWORD"
                     }
                 }
             }
@@ -262,6 +286,9 @@ pipeline {
          * occurred.
          ************************************************************************/
         always {
+            // publish any test results found
+            junit allowEmptyResults: true, testResults: '**/test-results/**/*.xml'
+
             script {
                 def buildStatus = currentBuild.currentResult
 
