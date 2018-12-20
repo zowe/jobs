@@ -31,10 +31,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.utils.ZosUtils;
+import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
+import org.zowe.jobs.exceptions.JobStepsNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -42,7 +45,11 @@ import org.zowe.jobs.services.JobsService;
 import javax.validation.Valid;
 
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
@@ -163,39 +170,44 @@ public class JobsController {
 
         return jobsService.getJobFileContent(jobName, jobId, fileId);
     }
-//
-//    @GetMapping(value = "/{jobName}/ids/{jobId}/steps", produces = { "application/json" })
-//    @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = Step.class, responseContainer = "List", tags = {
-//            "JES job APIs", })
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Ok", response = Step.class, responseContainer = "List") })
-//    public List<Step> getJobSteps(
-//            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-//            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-//
-//        OutputFile jcl = jobsService.getJobJcl(jobName, jobId);
-//        return findJobSteps(jcl.getContent());
-//    }
-//
-//    // TODO - refactor out private methods in utils class?
-//    private static final String JES_JCL_STEP_PATTERN = "^.*(\\/\\/|XX)([^*\\s][^\\s]{0,7}) .+?PGM=([^\\s,]{1,8})"; //$NON-NLS-1$
-//
-//    public static List<Step> findJobSteps(String JCL) {
-//        List<Step> steps = new LinkedList<>();
-//
-//        Pattern pattern = Pattern.compile(JES_JCL_STEP_PATTERN);
-//        Scanner scanner = new Scanner(JCL);
-//        int stepCount = 1;
-//        while (scanner.hasNextLine()) {
-//            String line = scanner.nextLine();
-//            Matcher matcher = pattern.matcher(line);
-//            if (matcher.find() && matcher.groupCount() == 3) {
-//                Step step = new Step(matcher.group(2), matcher.group(3), stepCount++);
-//                steps.add(step);
-//            }
-//        }
-//        scanner.close();
-//
-//        return steps;
-//    }
+
+    @GetMapping(value = "/{jobName}/{jobId}/steps", produces = { "application/json" })
+    @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = JobStep.class, responseContainer = "List", tags = {
+            "JES job APIs", })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Ok", response = JobStep.class, responseContainer = "List") })
+    public List<JobStep> getJobSteps(
+            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+
+        try {
+            JobFileContent jcl = jobsService.getJobJcl(jobName, jobId);
+            return findJobSteps(jcl.getContent());
+        } catch (JobJesjclNotFoundException e) {
+            log.error("getJobSteps", e);
+            throw new JobStepsNotFoundException(jobName, jobId);
+        }
+    }
+
+    // TODO - refactor out private methods in utils class?
+    private static final String JES_JCL_STEP_PATTERN = "^.*(\\/\\/|XX)([^*\\s][^\\s]{0,7}) .+?PGM=([^\\s,]{1,8})"; //$NON-NLS-1$
+
+    private static List<JobStep> findJobSteps(String JCL) {
+        List<JobStep> steps = new LinkedList<>();
+
+        Pattern pattern = Pattern.compile(JES_JCL_STEP_PATTERN);
+        Scanner scanner = new Scanner(JCL);
+        int stepCount = 1;
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find() && matcher.groupCount() == 3) {
+                JobStep step = new JobStep(matcher.group(2), matcher.group(3), stepCount++);
+                steps.add(step);
+            }
+        }
+        scanner.close();
+
+        return steps;
+    }
 }

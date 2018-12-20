@@ -32,10 +32,13 @@ import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
+import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
+import org.zowe.jobs.exceptions.JobStepsNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -287,6 +290,70 @@ public class JobsControllerTest extends ZoweApiTest {
                 .andExpect(jsonPath("$.message").value(errorMessage));
 
         verify(jobsService, times(1)).getJobFileContent(jobName, jobId, fileId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    public void test_get_job_steps_with_jobId_and_jobName() throws Exception {
+
+        JobStep step1 = JobStep.builder().name("STEP1").program("IEBGENER").step(1).build();
+        JobStep step2 = JobStep.builder().name("STEP2").program("AOPBATCH").step(2).build();
+
+        List<JobStep> expected = Arrays.asList(step1, step2);
+
+        String jobName = "TESTNAME";
+        String jobId = "TESTID11";
+
+        when(jobsService.getJobJcl(jobName, jobId))
+                .thenReturn(new JobFileContent(loadFile("src/test/resources/testData/JESJCL")));
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/steps", jobName, jobId)).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(content().string(JsonUtils.convertToJsonString(expected)));
+
+        verify(jobsService, times(1)).getJobJcl(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    @Test
+    // TODO - refactor with purge with exception?
+    public void get_job_steps_with_exception_should_be_converted_to_error_message() throws Exception {
+        String errorMessage = "JobId could not be found";
+
+        String jobId = "jobId";
+        String jobName = "jobName";
+
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.I_AM_A_TEAPOT).build();
+
+        doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).getJobJcl(jobName, jobId);
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/steps", jobName, jobId)).andExpect(status().isIAmATeapot())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+                .andExpect(jsonPath("$.message").value(errorMessage));
+
+        verify(jobsService, times(1)).getJobJcl(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    // TODO - refactor with purge with exception?
+    public void get_job_steps_with_jesjcl_exception_should_be_converted_to_error_message() throws Exception {
+
+        String jobId = "jobId";
+        String jobName = "jobName";
+
+        JobStepsNotFoundException expectedException = new JobStepsNotFoundException(jobName, jobId);
+
+        ApiError expectedError = expectedException.getApiError();
+
+        doThrow(new JobJesjclNotFoundException(jobName, jobId)).when(jobsService).getJobJcl(jobName, jobId);
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/steps", jobName, jobId)).andExpect(status().isIAmATeapot())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+                .andExpect(jsonPath("$.message").value(expectedError.getMessage()));
+
+        verify(jobsService, times(1)).getJobJcl(jobName, jobId);
         verifyNoMoreInteractions(jobsService);
     }
 
