@@ -21,3 +21,14 @@ dependencies {
     testCompile libraries.mockito_core
     testCompile libraries.explorer_api_common_test
 }
+
+jar {
+    manifest {
+        attributes(
+        'Main-Class' : 'org.zowe.jobs.JesJobsApplication'
+        )
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
