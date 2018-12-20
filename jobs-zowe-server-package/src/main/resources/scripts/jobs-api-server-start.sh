@@ -1,11 +1,11 @@
 # Variables to be replaced:
 # - JAVA_SETUP -- sets JAVA_HOME by ZOWE_JAVA_HOME
-# - IPADDRESS   -  The IP Address of the system running API Mediation
-# - HOSTNAME   -  The hostname of the system running API Mediation (defaults to localhost)
-# - DISCOVERY_PORT - The port the discovery service will use
-# - CATALOG_PORT - The port the catalog service will use
-# - GATEWAY_PORT - The port the gateway service will use
-# - VERIFY_CERTIFICATES - true/false - Validation of TLS/SSL certitificates for services
+# - SERVER_PORT - The port the jobs server will use
+# - KEYSTORE - The keystore to use for SSL certificates
+# - KEYSTORE_PASSWORD - The password to access the keystore supplied by KEYSTORE
+# - KEY_ALIAS - The alias of the key within the keystore
+# - ZOSMF_HTTPS_PORT - The SSL port z/OSMF is listening on.
+# - ZOSMF_IP - The IP Address z/OSMF can be reached
 
 **JAVA_SETUP**
 if [[ ":$PATH:" == *":$JAVA_HOME/bin:"* ]]; then
@@ -19,9 +19,12 @@ fi
 DIR=`dirname $0`
 
 java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
-    -Djava.io.tmpdir=/tmp -Xquickstart  -Dserver.port=8443   -Dserver.ssl.keyAlias=locahost   
+    -Djava.io.tmpdir=/tmp -Xquickstart  
+    -Dserver.port=**SERVER_PORT**   
+    -Dserver.ssl.keyAlias=**KEY_ALIAS**   
     -Dserver.ssl.keyStore=**KEYSTORE**   
-    -Dserver.ssl.keyStorePassword=**KEYSTORE_PASSWROD**   -Dserver.ssl.keyStoreType=PKCS12   
+    -Dserver.ssl.keyStorePassword=**KEYSTORE_PASSWORD**  
+    -Dserver.ssl.keyStoreType=PKCS12   
     -Dzosmf.httpsPort=**ZOSMF_HTTPS_PORT**   
     -Dzosmf.ipAddress=**ZOSMF_IP**
     -jar ../jobs-api-server-0.0.1-SNAPSHOT.jar
