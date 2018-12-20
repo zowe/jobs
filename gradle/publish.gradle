@@ -1,7 +1,8 @@
 ext.javaLibraries = [
     'jobs-api-server',
     'jobs-model',
-    'jobs-tests'
+    'jobs-tests',
+    'jobs-zowe-server-package'
 ]
 
 // Save this in case we make a packaging subproject 

@@ -1,3 +1,13 @@
+buildscript {
+    repositories mavenRepositories
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
 dependencies {
     compile project(':jobs-model')
     compile libraries.spring_boot_starter_actuator
@@ -22,13 +32,4 @@ dependencies {
     testCompile libraries.explorer_api_common_test
 }
 
-jar {
-    manifest {
-        attributes(
-        'Main-Class' : 'org.zowe.jobs.JesJobsApplication'
-        )
-    }
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-}
+bootJar.archiveName = "${bootJar.baseName}-${bootJar.version}.jar"
