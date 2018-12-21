@@ -10,10 +10,12 @@
 
 package org.zowe.jobs.tests;
 
-import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.errors.ApiError;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.tests.IntegrationTestResponse;
 
@@ -58,6 +60,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 //     TODO LATER - test submitting other invalid JCL (eg line > 72)
 
     @Test
+    @Ignore("see todo") // TODO - need to make build environment set up dataset
     public void testSubmitJobDataSet() throws Exception {
         String dataSetPath = getTestJclMemberPath(JOB_IEFBR14);
         submitAndVerifySuccessfulJob("'" + dataSetPath + "'");
@@ -65,8 +68,10 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testPostJobInvalidJobDataSet() throws Exception {
-        submitErrorJobByFileName("'ATLAS.TEST.JCL(INVALID)'", HttpStatus.SC_NOT_FOUND,
-                "expectedResults/Jobs/Jobs_invalidDataset.txt");
+        String dataSet = "ATLAS.TEST.JCL(INVALID)";
+        ZoweApiRestException expected = new DataSetNotFoundException(dataSet);
+
+        submitJobByFile(dataSet).shouldReturnException(expected);
     }
 
 //    @Test

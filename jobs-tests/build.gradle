@@ -11,7 +11,7 @@ ext {
 
 dependencies {
     compile project(':jobs-model')
-
+    compile project(':jobs-api-server')
     compile libraries.spring_boot_starter_actuator
     compile libraries.spring_boot_starter_parent
     compile libraries.spring_boot_starter_security
