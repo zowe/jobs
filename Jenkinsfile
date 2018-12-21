@@ -257,6 +257,9 @@ pipeline {
     -Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
     -Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
     -jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*.jar) &"""
+
+                        // give it a little time to start the server
+                        sleep time: 1, unit: 'MINUTES'
                     }
                 }
 
