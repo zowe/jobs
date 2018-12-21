@@ -52,6 +52,31 @@ if (BRANCH_NAME == MASTER_BRANCH) {
     opts.push(buildDiscarder(logRotator(numToKeepStr: '5')))
 }
 
+// define custom build parameters
+def customParameters = []
+customParameters.push(string(
+  name: 'INTEGRATION_TEST_ZOSMF_HOST',
+  description: 'z/OSMF server for integration test',
+  defaultValue: 'river.zowe.org',
+  trim: true,
+  required: true
+))
+customParameters.push(string(
+  name: 'INTEGRATION_TEST_ZOSMF_PORT',
+  description: 'z/OSMF port for integration test',
+  defaultValue: '10443',
+  trim: true,
+  required: true
+))
+customParameters.push(credentials(
+  name: 'INTEGRATION_TEST_ZOSMF_CREDENTIAL',
+  description: 'z/OSMF credential for integration test',
+  credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
+  defaultValue: 'ssh-zdt-test-image-guest',
+  required: true
+))
+opts.push(parameters(customParameters))
+
 properties(opts)
 
 pipeline {
@@ -182,11 +207,11 @@ pipeline {
         /************************************************************************
          * STAGE
          * -----
-         * Run integration tests [ TODO: DISABLED ]
+         * Run integration tests
          *
          * TIMEOUT
          * -------
-         * 10 Minutes
+         * 20 Minutes
          *
          * EXECUTION CONDITIONS
          * --------------------
@@ -199,21 +224,108 @@ pipeline {
          *
          * OUTPUTS
          * -------
-         * None [ TODO: Add test reporting ]
+         * HTML test report: Integration Test Results
          ************************************************************************/
-        stage('Unit Test') {
+        stage('Integration Test') {
             when {
                 expression {
                     return SHOULD_BUILD == 'true'
                 }
                 expression {
-                	return 1 == 0
+                    return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
+                }
+            }
+            stages {
+                stage('Prepare Certificate') {
+                    steps {
+                        sh """keytool -genkeypair -keystore localhost.keystore.p12 -storetype PKCS12 \
+    -storepass password -alias localhost -keyalg RSA -keysize 2048 -validity 99999 \
+    -dname \"CN=Zowe Jobs Explorer API Default Certificate, OU=Zowe API Squad, O=Zowe, L=Hursley, ST=Hampshire, C=UK\" \
+    -ext san=dns:localhost,ip:127.0.0.1"""
+                    }
+                }
+
+                stage('Start Server') {
+                    steps {
+                        sh """java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
+    -Djava.io.tmpdir=/tmp \
+    -Dserver.port=8443 \
+    -Dserver.ssl.keyAlias=localhost \
+    -Dserver.ssl.keyStore=localhost.keystore.p12 \
+    -Dserver.ssl.keyStorePassword=password \
+    -Dserver.ssl.keyStoreType=PKCS12 \
+    -Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
+    -Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
+    -jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*.jar) &"""
+                        }
+                    }
+                }
+
+                stage('Start Test') {
+                    steps {
+                        timeout(time: 20, unit: 'MINUTES') {
+                            withCredentials([usernamePassword(credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                sh """./gradlew runIntegrationTests \
+    -Pserver.host=localhost \
+    -Pserver.port=8443 \
+    -Pserver.username=${USERNAME} \
+    -Pserver.password=${PASSWORD}"""
+                            }
+                        }
+
+                        publishHTML(target: [
+                            allowMissing         : false,
+                            alwaysLinkToLastBuild: false,
+                            keepAll              : true,
+                            reportDir            : 'jobs-tests/build/reports/tests/test',
+                            reportFiles          : 'index.html',
+                            reportName           : "Integration Test Results"
+                        ])
+                    }
+                }
+            }
+        }
+
+        /************************************************************************
+         * STAGE
+         * -----
+         * Package
+         *
+         * TIMEOUT
+         * -------
+         * 5 Minutes
+         *
+         * EXECUTION CONDITIONS
+         * --------------------
+         * - SHOULD_BUILD is true
+         * - The current branch is MASTER branch or a RELEASE_BRANCH
+         * - The build is still successful and not unstable
+         *
+         * DESCRIPTION
+         * -----------
+         * Pacakge the current build as a zip file for zowe integration.
+         *
+         * OUTPUTS
+         * -------
+         * zip package
+         ************************************************************************/
+        stage('Package') {
+            when {
+                allOf {
+                    expression {
+                        return SHOULD_BUILD == 'true'
+                    }
+                    expression {
+                        return currentBuild.resultIsBetterOrEqualTo(BUILD_SUCCESS)
+                    }
+                    expression {
+                        return BRANCH_NAME.equals(MASTER_BRANCH) || RELEASE_BRANCH;   
+                    }
                 }
             }
             steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    echo 'Run Integration Tests'
-                    sh './gradlew runIntegrationTests'
+                timeout(time: 5, unit: 'MINUTES') {
+                    sh './gradlew packageJobsApiServer'
                 }
             }
         }
