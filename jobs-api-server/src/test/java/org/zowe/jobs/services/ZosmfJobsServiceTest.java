@@ -38,6 +38,7 @@ import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
@@ -46,8 +47,6 @@ import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -354,6 +353,72 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     @Test
+    public void get_job_jcl_should_call_zosmf_and_parse_response_correctly() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "JOB21489";
+        JobFileContent expected = new JobFileContent(
+                "        1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\n"
+                        + "          //*        TEST JOB\n        2 //UNIT     EXEC PGM=IEFBR14\n" + "");
+
+        HttpResponse response = mockTextResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFileRecordsResponse.txt"));
+
+        RequestBuilder requestBuilder = mockGetBuilder(
+                String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, "3"));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        assertEquals(expected, jobsService.getJobJcl(jobName, jobId));
+
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
+    public void get_job_jcl_for_non_existing_jobname_should_throw_exception() throws Exception {
+        String jobName = "ATLJ5000";
+        String jobId = "JOB21489";
+
+        Exception expectedException = new JobNameNotFoundException(jobName, jobId);
+
+        checkGetJobJclExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_BAD_REQUEST,
+                "zosmf_getJob_noJobNameResponse.json");
+    }
+
+    @Test
+    public void get_job_jcl_for_non_existing_job_id_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "z000000";
+
+        Exception expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        checkGetJobJclExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_INTERNAL_SERVER_ERROR,
+                "zosmf_getJobFiles_noJobIdResponse.json");
+    }
+
+    @Test
+    public void get_job_jcl_for_non_existing_field_id_should_throw_exception() throws Exception {
+        String jobName = "ATLJ0000";
+        String jobId = "JOB21849";
+
+        Exception expectedException = new JobJesjclNotFoundException(jobName, jobId);
+
+        checkGetJobJclExceptionAndVerify(jobName, jobId, expectedException, HttpStatus.SC_BAD_REQUEST,
+                "zosmf_getJobFileRecords_noJesJcl.json");
+    }
+
+    private void checkGetJobJclExceptionAndVerify(String jobName, String jobId, Exception expectedException,
+            int statusCode, String file) throws IOException, Exception {
+        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+
+        RequestBuilder requestBuilder = mockGetBuilder(
+                String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, "3"));
+
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.getJobJcl(jobName, jobId));
+        verifyInteractions(requestBuilder);
+    }
+
+    @Test
     public void submit_job_string_should_call_zosmf_and_parse_response_correctly() throws Exception {
         String jclString = "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440\n" + "//*        TEST JOB\n"
                 + "//UNIT     EXEC PGM=IEFBR14\n";
@@ -634,7 +699,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     }
 
     public String loadTestFile(String relativePath) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get("src/test/resources/zosmfResponses/" + relativePath));
-        return new String(encoded, Charset.forName("UTF8"));
+        return loadFile("src/test/resources/zosmfResponses/" + relativePath);
     }
 }

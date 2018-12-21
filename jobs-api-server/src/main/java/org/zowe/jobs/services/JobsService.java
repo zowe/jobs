@@ -32,7 +32,7 @@ public interface JobsService {
     List<JobFile> getJobFiles(String jobName, String jobId);
 
     JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
-//
-//    OutputFile getJobJcl(String jobName, String jobId);
+
+    JobFileContent getJobJcl(String jobName, String jobId);
 
 }
