@@ -19,12 +19,12 @@ fi
 DIR=`dirname $0`
 
 java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
-    -Djava.io.tmpdir=/tmp -Xquickstart  
-    -Dserver.port=**SERVER_PORT**   
-    -Dserver.ssl.keyAlias=**KEY_ALIAS**   
-    -Dserver.ssl.keyStore=**KEYSTORE**   
-    -Dserver.ssl.keyStorePassword=**KEYSTORE_PASSWORD**  
-    -Dserver.ssl.keyStoreType=PKCS12   
-    -Dzosmf.httpsPort=**ZOSMF_HTTPS_PORT**   
-    -Dzosmf.ipAddress=**ZOSMF_IP**
+    -Djava.io.tmpdir=/tmp -Xquickstart \
+    -Dserver.port=**SERVER_PORT** \
+    -Dserver.ssl.keyAlias=**KEY_ALIAS** \
+    -Dserver.ssl.keyStore=**KEYSTORE** \
+    -Dserver.ssl.keyStorePassword=**KEYSTORE_PASSWORD** \
+    -Dserver.ssl.keyStoreType=PKCS12 \
+    -Dzosmf.httpsPort=**ZOSMF_HTTPS_PORT** \
+    -Dzosmf.ipAddress=**ZOSMF_IP** \
     -jar ../jobs-api-server-0.0.1-SNAPSHOT.jar
