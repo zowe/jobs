@@ -28,18 +28,18 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
+import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
+import org.zowe.api.common.exceptions.NoZosmfResponseEntityException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseUtils;
-import org.zowe.jobs.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
-import org.zowe.jobs.exceptions.NoZosmfResponseEntityException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
@@ -333,7 +333,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         String jobId = "JOB21849";
         String fileId = "1";
 
-        // TODO sort out exception
         Exception expectedException = new JobFileIdNotFoundException(jobName, jobId, fileId);
 
         checkGetJobFileContentExceptionAndVerify(jobName, jobId, fileId, expectedException, HttpStatus.SC_BAD_REQUEST,
@@ -571,12 +570,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verifyInteractions(requestBuilder);
     }
 
-    private void verifyInteractions(RequestBuilder requestBuilder) throws IOException {
-        verify(zosmfConnector, times(1)).request(requestBuilder);
-        verify(zosmfConnector, times(1)).getFullUrl(anyString());
-        verifyNoMoreInteractions(zosmfConnector);
-    }
-
     private static Job createJob(String id, String jobName, String owner, String type, JobStatus status, String phase,
             String returnCode) {
         return Job.builder().jobId(id) // $NON-NLS-1$
@@ -591,7 +584,13 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
                 .build();
     }
 
-    // TODO LATER - refactor out into common?
+    // TODO - refactor with datasets
+    private void verifyInteractions(RequestBuilder requestBuilder) throws IOException {
+        verify(zosmfConnector, times(1)).request(requestBuilder);
+        verify(zosmfConnector, times(1)).getFullUrl(anyString());
+        verifyNoMoreInteractions(zosmfConnector);
+    }
+
     private RequestBuilder mockGetBuilder(String relativeUri) {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
