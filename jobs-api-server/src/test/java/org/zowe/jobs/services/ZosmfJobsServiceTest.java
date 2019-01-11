@@ -467,6 +467,17 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
                 "zosmf_submitJcl_tooLong.json", expectedException);
     }
 
+    private void checkExceptionThrownForSubmitJclStringAndVerifyCalls(String badJcl, String responsePath,
+            Exception expectedException) throws IOException, Exception {
+
+        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
+        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
+        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+
+        shouldThrow(expectedException, () -> jobsService.submitJobString(badJcl));
+        verifyInteractions(requestBuilder);
+    }
+
     @Test
     public void submit_job_data_set_should_call_zosmf_and_parse_response_correctly() throws Exception {
         String dataSet = "STEVENH.TEST.JCL(IEFBR14)";
@@ -559,17 +570,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verifyInteractions(requestBuilder);
     }
 
-    private void checkExceptionThrownForSubmitJclStringAndVerifyCalls(String badJcl, String responsePath,
-            Exception expectedException) throws IOException, Exception {
-
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
-        RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
-
-        shouldThrow(expectedException, () -> jobsService.submitJobString(badJcl));
-        verifyInteractions(requestBuilder);
-    }
-
     private static Job createJob(String id, String jobName, String owner, String type, JobStatus status, String phase,
             String returnCode) {
         return Job.builder().jobId(id) // $NON-NLS-1$
@@ -627,15 +627,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
         return builder;
-    }
-
-    private RequestBuilder mockPostBuilder(String relativeUri, Object body) throws Exception {
-        RequestBuilder builder = mock(RequestBuilder.class);
-
-        String jsonString = "dummyJson";
-        mockStatic(JsonUtils.class);
-        when(JsonUtils.convertToJsonString(body)).thenReturn(jsonString);
-        return mockPostBuilder(relativeUri, jsonString);
     }
 
     private RequestBuilder mockPostBuilder(String relativeUri, String jsonString) throws Exception {
