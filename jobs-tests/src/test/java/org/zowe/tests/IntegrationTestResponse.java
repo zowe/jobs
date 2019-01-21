@@ -9,6 +9,7 @@
  */
 package org.zowe.tests;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -16,15 +17,18 @@ import com.google.gson.JsonParser;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.util.EntityUtils;
+import org.hamcrest.Matchers;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.JsonUtils;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class IntegrationTestResponse {
@@ -100,8 +104,17 @@ public class IntegrationTestResponse {
     }
 
     public IntegrationTestResponse shouldHaveEntity(Object expected) throws Exception {
-        Object entity = getEntityAs(expected.getClass());
-        assertEquals(expected, entity);
+        Object entity = null;
+        if (expected instanceof List) {
+            List<?> list = (List<?>) expected;
+            Class<?> listType = list.get(0).getClass();
+            Class listArrayClass = Array.newInstance(listType, 0).getClass();
+            Object[] array = (Object[]) new Gson().fromJson(getEntity(), listArrayClass);
+            assertThat(list, Matchers.contains(array));
+        } else {
+            entity = getEntityAs(expected.getClass());
+            assertEquals(expected, entity);
+        }
         return this;
     }
 
