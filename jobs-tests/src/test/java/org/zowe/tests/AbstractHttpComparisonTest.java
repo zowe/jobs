@@ -62,7 +62,7 @@ public abstract class AbstractHttpComparisonTest {
     // TODO LATER - fix to use RestAssured
 
     private final static String SERVER_HOST = System.getProperty("server.host");
-    private final static String SERVER_PORT = System.getProperty("server.port");
+    private final static int SERVER_PORT = Integer.parseInt(System.getProperty("server.port"));
 
     protected final static String BASE_URL = "https://" + SERVER_HOST + ":" + SERVER_PORT + "/api/v1/";
 
@@ -78,20 +78,14 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare
-     * the return code and returned response body to expected values
+     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare the return code and returned response body to expected values
      *
-     * @param relativeURI            the relative URL path, which will be appended
-     *                               to the base web application URL
+     * @param relativeURI            the relative URL path, which will be appended to the base web application URL
      * @param HTTPmethodType         GET, POST, PUT, DELETE, etc
-     * @param expectedResultFilePath the path to the file containing the expected
-     *                               response body content. May be null, in which
-     *                               case verification of the response body will be
-     *                               skipped
-     * @param expectedReturnCode     the expected HTTP return code for the request.
-     *                               May be zero or negative, in which case
-     *                               verification of the return code and response
+     * @param expectedResultFilePath the path to the file containing the expected response body content. May be null, in which case verification of the response
      *                               body will be skipped
+     * @param expectedReturnCode     the expected HTTP return code for the request. May be zero or negative, in which case verification of the return code and
+     *                               response body will be skipped
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
             int expectedReturnCode) {
@@ -100,20 +94,14 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare
-     * the return code and returned response body to expected values
+     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare the return code and returned response body to expected values
      *
-     * @param relativeURI            the relative URL path, which will be appended
-     *                               to the base web application URL
+     * @param relativeURI            the relative URL path, which will be appended to the base web application URL
      * @param HTTPmethodType         GET, POST, PUT, DELETE, etc
-     * @param expectedResultFilePath the path to the file containing the expected
-     *                               response body content. May be null, in which
-     *                               case verification of the response body will be
-     *                               skipped
-     * @param expectedReturnCode     the expected HTTP return code for the request.
-     *                               May be zero or negative, in which case
-     *                               verification of the return code and response
+     * @param expectedResultFilePath the path to the file containing the expected response body content. May be null, in which case verification of the response
      *                               body will be skipped
+     * @param expectedReturnCode     the expected HTTP return code for the request. May be zero or negative, in which case verification of the return code and
+     *                               response body will be skipped
      */
     public void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
             int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex) {
@@ -122,20 +110,14 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare
-     * the return code and returned response body to expected values
+     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare the return code and returned response body to expected values
      *
-     * @param relativeURI            the relative URL path, which will be appended
-     *                               to the base web application URL
+     * @param relativeURI            the relative URL path, which will be appended to the base web application URL
      * @param HTTPmethodType         GET, POST, PUT, DELETE, etc
-     * @param expectedResultFilePath the path to the file containing the expected
-     *                               response body content. May be null, in which
-     *                               case verification of the response body will be
-     *                               skipped
-     * @param expectedReturnCode     the expected HTTP return code for the request.
-     *                               May be zero or negative, in which case
-     *                               verification of the return code and response
+     * @param expectedResultFilePath the path to the file containing the expected response body content. May be null, in which case verification of the response
      *                               body will be skipped
+     * @param expectedReturnCode     the expected HTTP return code for the request. May be zero or negative, in which case verification of the return code and
+     *                               response body will be skipped
      */
     private void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
             int expectedReturnCode, Map<String, String> substitutionVars, boolean treatExpectedValueAsRegex,
@@ -145,32 +127,19 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare
-     * the return code and returned response body to expected values
+     * Construct and send an HTTP request to baseAtlasURI+relativeURI, and compare the return code and returned response body to expected values
      *
-     * @param relativeURI               the relative URL path, which will be
-     *                                  appended to the base web application URL
+     * @param relativeURI               the relative URL path, which will be appended to the base web application URL
      * @param HTTPmethodType            GET, POST, PUT, DELETE, etc
-     * @param expectedResultFilePath    the path to the file containing the expected
-     *                                  response body content. May be null, in which
-     *                                  case verification of the response body will
-     *                                  be skipped
-     * @param expectedReturnCode        the expected HTTP return code for the
-     *                                  request. May be zero or negative, in which
-     *                                  case verification of the return code and
+     * @param expectedResultFilePath    the path to the file containing the expected response body content. May be null, in which case verification of the response
+     *                                  body will be skipped
+     * @param expectedReturnCode        the expected HTTP return code for the request. May be zero or negative, in which case verification of the return code and
      *                                  response body will be skipped
-     * @param substitutionVars          a map of variableName : variableValue, which
-     *                                  will be used to substitute text into the
-     *                                  expected result file before comparison with
-     *                                  the actual result
-     * @param treatExpectedValueAsRegex treat the expectedValue (the string value of
-     *                                  a JSON object) as a regex when comparing to
-     *                                  the actual result. Variable substitutions
-     *                                  (if specified) are made before the regex
-     *                                  compare
-     * @param allowUnorderedJSONArrays  when comparing JSON arrays between
-     *                                  expected/actual results, do not fail if the
-     *                                  array elements are otherwise the same except
+     * @param substitutionVars          a map of variableName : variableValue, which will be used to substitute text into the expected result file before comparison
+     *                                  with the actual result
+     * @param treatExpectedValueAsRegex treat the expectedValue (the string value of a JSON object) as a regex when comparing to the actual result. Variable
+     *                                  substitutions (if specified) are made before the regex compare
+     * @param allowUnorderedJSONArrays  when comparing JSON arrays between expected/actual results, do not fail if the array elements are otherwise the same except
      *                                  for array order
      */
     private void runAndVerifyHTTPRequest(String relativeURI, String HTTPmethodType, String expectedResultFilePath,
@@ -289,8 +258,7 @@ public abstract class AbstractHttpComparisonTest {
 
         // add user credentials to the request
         ensureAuthenticationCredentials(method, localContext);
-        System.out.println(BASE_URL);
-        URI uri = new URI(BASE_URL + relativeURI);
+        URI uri = new URI("https", null, SERVER_HOST, SERVER_PORT, "/api/v1/" + relativeURI, null, null);
         method.setURI(uri);
         Header[] headers = method.getAllHeaders();
         String stringHeaders = "";
@@ -318,8 +286,7 @@ public abstract class AbstractHttpComparisonTest {
         // add user credentials to the request
         ensureAuthenticationCredentials(method, localContext);
 
-        System.out.println(BASE_URL);
-        URI uri = new URI(BASE_URL + relativeURI);
+        URI uri = new URI("https", null, SERVER_HOST, SERVER_PORT, "/api/v1/" + relativeURI, null, null);
         method.setURI(uri);
         Header[] headers = method.getAllHeaders();
         String stringHeaders = "";
@@ -339,8 +306,7 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * @return A client object for subsequent REST calls to z/OSMF. This method
-     *         bypasses the self-signed certificate issue with z/OSMF
+     * @return A client object for subsequent REST calls to z/OSMF. This method bypasses the self-signed certificate issue with z/OSMF
      * @throws Exception
      */
     public static HttpClient createIgnoreSSLClient() throws Exception {
@@ -364,14 +330,14 @@ public abstract class AbstractHttpComparisonTest {
 
         } }, new java.security.SecureRandom());
         return HttpClientBuilder.create().setSSLContext(sslcontext).setDefaultCredentialsProvider(credentialsProvider)
-                .setSSLHostnameVerifier(new HostnameVerifier() {
+            .setSSLHostnameVerifier(new HostnameVerifier() {
 
-                    @Override
-                    public boolean verify(String s1, SSLSession s2) {
-                        return true;
-                    }
+                @Override
+                public boolean verify(String s1, SSLSession s2) {
+                    return true;
+                }
 
-                }).build();
+            }).build();
     }
 
     private static void ensureAuthenticationCredentials(AbstractHttpMessage method, HttpClientContext localContext)
@@ -406,12 +372,9 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * @param expectedResultDataPath - a fully or partially qualified path to an
-     *                               expected result file
-     * @param actualResultsBody      - the string content to compare against the
-     *                               expected result file contents
-     * @return - a string describing the comparison error, if any. Returns null if
-     *         comparison succeeds
+     * @param expectedResultDataPath - a fully or partially qualified path to an expected result file
+     * @param actualResultsBody      - the string content to compare against the expected result file contents
+     * @return - a string describing the comparison error, if any. Returns null if comparison succeeds
      * @throws IOException
      */
     public static String compareToExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,
@@ -428,12 +391,9 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * @param expectedResultDataPath - a fully or partially qualified path to an
-     *                               expected result file in JSON format
-     * @param actualResultsBody      - the string content to compare against the
-     *                               expected result file contents
-     * @return - a string describing the comparison error, if any. Returns null if
-     *         comparison succeeds
+     * @param expectedResultDataPath - a fully or partially qualified path to an expected result file in JSON format
+     * @param actualResultsBody      - the string content to compare against the expected result file contents
+     * @return - a string describing the comparison error, if any. Returns null if comparison succeeds
      * @throws IOException
      */
     public static String compareToJSONExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,
@@ -454,12 +414,9 @@ public abstract class AbstractHttpComparisonTest {
     }
 
     /**
-     * @param expectedResultDataPath - a fully or partially qualified path to an
-     *                               expected result file in text format
-     * @param actualResultsBody      - the string content to compare against the
-     *                               expected result file contents
-     * @return - a string describing the comparison error, if any. Returns null if
-     *         comparison succeeds
+     * @param expectedResultDataPath - a fully or partially qualified path to an expected result file in text format
+     * @param actualResultsBody      - the string content to compare against the expected result file contents
+     * @return - a string describing the comparison error, if any. Returns null if comparison succeeds
      * @throws IOException
      */
     public static String compareToTextExpectedResultsFile(String expectedResultFileDataPath, String actualResultsBody,

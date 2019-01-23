@@ -46,6 +46,8 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
@@ -75,11 +77,19 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     public void setUp() throws Exception {
         jobsService = new ZosmfJobsService();
         jobsService.zosmfconnector = zosmfConnector;
-        when(zosmfConnector.getFullUrl(anyString())).thenAnswer(new org.mockito.stubbing.Answer<String>() {
+        when(zosmfConnector.getFullUrl(anyString())).thenAnswer(new org.mockito.stubbing.Answer<URI>() {
             @Override
-            public String answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
+            public URI answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
                 Object[] args = invocation.getArguments();
-                return BASE_URL + (String) args[0];
+                return new URI(BASE_URL + (String) args[0]);
+            }
+        });
+
+        when(zosmfConnector.getFullUrl(anyString(), anyString())).thenAnswer(new org.mockito.stubbing.Answer<URI>() {
+            @Override
+            public URI answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
+                Object[] args = invocation.getArguments();
+                return new URI(BASE_URL + (String) args[0] + "?" + (String) args[1]);
             }
         });
     }
@@ -119,7 +129,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         assertEquals(expected, jobsService.getJobs(prefix, owner, status));
 
-        verifyInteractions(requestBuilder);
+        verifyInteractions(requestBuilder, true);
     }
 
     @Test
@@ -151,7 +161,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         String prefix = "PREFIX";
         String owner = "OWNER";
-        String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
+        String path = String.format(BASE_URL + "restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
         org.springframework.http.HttpStatus status = org.springframework.http.HttpStatus.I_AM_A_TEAPOT;
 
         Exception expectedException = new NoZosmfResponseEntityException(status, path);
@@ -169,7 +179,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, JobStatus.ALL));
 
-        verifyInteractions(requestBuilder);
+        verifyInteractions(requestBuilder, true);
     }
 
     @Test
@@ -230,11 +240,11 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         String jobName = "ATLJ5000";
         String jobId = "JOB21489";
         JobFile jesmsglg = JobFile.builder().id(2).ddname("JESMSGLG").recfm("UA").lrecl(133).byteCount(1103)
-                .recordCount(20).build();
+            .recordCount(20).build();
         JobFile jesjcl = JobFile.builder().id(3).ddname("JESJCL").recfm("V").lrecl(136).byteCount(182).recordCount(3)
-                .build();
+            .build();
         JobFile jesysmsg = JobFile.builder().id(4).ddname("JESYSMSG").recfm("VA").lrecl(137).byteCount(820)
-                .recordCount(13).build();
+            .recordCount(13).build();
         List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
 
         HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
@@ -573,35 +583,51 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     private static Job createJob(String id, String jobName, String owner, String type, JobStatus status, String phase,
             String returnCode) {
         return Job.builder().jobId(id) // $NON-NLS-1$
-                .jobName(jobName) // $NON-NLS-1$
-                .owner(owner) // $NON-NLS-1$
-                .type(type) // $NON-NLS-1$
-                .status(status) // $NON-NLS-1$
-                .subsystem("JES2") //$NON-NLS-1$
-                .executionClass(type) // $NON-NLS-1$
-                .phaseName(phase) // $NON-NLS-1$
-                .returnCode(returnCode) // $NON-NLS-1$
-                .build();
+            .jobName(jobName) // $NON-NLS-1$
+            .owner(owner) // $NON-NLS-1$
+            .type(type) // $NON-NLS-1$
+            .status(status) // $NON-NLS-1$
+            .subsystem("JES2") //$NON-NLS-1$
+            .executionClass(type) // $NON-NLS-1$
+            .phaseName(phase) // $NON-NLS-1$
+            .returnCode(returnCode) // $NON-NLS-1$
+            .build();
     }
 
     // TODO - refactor with datasets
-    private void verifyInteractions(RequestBuilder requestBuilder) throws IOException {
+    private void verifyInteractions(RequestBuilder requestBuilder) throws IOException, URISyntaxException {
+        verifyInteractions(requestBuilder, false);
+    }
+
+    // TODO - improve code - remove bool?
+    private void verifyInteractions(RequestBuilder requestBuilder, boolean path)
+            throws IOException, URISyntaxException {
         verify(zosmfConnector, times(1)).request(requestBuilder);
-        verify(zosmfConnector, times(1)).getFullUrl(anyString());
+        if (path) {
+            verify(zosmfConnector, times(1)).getFullUrl(anyString(), anyString());
+        } else {
+            verify(zosmfConnector, times(1)).getFullUrl(anyString());
+        }
         verifyNoMoreInteractions(zosmfConnector);
     }
 
-    private RequestBuilder mockGetBuilder(String relativeUri) {
+    private void verifyInteractionsWithPath(RequestBuilder requestBuilder) throws IOException, URISyntaxException {
+        verify(zosmfConnector, times(1)).request(requestBuilder);
+        verify(zosmfConnector, times(1)).getFullUrl(anyString(), anyString());
+        verifyNoMoreInteractions(zosmfConnector);
+    }
+
+    private RequestBuilder mockGetBuilder(String relativeUri) throws URISyntaxException {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.get(BASE_URL + relativeUri)).thenReturn(builder);
+        when(RequestBuilder.get(new URI(BASE_URL + relativeUri))).thenReturn(builder);
         return builder;
     }
 
-    private RequestBuilder mockDeleteBuilder(String relativeUri) {
+    private RequestBuilder mockDeleteBuilder(String relativeUri) throws URISyntaxException {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.delete(BASE_URL + relativeUri)).thenReturn(builder);
+        when(RequestBuilder.delete(new URI(BASE_URL + relativeUri))).thenReturn(builder);
         return builder;
     }
 
@@ -614,7 +640,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     private RequestBuilder mockPutBuilder(String relativeUri, JsonObject json) throws Exception {
         StringEntity stringEntity = mock(StringEntity.class);
         PowerMockito.whenNew(StringEntity.class).withArguments(json.toString(), ContentType.APPLICATION_JSON)
-                .thenReturn(stringEntity);
+            .thenReturn(stringEntity);
 
         return mockPutBuilder(relativeUri, stringEntity);
     }
@@ -623,7 +649,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.put(BASE_URL + relativeUri)).thenReturn(builder);
+        when(RequestBuilder.put(new URI(BASE_URL + relativeUri))).thenReturn(builder);
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
         return builder;
@@ -634,10 +660,10 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         StringEntity stringEntity = mock(StringEntity.class);
         PowerMockito.whenNew(StringEntity.class).withArguments(jsonString, Charset.forName("UTF-8"))
-                .thenReturn(stringEntity);
+            .thenReturn(stringEntity);
 
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.post(BASE_URL + relativeUri)).thenReturn(builder);
+        when(RequestBuilder.post(new URI(BASE_URL + relativeUri))).thenReturn(builder);
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
         return builder;

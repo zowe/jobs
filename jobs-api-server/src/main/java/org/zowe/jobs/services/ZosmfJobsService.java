@@ -42,6 +42,8 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,10 +70,10 @@ public class ZosmfJobsService implements JobsService {
             queryOwner = owner;
         }
 
-        String urlPath = String.format("restjobs/jobs?owner=%s&prefix=%s", queryOwner, queryPrefix); //$NON-NLS-1$
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        List<Job> jobs = new ArrayList<>();
+        String query = String.format("owner=%s&prefix=%s", queryOwner, queryPrefix); //$NON-NLS-1$
         try {
+            URI requestUrl = zosmfconnector.getFullUrl("restjobs/jobs", query);
+            List<Job> jobs = new ArrayList<>();
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_OK) {
@@ -83,6 +85,7 @@ public class ZosmfJobsService implements JobsService {
                         jobs.add(job);
                     }
                 }
+                return jobs;
             } else {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -117,28 +120,27 @@ public class ZosmfJobsService implements JobsService {
                         throw new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
                     }
                 } else {
-                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
+                    throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode),
+                            requestUrl.toString());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("getJobs", e);
             throw new ServerErrorException(e);
         }
-        return jobs;
     }
 
     @Override
     public Job getJob(String jobName, String jobId) {
 
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        Job job = null;
         try {
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_OK) {
                 JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-                job = getJobFromJson(jsonResponse.getAsJsonObject());
+                return getJobFromJson(jsonResponse.getAsJsonObject());
             } else {
                 HttpEntity entity = response.getEntity();
                 // TODO - work out how to tidy when brain is sharper
@@ -151,7 +153,7 @@ public class ZosmfJobsService implements JobsService {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
                                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
-                                        .equals(zosmfMessage)) {
+                                    .equals(zosmfMessage)) {
                                     throw new JobNameNotFoundException(jobName, jobId);
                                 } else
                                     // TODO LATER - improve this if we ever hit
@@ -187,21 +189,18 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("getJob", e);
             throw new ServerErrorException(e);
         }
-        return job;
     }
 
     @Override
     public Job submitJobString(String jcl) {
         String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
 
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        Job job = null;
         try {
-
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(new StringEntity(jcl));
             requestBuilder.addHeader("X-IBM-Intrdr-Class", "A");
             requestBuilder.addHeader("X-IBM-Intrdr-Recfm", "F");
@@ -214,7 +213,7 @@ public class ZosmfJobsService implements JobsService {
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_CREATED) {
                 JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-                job = getJobFromJson(jsonResponse.getAsJsonObject());
+                return getJobFromJson(jsonResponse.getAsJsonObject());
             } else {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -237,21 +236,17 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("submitJobString", e);
             throw new ServerErrorException(e);
         }
-        return job;
     }
 
     @Override
     public Job submitJobFile(String dataSet) {
         String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
-
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        Job job = null;
         try {
-
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             JsonObject body = new JsonObject();
             body.addProperty("file", "//'" + dataSet + "'");
 
@@ -262,7 +257,7 @@ public class ZosmfJobsService implements JobsService {
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_CREATED) {
                 JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-                job = getJobFromJson(jsonResponse.getAsJsonObject());
+                return getJobFromJson(jsonResponse.getAsJsonObject());
             } else {
                 HttpEntity entity = response.getEntity();
                 if (entity != null) {
@@ -286,7 +281,7 @@ public class ZosmfJobsService implements JobsService {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
                                 if (String.format("Error opening input data set: //'%s'", dataSet)
-                                        .equals(zosmfMessage)) {
+                                    .equals(zosmfMessage)) {
                                     throw new DataSetNotFoundException(dataSet);
                                 } else
                                     // TODO LATER - improve this if we ever hit
@@ -311,18 +306,17 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("submitJobFile", e);
             throw new ServerErrorException(e);
         }
-        return job;
     }
 
     @Override
     public void purgeJob(String jobName, String jobId) {
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
         try {
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.delete(requestUrl));
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode != HttpStatus.SC_ACCEPTED) {
@@ -337,7 +331,7 @@ public class ZosmfJobsService implements JobsService {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
                                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
-                                        .equals(zosmfMessage)) {
+                                    .equals(zosmfMessage)) {
                                     throw new JobNameNotFoundException(jobName, jobId);
                                 } else
                                     // TODO LATER - improve this if we ever hit
@@ -362,7 +356,7 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("purgeJob", e);
             throw new ServerErrorException(e);
         }
@@ -371,17 +365,17 @@ public class ZosmfJobsService implements JobsService {
     @Override
     public List<JobFile> getJobFiles(String jobName, String jobId) {
         String urlPath = String.format("restjobs/jobs/%s/%s/files", jobName, jobId); //$NON-NLS-1$
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        List<JobFile> jobFiles = new ArrayList<>();
         try {
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_OK) {
                 JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-
+                List<JobFile> jobFiles = new ArrayList<>();
                 for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
                     jobFiles.add(getJobFileFromJson(jsonElement.getAsJsonObject()));
                 }
+                return jobFiles;
             } else {
                 HttpEntity entity = response.getEntity();
                 // TODO - work out how to tidy when brain is sharper
@@ -394,7 +388,7 @@ public class ZosmfJobsService implements JobsService {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
                                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
-                                        .equals(zosmfMessage)) {
+                                    .equals(zosmfMessage)) {
                                     throw new JobNameNotFoundException(jobName, jobId);
                                 } else
                                     // TODO LATER - improve this if we ever hit
@@ -431,23 +425,21 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("getJob", e);
             throw new ServerErrorException(e);
         }
-        return jobFiles;
     }
 
     @Override
     public JobFileContent getJobFileContent(String jobName, String jobId, String fileId) {
         String urlPath = String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId); //$NON-NLS-1$
-        String requestUrl = zosmfconnector.getFullUrl(urlPath);
-        JobFileContent jobFileContent;
         try {
+            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_OK) {
-                jobFileContent = new JobFileContent(ResponseUtils.getEntity(response));
+                return new JobFileContent(ResponseUtils.getEntity(response));
             } else {
                 HttpEntity entity = response.getEntity();
                 // TODO - work out how to tidy when brain is sharper
@@ -460,10 +452,11 @@ public class ZosmfJobsService implements JobsService {
                             if (jsonResponse.has("message")) {
                                 String zosmfMessage = jsonResponse.get("message").getAsString();
                                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId)
-                                        .equals(zosmfMessage)) {
+                                    .equals(zosmfMessage)) {
                                     throw new JobNameNotFoundException(jobName, jobId);
-                                } else if (String.format("Job '%s(%s)' does not contain spool file id %s", jobName,
-                                        jobId, fileId).equals(zosmfMessage)) {
+                                } else if (String
+                                    .format("Job '%s(%s)' does not contain spool file id %s", jobName, jobId, fileId)
+                                    .equals(zosmfMessage)) {
                                     throw new JobFileIdNotFoundException(jobName, jobId, fileId);
                                 } else {
                                     // TODO LATER - improve this if we ever hit
@@ -501,11 +494,10 @@ public class ZosmfJobsService implements JobsService {
                     throw new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), urlPath);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             log.error("getJobFileContent", e);
             throw new ServerErrorException(e);
         }
-        return jobFileContent;
     }
 
     @Override
@@ -520,22 +512,22 @@ public class ZosmfJobsService implements JobsService {
 
     private static Job getJobFromJson(JsonObject returned) {
         return Job.builder().jobId(returned.get("jobid").getAsString()) //$NON-NLS-1$
-                .jobName(returned.get("jobname").getAsString()) //$NON-NLS-1$
-                .owner(returned.get("owner").getAsString()) //$NON-NLS-1$
-                .type(returned.get("type").getAsString()) //$NON-NLS-1$
-                .status(JobStatus.valueOf(returned.get("status").getAsString())) //$NON-NLS-1$
-                .returnCode(getStringOrNull(returned, "retcode")) //$NON-NLS-1$
-                .subsystem(returned.get("subsystem").getAsString()) //$NON-NLS-1$
-                .executionClass(returned.get("class").getAsString()) //$NON-NLS-1$
-                .phaseName(returned.get("phase-name").getAsString()) //$NON-NLS-1$
-                .build();
+            .jobName(returned.get("jobname").getAsString()) //$NON-NLS-1$
+            .owner(returned.get("owner").getAsString()) //$NON-NLS-1$
+            .type(returned.get("type").getAsString()) //$NON-NLS-1$
+            .status(JobStatus.valueOf(returned.get("status").getAsString())) //$NON-NLS-1$
+            .returnCode(getStringOrNull(returned, "retcode")) //$NON-NLS-1$
+            .subsystem(returned.get("subsystem").getAsString()) //$NON-NLS-1$
+            .executionClass(returned.get("class").getAsString()) //$NON-NLS-1$
+            .phaseName(returned.get("phase-name").getAsString()) //$NON-NLS-1$
+            .build();
     }
 
     private static JobFile getJobFileFromJson(JsonObject returned) {
         return JobFile.builder().id(returned.get("id").getAsLong()).ddname(returned.get("ddname").getAsString())
-                .recfm(returned.get("recfm").getAsString()).lrecl(returned.get("lrecl").getAsLong())
-                .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
-                .build();
+            .recfm(returned.get("recfm").getAsString()).lrecl(returned.get("lrecl").getAsLong())
+            .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
+            .build();
     }
 
     private static String getStringOrNull(JsonObject json, String key) {
