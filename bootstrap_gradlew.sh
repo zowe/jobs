@@ -9,7 +9,7 @@ if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
         echo "Gradle wrapper download failed. Bootstrap failed."
         exit 1
     else
-        echo " Gradle wrapper download success; bootstrap complete."
+        echo "Gradle wrapper download success; bootstrap complete."
         exit 0
     fi
 else

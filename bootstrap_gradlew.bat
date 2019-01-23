@@ -11,5 +11,3 @@ if not exist gradle/wrapper/gradle-wrapper.jar (
 ) else (
     echo Gradle Wrapper found; bootstrap complete.
 )
-
-rem  powershell -Command <wget https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar -OutFile gradle-wrapper.jar>
