@@ -611,12 +611,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verifyNoMoreInteractions(zosmfConnector);
     }
 
-    private void verifyInteractionsWithPath(RequestBuilder requestBuilder) throws IOException, URISyntaxException {
-        verify(zosmfConnector, times(1)).request(requestBuilder);
-        verify(zosmfConnector, times(1)).getFullUrl(anyString(), anyString());
-        verifyNoMoreInteractions(zosmfConnector);
-    }
-
     private RequestBuilder mockGetBuilder(String relativeUri) throws URISyntaxException {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
