@@ -9,12 +9,17 @@
  */
 package org.zowe.jobs.tests;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -36,6 +41,11 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
     static final String JOB_WITH_STEPS = "JOB1DD";
 
     static final String TEST_JCL_PDS = USER.toUpperCase() + ".TEST.JCL";
+
+    @BeforeClass
+    public static void setUpEndpoint() throws Exception {
+        RestAssured.basePath = JOBS_ROOT_ENDPOINT;
+    }
 
     static Job submitJobAndPoll(String testJobName) throws Exception {
         return submitJobAndPoll(testJobName, null);
@@ -67,6 +77,24 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
     public static IntegrationTestResponse purgeJob(Job job) throws Exception {
         return sendDeleteRequest(getJobUri(job));
+    }
+
+    static Response getJobs(String prefix, String owner) {
+        return getJobs(prefix, owner, null);
+    }
+
+    static Response getJobs(String prefix, String owner, JobStatus status) {
+        RequestSpecification request = RestAssured.given();
+        if (prefix != null) {
+            request = request.queryParam("prefix", prefix);
+        }
+        if (owner != null) {
+            request = request.queryParam("owner", owner);
+        }
+        if (status != null) {
+            request = request.queryParam("status", status.name());
+        }
+        return request.when().get();
     }
 
     public static IntegrationTestResponse getJob(Job job) throws Exception {

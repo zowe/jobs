@@ -9,6 +9,8 @@
  */
 package org.zowe.tests;
 
+import io.restassured.RestAssured;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -55,6 +57,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.restassured.RestAssured.preemptive;
+
 import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractHttpComparisonTest {
@@ -62,7 +66,7 @@ public abstract class AbstractHttpComparisonTest {
     // TODO LATER - fix to use RestAssured
 
     private final static String SERVER_HOST = System.getProperty("server.host");
-    private final static int SERVER_PORT = Integer.parseInt(System.getProperty("server.port"));
+    private final static int SERVER_PORT = Integer.valueOf(System.getProperty("server.port"));
 
     protected final static String BASE_URL = "https://" + SERVER_HOST + ":" + SERVER_PORT + "/api/v1/";
 
@@ -70,6 +74,14 @@ public abstract class AbstractHttpComparisonTest {
     private final static String PASSWORD = System.getProperty("server.password");
 
     public static final String EOL = System.getProperty("line.separator");
+
+    @BeforeClass
+    public static void setUpConnection() {
+        RestAssured.port = SERVER_PORT;
+        RestAssured.baseURI = BASE_URL;
+        RestAssured.useRelaxedHTTPSValidation();
+        RestAssured.authentication = preemptive().basic(USER, PASSWORD);
+    }
 
     @BeforeClass
     public static void setupClass() throws Exception {

@@ -9,17 +9,28 @@
  */
 package org.zowe.jobs.tests;
 
+import io.restassured.http.ContentType;
+
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
+import org.hamcrest.collection.IsEmptyCollection;
+import org.hamcrest.text.IsEqualIgnoringCase;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.zowe.api.common.errors.ApiError;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.jobs.exceptions.InvalidOwnerException;
+import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
-import java.util.HashMap;
+import java.util.List;
 
-//TODO LATER - fix to use RestAssured
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
     private static Job job;
@@ -34,131 +45,93 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
         purgeJob(job);
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobs() {
-        System.out.println("> testGetJobs()");
+        List<Job> actual = getJobs(null, null).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+            .getList("", Job.class);
 
-        String relativeURI = "jobs";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
+        // We have results, they are of type job and all have owner = user
+        assertTrue(actual.size() > 0);
+        for (Job job : actual) {
+            assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
+        }
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithUnlikelyPrefix() {
-        System.out.println("> testGetJobsWithUnlikelyPrefix()");
-
-        String relativeURI = "jobs?prefix=12345678";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_unlikelyPrefix.json";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode);
+        String prefix = "12345678";
+        getJobs(prefix, null).then().statusCode(HttpStatus.SC_OK).body("$", IsEmptyCollection.empty());
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithInvalidPrefix() {
-        System.out.println("> testGetJobsWithInvalidPrefix()");
+        String prefix = "123456789";
+        ZoweApiRestException expected = new InvalidPrefixException(prefix);
 
-        String relativeURI = "jobs?prefix=123456789";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_invalidPrefix.json";
-        int expectedReturnCode = HttpStatus.SC_BAD_REQUEST;
+        ApiError expectedError = expected.getApiError();
 
-        HashMap<String, String> substitutionVars = new HashMap<String, String>();
-        substitutionVars.put("ATLAS.USERNAME", USER.toUpperCase());
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode,
-                substitutionVars, false);
+        getJobs(prefix, null).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithUnlikelyOwner() {
-        System.out.println("> testGetJobsWithUnlikelyOwner()");
-
-        String relativeURI = "jobs?owner=12345678";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_unlikelyPrefix.json";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode);
+        String owner = "12345678";
+        getJobs(null, owner).then().statusCode(HttpStatus.SC_OK).body("$", IsEmptyCollection.empty());
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithInvalidOwner() {
-        System.out.println("> testGetJobsWithInvalidOwner()");
+        String owner = "123456789";
+        ZoweApiRestException expected = new InvalidOwnerException(owner);
 
-        String relativeURI = "jobs?owner=123456789";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_invalidOwner.json";
-        int expectedReturnCode = HttpStatus.SC_BAD_REQUEST;
+        ApiError expectedError = expected.getApiError();
 
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, false);
+        getJobs(null, owner).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithOwnerAndPrefix() {
-        System.out.println("> testGetJobsWithOwnerAndPrefix()");
+        String owner = USER;
+        String prefix = job.getJobName();
+        List<Job> actual = getJobs(prefix, owner).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+            .getList("", Job.class);
 
-        String relativeURI = "jobs?owner=" + USER + "&prefix=*";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
+        // We have results, they are of type job and all have owner = user and prefix
+        assertTrue(actual.size() > 0);
+        for (Job job : actual) {
+            assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
+            assertThat(job.getJobName(), org.hamcrest.core.StringStartsWith.startsWith(prefix));
+        }
     }
 
-    /**
-     * GET /Atlas/jobs
-     */
     @Test
     public void testGetJobsWithCurrentUserAsOwnerAndSpecificPrefix() throws Exception {
-        System.out.println("> testGetJobsWithSpecificOwnerAndPrefix()");
+        String prefix = job.getJobName();
+        List<Job> actual = getJobs(prefix, null).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+            .getList("", Job.class);
 
-        String relativeURI = "jobs?prefix=" + job.getJobName();
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_specificPrefix_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode,
-                getSubstitutionVars(job), true);
+        // We have results, they are of type job and all have owner = user and prefix
+        assertTrue(actual.size() > 0);
+        for (Job job : actual) {
+            assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
+            assertThat(job.getJobName(), org.hamcrest.core.StringStartsWith.startsWith(prefix));
+        }
     }
 
-    /**
-     * GET /Atlas/jobs
-     *
-     * @throws Exception
-     */
     @Test
     public void testGetJobsWithCurrentUserAsOwnerSpecificPrefixAndStatus() throws Exception {
-        System.out.println("> testGetJobsWithSpecificOwnerAndPrefix()");
+        List<Job> actual = getJobs(null, null, JobStatus.OUTPUT).then().statusCode(HttpStatus.SC_OK).extract().body()
+            .jsonPath().getList("", Job.class);
 
-        String relativeURI = "jobs?status=OUTPUT&prefix=" + job.getJobName();
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/Jobs_specificPrefix_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode,
-                getSubstitutionVars(job), true);
+        // We have results, they are of type job and all have owner = user and status OUTPUT
+        assertTrue(actual.size() > 0);
+        for (Job job : actual) {
+            assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
+            assertEquals(JobStatus.OUTPUT, job.getStatus());
+        }
     }
 }
