@@ -48,7 +48,6 @@ import org.zowe.jobs.model.JobStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -649,12 +648,22 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         return builder;
     }
 
-    private RequestBuilder mockPostBuilder(String relativeUri, String jsonString) throws Exception {
-        RequestBuilder builder = mock(RequestBuilder.class);
-
+    private RequestBuilder mockPostBuilder(String relativeUri, String string) throws Exception {
         StringEntity stringEntity = mock(StringEntity.class);
-        PowerMockito.whenNew(StringEntity.class).withArguments(jsonString, Charset.forName("UTF-8"))
+        PowerMockito.whenNew(StringEntity.class).withArguments(string).thenReturn(stringEntity);
+        return mockPostBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPostBuilder(String relativeUri, JsonObject json) throws Exception {
+        StringEntity stringEntity = mock(StringEntity.class);
+        PowerMockito.whenNew(StringEntity.class).withArguments(json.toString(), ContentType.APPLICATION_JSON)
             .thenReturn(stringEntity);
+
+        return mockPostBuilder(relativeUri, stringEntity);
+    }
+
+    private RequestBuilder mockPostBuilder(String relativeUri, StringEntity stringEntity) throws Exception {
+        RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
         when(RequestBuilder.post(new URI(BASE_URL + relativeUri))).thenReturn(builder);
