@@ -1,12 +1,11 @@
 #!/usr/bin/env sh
 
-if [[ ! -f gradle/wrapper/gradle-wrapper.jar ]]; then
+if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
     echo "Gradle Wrapper not found. Attempting to download..."
     curl --silent --output gradle/wrapper/gradle-wrapper.jar \
             https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar
     rc=$?;
-    echo $rc
-    if [[ $rc != 0 ]]; then
+    if [ $rc != 0 ]; then
         echo "Gradle wrapper download failed. Bootstrap failed."
         exit 1
     else
