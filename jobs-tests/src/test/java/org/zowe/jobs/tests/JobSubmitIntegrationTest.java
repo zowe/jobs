@@ -29,7 +29,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 
     @BeforeClass
     public static void setUpJobDatasetsIfRequired() throws Exception {
-        // TODO - fix AbstractDatasetsIntegrationTest.initialiseDatasetsIfNescessary();
+        // TODO - fix AbstractDatasetsIntegrationTest.initialiseDatasetsIfNecessary();
     }
 
     @Test
@@ -77,7 +77,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 //    @Test
 //    public void testPostJobFromUSS() throws Exception {
 //        String submitJobUssPath = USER_DIRECTORY + "/submitJob";
-//        createUssFileWithJobIfNescessary(submitJobUssPath);
+//        createUssFileWithJobIfNecessary(submitJobUssPath);
 //        submitAndVerifySuccessfulJob(submitJobUssPath);
 //    }
 
@@ -86,7 +86,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         return USER.toUpperCase() + ".TEST.JCL(" + member + ")";
     }
 
-//    private void createUssFileWithJobIfNescessary(String submitJobUssPath) throws Exception {
+//    private void createUssFileWithJobIfNecessary(String submitJobUssPath) throws Exception {
 //        if (getAttributes(submitJobUssPath).getStatus() != HttpStatus.SC_OK) {
 //            createFile(submitJobUssPath, null);
 //            String jobContent = new String(Files.readAllBytes(Paths.get("testFiles/jobIEFBR14")));
