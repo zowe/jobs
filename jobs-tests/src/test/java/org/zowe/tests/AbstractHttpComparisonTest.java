@@ -58,7 +58,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.preemptive;
-
 import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractHttpComparisonTest {
