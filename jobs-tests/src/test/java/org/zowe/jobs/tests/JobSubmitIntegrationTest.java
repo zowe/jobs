@@ -10,6 +10,10 @@
 
 package org.zowe.jobs.tests;
 
+import io.restassured.http.ContentType;
+import io.restassured.response.ValidatableResponse;
+
+import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,9 +23,8 @@ import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.tests.IntegrationTestResponse;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 //TODO LATER - fix to use RestAssured
@@ -38,23 +41,45 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     private void submitJclStringAndVerifyJob(String fileString) throws Exception {
-        IntegrationTestResponse submitResponse = submitJobJclStringFromFile(fileString).shouldHaveStatusCreated();
-        verifyJob(submitJobJclStringFromFile(fileString));
+        ValidatableResponse response = submitJobJclStringFromFile(fileString).then().statusCode(HttpStatus.SC_CREATED);
+        verifyJob(response);
+    }
+
+    private void verifyJob(ValidatableResponse response) throws Exception {
+        Job actual = response.extract().body().as(Job.class);
+        String jobName = actual.getJobName();
+        String jobId = actual.getJobId();
+        Job expected = Job.builder().owner(USER.toUpperCase()).subsystem("JES2").type("JOB").executionClass("A")
+            .build();
+
+        // We can't know these values at the moment based on input & timing
+        actual.setJobId(null);
+        actual.setJobName(null);
+        actual.setStatus(null);
+        actual.setPhaseName(null);
+
+        assertEquals(actual, expected);
+
+        response.header("Location", endsWith(JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId));
     }
 
     @Test
     public void testSubmitJobByStringWithBadJcl() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                .message("Job input was not recognized by system as a job").build();
-        submitJobJclString("//Some bad jcl").shouldReturnError(expected);
+        ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
+            .message("Job input was not recognized by system as a job").build();
+
+        submitJobJclString("//Some bad jcl").then().statusCode(expectedError.getStatus().value())
+            .contentType(ContentType.JSON).body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
     }
 
     @Test
     public void testSubmitJobByStringWithEmptyJcl() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
-                .message("Invalid field jcl supplied to object submitJobStringRequest - JCL string can't be empty")
-                .build();
-        submitJobJclString("").shouldReturnError(expected);
+        ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
+            .message("Invalid field jcl supplied to object submitJobStringRequest - JCL string can't be empty").build();
+        submitJobJclString("").then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
     }
 
 //     TODO LATER - test submitting other invalid JCL (eg line > 72)
@@ -102,10 +127,6 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         verifyJob(submitJobByFile(fileString), expectedResultFilePath);
     }
 
-    private void verifyJob(IntegrationTestResponse submitResponse) throws Exception {
-        verifyJob(submitResponse, "expectedResults/Jobs/JobsResponse.json");
-    }
-
     private void verifyJob(IntegrationTestResponse submitResponse, String expectedResultFilePath) throws Exception {
         submitResponse.shouldHaveStatusCreated();
         Job actualJob = submitResponse.getEntityAs(Job.class);
@@ -115,15 +136,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
                     + actualJob.getJobId();
             submitResponse.shouldHaveLocationHeader(expectedLocation);
         } finally {
-            purgeJob(actualJob);
+            deleteJob(actualJob);
         }
-    }
-
-    private void submitErrorJobByFileName(String fileString, int expectedStatus, String expectedErrorFilePath)
-            throws Exception {
-        String actualError = submitJobByFile(fileString).shouldHaveStatus(expectedStatus).getEntity();
-        String expectedError = new String(Files.readAllBytes(Paths.get(expectedErrorFilePath)));
-
-        assertEquals(expectedError, actualError);
     }
 }

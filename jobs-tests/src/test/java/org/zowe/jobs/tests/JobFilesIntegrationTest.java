@@ -32,7 +32,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
 
     @AfterClass
     public static void purgeJob() throws Exception {
-        purgeJob(job);
+        deleteJob(job);
     }
 
     /**

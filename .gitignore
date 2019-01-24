@@ -3,8 +3,8 @@ target/
 .history/
 
 # Gradle
-
 .idea/
+gradle/wrapper/gradle-wrapper.jar
 
 ### STS ###
 .apt_generated

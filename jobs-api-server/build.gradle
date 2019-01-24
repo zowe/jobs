@@ -32,4 +32,13 @@ dependencies {
     testCompile libraries.explorer_api_common_test
 }
 
-bootJar.archiveName = "${bootJar.baseName}-${bootJar.version}.jar"
+// We need to create a regular JAR (not spring boot) to resolve dependencies in jobs-tests
+// TODO: Is there a better way to handle dependency resolution for spring-based projects?
+jar {
+    enabled = true
+}
+
+bootJar {
+    mainClassName = 'org.zowe.jobs.JesJobsApplication'
+    classifier = 'boot'
+}

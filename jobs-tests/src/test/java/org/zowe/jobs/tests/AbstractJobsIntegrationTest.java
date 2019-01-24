@@ -9,12 +9,17 @@
  */
 package org.zowe.jobs.tests;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -37,6 +42,11 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
     static final String TEST_JCL_PDS = USER.toUpperCase() + ".TEST.JCL";
 
+    @BeforeClass
+    public static void setUpEndpoint() throws Exception {
+        RestAssured.basePath = JOBS_ROOT_ENDPOINT;
+    }
+
     static Job submitJobAndPoll(String testJobName) throws Exception {
         return submitJobAndPoll(testJobName, null);
     }
@@ -51,30 +61,57 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
     }
 
     public static Job submitJobString(String jobFile) throws Exception {
-        return submitJobJclStringFromFile(jobFile).shouldHaveStatusCreated().getEntityAs(Job.class);
+        return submitJobJclStringFromFile(jobFile).then().statusCode(HttpStatus.SC_CREATED).extract().body()
+            .as(Job.class);
     }
 
-    static IntegrationTestResponse submitJobJclStringFromFile(String jobFile) throws Exception {
+    static Response submitJobJclStringFromFile(String jobFile) throws Exception {
         String jcl = new String(Files.readAllBytes(Paths.get("testFiles/" + jobFile)));
         return submitJobJclString(jcl);
     }
 
-    static IntegrationTestResponse submitJobJclString(String jclString) throws Exception {
+    static Response submitJobJclString(String jclString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("jcl", jclString);
-        return sendPostRequest(JOBS_ROOT_ENDPOINT + "/string", body);
+        return RestAssured.given().contentType("application/json").body(body.toString()).when().post("/string");
     }
 
-    public static IntegrationTestResponse purgeJob(Job job) throws Exception {
-        return sendDeleteRequest(getJobUri(job));
+    public static Response deleteJob(Job job) throws Exception {
+        return RestAssured.given().when().delete(getJobPath(job));
+    }
+
+    static Response getJobs(String prefix, String owner) {
+        return getJobs(prefix, owner, null);
+    }
+
+    static Response getJobs(String prefix, String owner, JobStatus status) {
+        RequestSpecification request = RestAssured.given();
+        if (prefix != null) {
+            request = request.queryParam("prefix", prefix);
+        }
+        if (owner != null) {
+            request = request.queryParam("owner", owner);
+        }
+        if (status != null) {
+            request = request.queryParam("status", status.name());
+        }
+        return request.when().get();
     }
 
     public static IntegrationTestResponse getJob(Job job) throws Exception {
         return sendGetRequest2(getJobUri(job));
     }
 
-    public static IntegrationTestResponse getJob(String jobName, String jobId) throws Exception {
+    public static IntegrationTestResponse getJobA(String jobName, String jobId) throws Exception {
         return sendGetRequest2(getJobUri(jobName, jobId));
+    }
+
+    static Response getJob(String jobName, String jobId) throws Exception {
+        return RestAssured.given().when().get(jobName + "/" + jobId);
+    }
+
+    protected static String getJobPath(Job job) {
+        return job.getJobName() + "/" + job.getJobId();
     }
 
     protected static String getJobUri(String jobName, String jobId) {
@@ -92,12 +129,10 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
     public static boolean pollJob(String jobName, String jobId, JobStatus waitForState) throws Exception {
         for (int i = 0; i < 20; i++) {
-            IntegrationTestResponse response = getJob(jobName, jobId);
-            System.out.println("Response status is: " + response.getStatus());
-            if (response.getStatus() == HttpStatus.SC_OK) {
+            Response response = getJob(jobName, jobId);
+            if (response.then().extract().statusCode() == HttpStatus.SC_OK) {
                 if (waitForState != null) {
-                    Job jobResponse = response.getEntityAs(Job.class);
-                    System.out.println("Job status is: " + jobResponse.getStatus());
+                    Job jobResponse = response.then().extract().body().as(Job.class);
                     if (waitForState == jobResponse.getStatus()) {
                         return true;
                     }
