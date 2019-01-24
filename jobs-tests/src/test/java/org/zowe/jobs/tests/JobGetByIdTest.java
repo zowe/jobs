@@ -10,6 +10,8 @@
 
 package org.zowe.jobs.tests;
 
+import io.restassured.http.ContentType;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -18,6 +20,8 @@ import org.zowe.jobs.model.Job;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
@@ -31,14 +35,14 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
         job = submitJobAndPoll(JOB_IEFBR14);
         String jcl = new String(Files.readAllBytes(Paths.get("testFiles/" + JOB_IEFBR14)));
         jcl = jcl.replace("ATLJ0000", "JOB#HASH");
-        jobWithHash = submitJobJclString(jcl).getEntityAs(Job.class);
+        jobWithHash = submitJobJclString(jcl).then().extract().body().as(Job.class);
 
     }
 
     @AfterClass
     public static void purgeJob() throws Exception {
-        purgeJob(job);
-        purgeJob(jobWithHash);
+        deleteJob(job);
+        deleteJob(jobWithHash);
     }
 
     @Test
@@ -55,8 +59,10 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobByNameAndNonexistingId() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+        ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
             .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000")).build();
-        getJob(job.getJobName(), "z000000").shouldReturnError(expected);
+        getJob(job.getJobName(), "z000000").then().statusCode(expectedError.getStatus().value())
+            .contentType(ContentType.JSON).body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
     }
 }

@@ -78,11 +78,14 @@ public class ZosmfJobsService implements JobsService {
             int statusCode = ResponseUtils.getStatus(response);
             if (statusCode == HttpStatus.SC_OK) {
                 JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-
                 for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
-                    Job job = getJobFromJson(jsonElement.getAsJsonObject());
-                    if (status.matches(job.getStatus())) {
-                        jobs.add(job);
+                    try {
+                        Job job = getJobFromJson(jsonElement.getAsJsonObject());
+                        if (status.matches(job.getStatus())) {
+                            jobs.add(job);
+                        }
+                    } catch (IllegalArgumentException e) {
+                        log.error("getJobs", e);
                     }
                 }
                 return jobs;

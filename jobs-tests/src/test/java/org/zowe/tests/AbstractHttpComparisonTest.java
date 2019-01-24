@@ -17,7 +17,6 @@ import com.google.gson.JsonObject;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -58,7 +57,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.preemptive;
-import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractHttpComparisonTest {
 
@@ -80,12 +78,6 @@ public abstract class AbstractHttpComparisonTest {
         RestAssured.baseURI = BASE_URL;
         RestAssured.useRelaxedHTTPSValidation();
         RestAssured.authentication = preemptive().basic(USER, PASSWORD);
-    }
-
-    @BeforeClass
-    public static void setupClass() throws Exception {
-        assertEquals("We are able to login in authenticated (if not check your password, so stop it getting revoked)",
-                HttpStatus.SC_OK, sendGetRequest("jobs").getStatusLine().getStatusCode());
     }
 
     /**
