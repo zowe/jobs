@@ -51,15 +51,18 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
         String jobName = job.getJobName();
         String jobId = job.getJobId();
 
-        JobFile jesmsglg = JobFile.builder().ddname("JESMSGLG").recfm("UA").lrecl(133).id(2).byteCount(1102)
-            .recordCount(20).build();
-        JobFile jesjcl = JobFile.builder().ddname("JESJCL").recfm("V").lrecl(136).id(3).byteCount(182).recordCount(3)
-            .build();
-        JobFile jessysmsg = JobFile.builder().ddname("JESYSMSG").recfm("VA").lrecl(137).id(4).byteCount(819)
-            .recordCount(13).build();
+        JobFile jesmsglg = JobFile.builder().ddname("JESMSGLG").recfm("UA").lrecl(133l).id(2l).build();
+        JobFile jesjcl = JobFile.builder().ddname("JESJCL").recfm("V").lrecl(136l).id(3l).build();
+        JobFile jessysmsg = JobFile.builder().ddname("JESYSMSG").recfm("VA").lrecl(137l).id(4l).build();
 
         List<JobFile> actual = getJobFiles(jobName, jobId).then().statusCode(HttpStatus.SC_OK).extract().body()
             .jsonPath().getList("", JobFile.class);
+
+        // Different systems have different byte and record counts
+        for (JobFile jobFile : actual) {
+            jobFile.setByteCount(null);
+            jobFile.setRecordCount(null);
+        }
 
         assertThat(actual, hasItems(jesmsglg, jesjcl, jessysmsg));
     }
@@ -87,7 +90,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
         String jobName = job.getJobName();
         String jobId = job.getJobId();
         String expectedContentRegex = ".*J E S 2  J O B  L O G.*------ JES2 JOB STATISTICS ------.*3 CARDS READ.*"
-                + "-           40 SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
+                + "-           .* SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
                 + "-            5 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
         Pattern regex = Pattern.compile(expectedContentRegex, Pattern.DOTALL);
         getJobFileContent(jobName, jobId, "2").then().statusCode(HttpStatus.SC_OK).body("content",
