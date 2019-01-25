@@ -1,1 +1,0 @@
-Attempt to submit dataset using z/OSMF failed for data set ''ATLAS.TEST.JCL(INVALID)''

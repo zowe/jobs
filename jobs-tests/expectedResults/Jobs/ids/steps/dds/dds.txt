@@ -1,1 +1,0 @@
-[{"content":"DSN=ATLAS.TEST.LOAD,DISP=SHR","dd":1,"dsns":["ATLAS.TEST.LOAD"],"name":"STEPLIB"},{"content":"DISP=SHR,DSN=ATLAS.TEST.FAOPTS(IDIOPTS1)","dd":2,"dsns":["ATLAS.TEST.FAOPTS(IDIOPTS1)"],"name":"IDIOPTS"},{"content":"SYSOUT=*","dd":3,"dsns":[],"name":"SYSPRINT"},{"content":"SYSOUT=*","dd":4,"dsns":[],"name":"SYSOUT"}]

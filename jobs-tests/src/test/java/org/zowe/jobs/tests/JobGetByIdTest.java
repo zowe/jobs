@@ -12,11 +12,13 @@ package org.zowe.jobs.tests;
 
 import io.restassured.http.ContentType;
 
+import org.apache.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.JobStatus;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,7 +34,7 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @BeforeClass
     public static void submitJob() throws Exception {
-        job = submitJobAndPoll(JOB_IEFBR14);
+        job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
         String jcl = new String(Files.readAllBytes(Paths.get("testFiles/" + JOB_IEFBR14)));
         jcl = jcl.replace("ATLJ0000", "JOB#HASH");
         jobWithHash = submitJobJclString(jcl).then().extract().body().as(Job.class);
@@ -47,14 +49,14 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobByNameAndId() throws Exception {
-        Job actualJob = getJob(job).shouldHaveStatusOk().getEntityAs(Job.class);
-        verifyJobIsAsExpected("expectedResults/Jobs/JobsResponse.json", actualJob);
+        Job actualJob = getJob(job).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        verifyJobIsAsExpected(actualJob);
     }
 
     @Test
     public void testGetJobByNameWithHashAndId() throws Exception {
-        Job actualJob = getJob(jobWithHash).shouldHaveStatusOk().getEntityAs(Job.class);
-        verifyJobIsAsExpected("expectedResults/Jobs/JobsResponse.json", actualJob);
+        Job actualJob = getJob(jobWithHash).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        verifyJobIsAsExpected(actualJob);
     }
 
     @Test

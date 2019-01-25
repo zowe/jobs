@@ -14,26 +14,17 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 
 import org.apache.http.HttpStatus;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.jobs.model.Job;
-import org.zowe.tests.IntegrationTestResponse;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 
-//TODO LATER - fix to use RestAssured
 public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
-
-    @BeforeClass
-    public static void setUpJobDatasetsIfRequired() throws Exception {
-        // TODO - fix AbstractDatasetsIntegrationTest.initialiseDatasetsIfNecessary();
-    }
 
     @Test
     public void testSubmitJobByString() throws Exception {
@@ -49,17 +40,8 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         Job actual = response.extract().body().as(Job.class);
         String jobName = actual.getJobName();
         String jobId = actual.getJobId();
-        Job expected = Job.builder().owner(USER.toUpperCase()).subsystem("JES2").type("JOB").executionClass("A")
-            .build();
 
-        // We can't know these values at the moment based on input & timing
-        actual.setJobId(null);
-        actual.setJobName(null);
-        actual.setStatus(null);
-        actual.setPhaseName(null);
-
-        assertEquals(actual, expected);
-
+        verifyInProgressJobIsAsExpected(actual);
         response.header("Location", endsWith(JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId));
     }
 
@@ -88,7 +70,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
     @Ignore("see todo") // TODO - need to make build environment set up dataset
     public void testSubmitJobDataSet() throws Exception {
         String dataSetPath = getTestJclMemberPath(JOB_IEFBR14);
-        submitAndVerifySuccessfulJob("'" + dataSetPath + "'");
+        submitAndVerifyJob("'" + dataSetPath + "'");
     }
 
     @Test
@@ -96,7 +78,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         String dataSet = "ATLAS.TEST.JCL(INVALID)";
         ZoweApiRestException expected = new DataSetNotFoundException(dataSet);
 
-        submitJobByFile(dataSet).shouldReturnException(expected);
+        verifyExceptionReturn(expected, submitJobByFile(dataSet));
     }
 
 //    @Test
@@ -119,24 +101,8 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 //        }
 //    }
 //
-    private void submitAndVerifySuccessfulJob(String fileName) throws Exception {
-        submitAndVerifyJob(fileName, "expectedResults/Jobs/JobsResponse.json");
-    }
 
-    private void submitAndVerifyJob(String fileString, String expectedResultFilePath) throws Exception {
-        verifyJob(submitJobByFile(fileString), expectedResultFilePath);
-    }
-
-    private void verifyJob(IntegrationTestResponse submitResponse, String expectedResultFilePath) throws Exception {
-        submitResponse.shouldHaveStatusCreated();
-        Job actualJob = submitResponse.getEntityAs(Job.class);
-        try {
-            verifyJobIsAsExpected(expectedResultFilePath, actualJob);
-            String expectedLocation = BASE_URL + JOBS_ROOT_ENDPOINT + "/" + actualJob.getJobName() + "/"
-                    + actualJob.getJobId();
-            submitResponse.shouldHaveLocationHeader(expectedLocation);
-        } finally {
-            deleteJob(actualJob);
-        }
+    private void submitAndVerifyJob(String fileString) throws Exception {
+        verifyInProgressJobIsAsExpected(submitJobByFile(fileString).then().extract().body().as(Job.class));
     }
 }

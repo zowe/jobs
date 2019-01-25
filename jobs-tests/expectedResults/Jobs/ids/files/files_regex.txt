@@ -1,1 +1,0 @@
-\[\{"ddname":"JESMSGLG","recfm":"UA","lrecl":133,"byteCount":(\d)+,"recordCount":(\d)+,"id":2\},\{"ddname":"JESJCL","recfm":"V","lrecl":136,"byteCount":(\d)+,"recordCount":(\d)+,"id":3\},\{"ddname":"JESYSMSG","recfm":"VA","lrecl":137,"byteCount":(\d)+,"recordCount":(\d)+,"id":4\}\]
