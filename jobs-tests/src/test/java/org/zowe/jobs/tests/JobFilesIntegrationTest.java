@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2018
+ * Copyright IBM Corporation 2016, 2019
  */
 
 package org.zowe.jobs.tests;
@@ -51,9 +51,9 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
         String jobName = job.getJobName();
         String jobId = job.getJobId();
 
-        JobFile jesmsglg = JobFile.builder().ddname("JESMSGLG").recfm("UA").lrecl(133l).id(2l).build();
-        JobFile jesjcl = JobFile.builder().ddname("JESJCL").recfm("V").lrecl(136l).id(3l).build();
-        JobFile jessysmsg = JobFile.builder().ddname("JESYSMSG").recfm("VA").lrecl(137l).id(4l).build();
+        JobFile jesmsglg = JobFile.builder().ddName("JESMSGLG").recordFormat("UA").recordLength(133l).id(2l).build();
+        JobFile jesjcl = JobFile.builder().ddName("JESJCL").recordFormat("V").recordLength(136l).id(3l).build();
+        JobFile jessysmsg = JobFile.builder().ddName("JESYSMSG").recordFormat("VA").recordLength(137l).id(4l).build();
 
         List<JobFile> actual = getJobFiles(jobName, jobId).then().statusCode(HttpStatus.SC_OK).extract().body()
             .jsonPath().getList("", JobFile.class);
