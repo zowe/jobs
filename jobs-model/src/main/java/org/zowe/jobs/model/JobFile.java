@@ -23,8 +23,8 @@ public class JobFile {
 
     private String ddname;
     private String recfm;
-    private long lrecl;
-    private long byteCount;
-    private long recordCount;
-    private long id;
+    private Long lrecl;
+    private Long byteCount;
+    private Long recordCount;
+    private Long id;
 }

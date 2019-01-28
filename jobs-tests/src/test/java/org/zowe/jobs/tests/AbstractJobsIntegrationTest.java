@@ -13,25 +13,24 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.Job.JobBuilder;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.tests.AbstractHttpComparisonTest;
-import org.zowe.tests.IntegrationTestResponse;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
+import static org.hamcrest.CoreMatchers.anyOf;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
 
@@ -98,12 +97,8 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         return request.when().get();
     }
 
-    public static IntegrationTestResponse getJob(Job job) throws Exception {
-        return sendGetRequest2(getJobUri(job));
-    }
-
-    public static IntegrationTestResponse getJobA(String jobName, String jobId) throws Exception {
-        return sendGetRequest2(getJobUri(jobName, jobId));
+    public static Response getJob(Job job) throws Exception {
+        return getJob(job.getJobName(), job.getJobId());
     }
 
     static Response getJob(String jobName, String jobId) throws Exception {
@@ -111,15 +106,11 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
     }
 
     protected static String getJobPath(Job job) {
-        return job.getJobName() + "/" + job.getJobId();
+        return getJobPath(job.getJobName(), job.getJobId());
     }
 
-    protected static String getJobUri(String jobName, String jobId) {
-        return JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId;
-    }
-
-    private static String getJobUri(Job job) {
-        return getJobUri(job.getJobName(), job.getJobId());
+    protected static String getJobPath(String jobName, String jobId) {
+        return jobName + "/" + jobId;
     }
 
     private static void assertPoll(String jobName, String jobId, JobStatus waitForState) throws Exception {
@@ -178,18 +169,36 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         return toUpdate;
     }
 
-    void verifyJobIsAsExpected(String expectedResultFilePath, Job actualJob)
-            throws JsonParseException, JsonMappingException, IOException {
-        Job expectedJob = JsonUtils.convertFilePath(Paths.get(expectedResultFilePath), Job.class);
-        expectedJob = getSubstitutionVars(expectedJob, actualJob);
-
-        assertEquals(expectedJob, actualJob);
+    void verifyJobIsAsExpected(Job actual) {
+        verifyJobIsAsExpected(actual, false);
     }
 
-    static IntegrationTestResponse submitJobByFile(String fileString) throws Exception {
+    void verifyInProgressJobIsAsExpected(Job actual) {
+        verifyJobIsAsExpected(actual, true);
+    }
+
+    private void verifyJobIsAsExpected(Job actual, boolean inProgress) {
+        JobBuilder builder = Job.builder().owner(USER.toUpperCase()).subsystem("JES2").type("JOB").executionClass("A");
+        if (!inProgress) {
+            builder = builder.returnCode("CC 0000").status(JobStatus.OUTPUT);
+        } else {
+            // Depending on timing we might be input, active, or output
+            assertThat(actual.getStatus(), anyOf(is(JobStatus.INPUT), is(JobStatus.ACTIVE), is(JobStatus.OUTPUT)));
+            actual.setStatus(null);
+            actual.setReturnCode(null);
+        }
+
+        // We can't know these values at the moment based on input
+        actual.setJobId(null);
+        actual.setJobName(null);
+        actual.setPhaseName(null);
+
+        assertEquals(actual, builder.build());
+    }
+
+    static Response submitJobByFile(String fileString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("file", fileString);
-
-        return sendPostRequest(JOBS_ROOT_ENDPOINT + "/dataset", body);
+        return RestAssured.given().contentType("application/json").body(body.toString()).when().post("/dataset");
     }
 }

@@ -1,4 +1,0 @@
-{
-	"message": "Requested step '99' does not exist for job (jobName = '${JOBNAME}', jobId = '${JOBID}')",
-	"status": "fail"
-}

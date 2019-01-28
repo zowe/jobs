@@ -10,15 +10,26 @@
 
 package org.zowe.jobs.tests;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpGet;
+import org.hamcrest.text.MatchesPattern;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.zowe.api.common.errors.ApiError;
+import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
+import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
+import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.tests.IntegrationTestResponse;
+
+import java.util.List;
+import java.util.regex.Pattern;
+
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertThat;
 
 //TODO - rewrite using rest assured
 public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
@@ -35,164 +46,81 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
         deleteJob(job);
     }
 
-    /**
-     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files
-     */
     @Test
     public void testGetJobOutputFiles() throws Exception {
-        System.out.println("> testGetJobOutputFiles()");
+        String jobName = job.getJobName();
+        String jobId = job.getJobId();
 
-        String relativeURI = "jobs/" + job.getJobName() + "/" + job.getJobId() + "/files";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/ids/files/files_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
+        JobFile jesmsglg = JobFile.builder().ddname("JESMSGLG").recfm("UA").lrecl(133l).id(2l).build();
+        JobFile jesjcl = JobFile.builder().ddname("JESJCL").recfm("V").lrecl(136l).id(3l).build();
+        JobFile jessysmsg = JobFile.builder().ddname("JESYSMSG").recfm("VA").lrecl(137l).id(4l).build();
 
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
+        List<JobFile> actual = getJobFiles(jobName, jobId).then().statusCode(HttpStatus.SC_OK).extract().body()
+            .jsonPath().getList("", JobFile.class);
+
+        // Different systems have different byte and record counts
+        for (JobFile jobFile : actual) {
+            jobFile.setByteCount(null);
+            jobFile.setRecordCount(null);
+        }
+
+        assertThat(actual, hasItems(jesmsglg, jesjcl, jessysmsg));
     }
 
     @Test
     public void testGetJobOutputFilesInvalidJobId() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000"))
-                .build();
-
-        getJobFiles(job.getJobName(), "z000000").shouldReturnError(expected);
+        String jobName = job.getJobName();
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobIdNotFoundException(jobName, jobId), getJobFiles(jobName, jobId));
     }
 
     @Test
     public void testGetJobOutputFilesInvalidJobNameAndId() throws Exception {
-        // TODO MAYBE - use exception?
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", "z", "z000000")).build();
-
-        getJobFiles("z", "z000000").shouldReturnError(expected);
+        String jobName = "z";
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobIdNotFoundException(jobName, jobId), getJobFiles(jobName, jobId));
     }
 
-    public static IntegrationTestResponse getJobFiles(String jobName, String jobId) throws Exception {
-        return sendGetRequest2(getJobUri(jobName, jobId) + "/files");
+    public static Response getJobFiles(String jobName, String jobId) throws Exception {
+        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files");
     }
 
-    /**
-     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
-     */
     @Test
     public void testGetJobOutputFileContents() throws Exception {
-        System.out.println("> testGetJobOutputFileFieldId()");
-
-        String relativeURI = "jobs/" + job.getJobName() + "/" + job.getJobId() + "/files/2/content";
-        String httpMethodType = HttpGet.METHOD_NAME;
-        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
-        int expectedReturnCode = HttpStatus.SC_OK;
-
-        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
+        String jobName = job.getJobName();
+        String jobId = job.getJobId();
+        String expectedContentRegex = ".*J E S 2  J O B  L O G.*------ JES2 JOB STATISTICS ------.*3 CARDS READ.*"
+                + "-           .* SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
+                + "-            5 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
+        Pattern regex = Pattern.compile(expectedContentRegex, Pattern.DOTALL);
+        getJobFileContent(jobName, jobId, "2").then().statusCode(HttpStatus.SC_OK).body("content",
+                MatchesPattern.matchesPattern(regex));
     }
 
     @Test
     public void testGetJobOutputFileContentsInvalidJobId() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000"))
-                .build();
-
-        getJobFileContent(job.getJobName(), "z000000", 2).shouldReturnError(expected);
+        String jobName = job.getJobName();
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobNameNotFoundException(jobName, jobId), getJobFileContent(jobName, jobId, "2"));
     }
 
     @Test
     public void testGetJobOutputFileContentsInvalidJobName() throws Exception {
-        // TODO MAYBE - use exception?
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", "z", "z000000")).build();
-
-        getJobFileContent("z", "z000000", 2).shouldReturnError(expected);
+        String jobName = "z";
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobIdNotFoundException(jobName, jobId), getJobFileContent(jobName, jobId, "2"));
     }
 
     @Test
     public void testGetJobOutputFileContentsInvalidJobFileId() throws Exception {
-        // TODO MAYBE - use exception?
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND).message(String
-                .format("No spool file with id '%s' was found for job %s(%s)", 999, job.getJobName(), job.getJobId()))
-                .build();
-
-        getJobFileContent(job.getJobName(), job.getJobId(), 999).shouldReturnError(expected);
+        String jobName = job.getJobName();
+        String jobId = job.getJobId();
+        String fileId = "999";
+        verifyExceptionReturn(new JobFileIdNotFoundException(jobName, jobId, fileId),
+                getJobFileContent(jobName, jobId, fileId));
     }
 
-    public static IntegrationTestResponse getJobFileContent(String jobName, String jobId, int fileId) throws Exception {
-        return sendGetRequest2(getJobUri(jobName, jobId) + "/files/" + fileId + "/content");
+    public static Response getJobFileContent(String jobName, String jobId, String fileId) throws Exception {
+        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files/" + fileId + "/content");
     }
-
-//
-//    /**
-//     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
-//     */
-//    @Test
-//    public void testGetJobOutputFileFieldIdStartParam() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldIdStartParam()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2?start=2";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
-//    }
-//
-//    /**
-//     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
-//     */
-//    @Test
-//    public void testGetJobOutputFileFieldIdEndParam() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldIdEndParam()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2?end=0";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
-//    }
-//
-//    /**
-//     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files{fieldId}
-//     */
-//    @Test
-//    public void testGetJobOutputFileFieldIdStartEndParam() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldIdStartEndParam()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2?start=0&end=1";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_line1.json";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode);
-//    }
-//
-//    /**
-//     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files/{fileId}/tail
-//     */
-//    @Test
-//    public void testGetJobOutputFileFieldIdTail() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldIdTail()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2/tail";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_regex.txt";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
-//    }
-//
-//    /**
-//     * GET /Atlas/jobs/{jobName}/ids/{jobId}/files/{fileId}/tail
-//     */
-//    @Test
-//    public void testGetJobOutputFileFieldIdTailRecords() throws Exception {
-//        System.out.println("> testGetJobOutputFileFieldIdTailRecords()");
-//
-//        String relativeURI = "jobs/" + job.getJobName() + "/ids/" + job.getJobId() + "/files/2/tail?records=1";
-//        String httpMethodType = HttpGet.METHOD_NAME;
-//        String expectedResultFilePath = "expectedResults/Jobs/ids/files/JESMSGLG_tail1.json";
-//        int expectedReturnCode = HttpStatus.SC_OK;
-//
-//        runAndVerifyHTTPRequest(relativeURI, httpMethodType, expectedResultFilePath, expectedReturnCode, null, true);
-//    }
-
 }

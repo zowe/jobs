@@ -10,19 +10,23 @@
 
 package org.zowe.jobs.tests;
 
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+
+import org.apache.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.zowe.api.common.errors.ApiError;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
-import org.zowe.tests.IntegrationTestResponse;
 
 import java.util.Collections;
 import java.util.List;
 
-//TODO - rewrite using rest assured
+import static org.junit.Assert.assertEquals;
+
 public class JobStepsIntegrationTest extends AbstractJobsIntegrationTest {
 
     private static Job job;
@@ -41,30 +45,29 @@ public class JobStepsIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobSteps() throws Exception {
         JobStep step = JobStep.builder().name("UNIT").program("IEFBR14").step(1).build();
         List<JobStep> expected = Collections.singletonList(step);
-        getJobSteps(job.getJobName(), job.getJobId()).shouldHaveStatusOk().shouldHaveEntity(expected);
+        List<JobStep> actual = getJobSteps(job.getJobName(), job.getJobId()).then().statusCode(HttpStatus.SC_OK)
+            .extract().body().jsonPath().getList("", JobStep.class);
+
+        assertEquals(expected, actual);
     }
 
     // TODO test job with no steps?
 
     @Test
     public void testGetJobOutputStepsInvalidJobId() throws Exception {
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000"))
-                .build();
-
-        getJobSteps(job.getJobName(), "z000000").shouldReturnError(expected);
+        String jobName = job.getJobName();
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobNameNotFoundException(jobName, jobId), getJobSteps(jobName, jobId));
     }
 
     @Test
     public void testGetJobOutputStepsInvalidJobNameAndId() throws Exception {
-        // TODO MAYBE - use exception?
-        ApiError expected = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-                .message(String.format("No job with name '%s' and id '%s' was found", "z", "z000000")).build();
-
-        getJobSteps("z", "z000000").shouldReturnError(expected);
+        String jobName = "z";
+        String jobId = "z0000000";
+        verifyExceptionReturn(new JobNameNotFoundException(jobName, jobId), getJobSteps(jobName, jobId));
     }
 
-    public static IntegrationTestResponse getJobSteps(String jobName, String jobId) throws Exception {
-        return sendGetRequest2(getJobUri(jobName, jobId) + "/steps");
+    public static Response getJobSteps(String jobName, String jobId) throws Exception {
+        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/steps");
     }
 }

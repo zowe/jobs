@@ -213,10 +213,10 @@ public class JobsControllerTest extends ZoweApiTest {
     @Test
     public void test_get_job_files_with_jobId_and_jobName() throws Exception {
 
-        JobFile jesjcl = JobFile.builder().id(3).ddname("JESJCL").recfm("V").lrecl(136).byteCount(182).recordCount(3)
-            .build();
-        JobFile jesmsglg = JobFile.builder().id(2).ddname("JESMSGLG").recfm("UA").lrecl(133).byteCount(1103)
-            .recordCount(20).build();
+        JobFile jesjcl = JobFile.builder().id(3l).ddname("JESJCL").recfm("V").lrecl(136l).byteCount(182l)
+            .recordCount(3l).build();
+        JobFile jesmsglg = JobFile.builder().id(2l).ddname("JESMSGLG").recfm("UA").lrecl(133l).byteCount(1103l)
+            .recordCount(20l).build();
         List<JobFile> jobFiles = Arrays.asList(jesjcl, jesmsglg);
 
         String jobName = "TESTNAME";

@@ -238,12 +238,12 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     public void get_job_files_should_call_zosmf_and_parse_response_correctly() throws Exception {
         String jobName = "ATLJ5000";
         String jobId = "JOB21489";
-        JobFile jesmsglg = JobFile.builder().id(2).ddname("JESMSGLG").recfm("UA").lrecl(133).byteCount(1103)
-            .recordCount(20).build();
-        JobFile jesjcl = JobFile.builder().id(3).ddname("JESJCL").recfm("V").lrecl(136).byteCount(182).recordCount(3)
-            .build();
-        JobFile jesysmsg = JobFile.builder().id(4).ddname("JESYSMSG").recfm("VA").lrecl(137).byteCount(820)
-            .recordCount(13).build();
+        JobFile jesmsglg = JobFile.builder().id(2l).ddname("JESMSGLG").recfm("UA").lrecl(133l).byteCount(1103l)
+            .recordCount(20l).build();
+        JobFile jesjcl = JobFile.builder().id(3l).ddname("JESJCL").recfm("V").lrecl(136l).byteCount(182l)
+            .recordCount(3l).build();
+        JobFile jesysmsg = JobFile.builder().id(4l).ddname("JESYSMSG").recfm("VA").lrecl(137l).byteCount(820l)
+            .recordCount(13l).build();
         List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
 
         HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
