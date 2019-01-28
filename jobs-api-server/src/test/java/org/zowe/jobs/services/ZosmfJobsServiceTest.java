@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.services;
 
@@ -238,12 +238,12 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     public void get_job_files_should_call_zosmf_and_parse_response_correctly() throws Exception {
         String jobName = "ATLJ5000";
         String jobId = "JOB21489";
-        JobFile jesmsglg = JobFile.builder().id(2l).ddname("JESMSGLG").recfm("UA").lrecl(133l).byteCount(1103l)
-            .recordCount(20l).build();
-        JobFile jesjcl = JobFile.builder().id(3l).ddname("JESJCL").recfm("V").lrecl(136l).byteCount(182l)
+        JobFile jesmsglg = JobFile.builder().id(2l).ddName("JESMSGLG").recordFormat("UA").recordLength(133l)
+            .byteCount(1103l).recordCount(20l).build();
+        JobFile jesjcl = JobFile.builder().id(3l).ddName("JESJCL").recordFormat("V").recordLength(136l).byteCount(182l)
             .recordCount(3l).build();
-        JobFile jesysmsg = JobFile.builder().id(4l).ddname("JESYSMSG").recfm("VA").lrecl(137l).byteCount(820l)
-            .recordCount(13l).build();
+        JobFile jesysmsg = JobFile.builder().id(4l).ddName("JESYSMSG").recordFormat("VA").recordLength(137l)
+            .byteCount(820l).recordCount(13l).build();
         List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
 
         HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));

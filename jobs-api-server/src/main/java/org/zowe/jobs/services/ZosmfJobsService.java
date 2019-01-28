@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.services;
 
@@ -527,8 +527,8 @@ public class ZosmfJobsService implements JobsService {
     }
 
     private static JobFile getJobFileFromJson(JsonObject returned) {
-        return JobFile.builder().id(returned.get("id").getAsLong()).ddname(returned.get("ddname").getAsString())
-            .recfm(returned.get("recfm").getAsString()).lrecl(returned.get("lrecl").getAsLong())
+        return JobFile.builder().id(returned.get("id").getAsLong()).ddName(returned.get("ddname").getAsString())
+            .recordFormat(returned.get("recfm").getAsString()).recordLength(returned.get("lrecl").getAsLong())
             .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
             .build();
     }

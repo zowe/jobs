@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.controller;
 
@@ -213,10 +213,10 @@ public class JobsControllerTest extends ZoweApiTest {
     @Test
     public void test_get_job_files_with_jobId_and_jobName() throws Exception {
 
-        JobFile jesjcl = JobFile.builder().id(3l).ddname("JESJCL").recfm("V").lrecl(136l).byteCount(182l)
+        JobFile jesjcl = JobFile.builder().id(3l).ddName("JESJCL").recordFormat("V").recordLength(136l).byteCount(182l)
             .recordCount(3l).build();
-        JobFile jesmsglg = JobFile.builder().id(2l).ddname("JESMSGLG").recfm("UA").lrecl(133l).byteCount(1103l)
-            .recordCount(20l).build();
+        JobFile jesmsglg = JobFile.builder().id(2l).ddName("JESMSGLG").recordFormat("UA").recordLength(133l)
+            .byteCount(1103l).recordCount(20l).build();
         List<JobFile> jobFiles = Arrays.asList(jesjcl, jesmsglg);
 
         String jobName = "TESTNAME";

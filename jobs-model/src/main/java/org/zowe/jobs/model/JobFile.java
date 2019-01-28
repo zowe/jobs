@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2018
+ * Copyright IBM Corporation 2016, 2019
  */
 
 package org.zowe.jobs.model;
@@ -21,10 +21,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class JobFile {
 
-    private String ddname;
-    private String recfm;
-    private Long lrecl;
+    private Long id;
+    private String ddName;
+    private String recordFormat;
+    private Long recordLength;
     private Long byteCount;
     private Long recordCount;
-    private Long id;
 }
