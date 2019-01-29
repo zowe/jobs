@@ -3,7 +3,7 @@
 set -ex
 
 ./bootstrap_gradlew.sh
-AUTH="-Pzowe.deploy.username=$USERNAME -Pzowe.deploy.password=$PASSWORD"
+AUTH="-Pdeploy.username=$USERNAME -Pdeploy.password=$PASSWORD"
 
 case $RELEASE_TYPE in
    "SNAPSHOT_RELEASE")
