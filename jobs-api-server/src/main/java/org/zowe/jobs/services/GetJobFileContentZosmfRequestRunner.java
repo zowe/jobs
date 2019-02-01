@@ -1,0 +1,67 @@
+package org.zowe.jobs.services;
+
+import com.google.gson.JsonObject;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
+import org.zowe.jobs.exceptions.JobIdNotFoundException;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
+import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.model.JobFileContent;
+
+import java.io.IOException;
+
+@Slf4j
+public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRunner<JobFileContent> {
+
+    private String jobName;
+    private String jobId;
+    private String fileId;
+
+    public GetJobFileContentZosmfRequestRunner(String jobName, String jobId, String fileId) {
+        this.jobName = jobName;
+        this.jobId = jobId;
+        this.fileId = fileId;
+    }
+
+    @Override
+    public JobFileContent getResult(HttpResponse response) throws IOException {
+        return new JobFileContent(ResponseUtils.getEntity(response));
+    }
+
+    // TODO NOW - review the createExceptions to look for common behaviour
+    @Override
+    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+            if (jsonResponse.has("message")) {
+                String zosmfMessage = jsonResponse.get("message").getAsString();
+                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
+                    return new JobNameNotFoundException(jobName, jobId);
+                } else if (String.format("Job '%s(%s)' does not contain spool file id %s", jobName, jobId, fileId)
+                    .equals(zosmfMessage)) {
+                    return new JobFileIdNotFoundException(jobName, jobId, fileId);
+                }
+            }
+        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
+            if (jsonResponse.has("message")) {
+                String zosmfMessage = jsonResponse.get("message").getAsString();
+                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
+                    return new JobIdNotFoundException(jobName, jobId);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static JobFile getJobFileFromJson(JsonObject returned) {
+        return JobFile.builder().id(returned.get("id").getAsLong()).ddName(returned.get("ddname").getAsString())
+            .recordFormat(returned.get("recfm").getAsString()).recordLength(returned.get("lrecl").getAsLong())
+            .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
+            .build();
+    }
+}
