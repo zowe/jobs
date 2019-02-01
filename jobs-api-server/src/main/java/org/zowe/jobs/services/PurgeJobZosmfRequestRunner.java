@@ -12,6 +12,7 @@ import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
@@ -32,16 +33,18 @@ public class PurgeJobZosmfRequestRunner extends AbstractZosmfRequestRunner<Void>
 
     @Override
     RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        return RequestBuilder.delete(requestUrl);
+    }
+
+    @Override
+    Void getResult(HttpResponse response) throws IOException {
         return null;
     }
 
     @Override
-    public Void getResult(HttpResponse response) throws IOException {
-        return null;
-    }
-
-    @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

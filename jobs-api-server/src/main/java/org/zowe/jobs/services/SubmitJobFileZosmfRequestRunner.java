@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
@@ -16,6 +18,7 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
@@ -28,24 +31,31 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfRequestRunner<
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
-        return null;
-    }
-
-    @Override
     int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_CREATED };
     }
 
     @Override
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        JsonObject body = new JsonObject();
+        body.addProperty("file", "//'" + fileName + "'");
+
+        StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
+        RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(requestEntity);
+        return requestBuilder;
+    }
+
+    @Override
     // TODO - dup of getJob & submitstring
-    public Job getResult(HttpResponse response) throws IOException {
+    Job getResult(HttpResponse response) throws IOException {
         JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
         return getJobFromJson(jsonResponse.getAsJsonObject());
     }
 
     @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

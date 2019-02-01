@@ -17,6 +17,7 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
@@ -39,17 +40,19 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRun
 
     @Override
     RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
-        return null;
+        String urlPath = String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        return RequestBuilder.get(requestUrl);
     }
 
     @Override
-    public JobFileContent getResult(HttpResponse response) throws IOException {
+    JobFileContent getResult(HttpResponse response) throws IOException {
         return new JobFileContent(ResponseUtils.getEntity(response));
     }
 
     // TODO NOW - review the createExceptions to look for common behaviour
     @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

@@ -16,6 +16,7 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,9 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
 
     @Override
     RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
-        return null;
+        String urlPath = String.format("restjobs/jobs/%s/%s/files", jobName, jobId); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        return RequestBuilder.get(requestUrl);
     }
 
     @Override
@@ -42,7 +45,7 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
     }
 
     @Override
-    public List<JobFile> getResult(HttpResponse response) throws IOException {
+    List<JobFile> getResult(HttpResponse response) throws IOException {
         JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
         List<JobFile> jobFiles = new ArrayList<>();
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
@@ -52,7 +55,7 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
     }
 
     @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();
