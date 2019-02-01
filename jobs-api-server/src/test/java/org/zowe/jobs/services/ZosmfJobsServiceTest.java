@@ -61,8 +61,8 @@ import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class,
-        ContentType.class })
+@PrepareForTest({ ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
+        SubmitJobStringZosmfRequestRunner.class })
 public class ZosmfJobsServiceTest extends ZoweApiTest {
 
     private static final String BASE_URL = "https://dummy.com/zosmf/";
@@ -610,17 +610,22 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         verifyNoMoreInteractions(zosmfConnector);
     }
 
+    // TODO - refactor common bits together
     private RequestBuilder mockGetBuilder(String relativeUri) throws URISyntaxException {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.get(new URI(BASE_URL + relativeUri))).thenReturn(builder);
+        URI uri = new URI(BASE_URL + relativeUri);
+        when(RequestBuilder.get(uri)).thenReturn(builder);
+        when(builder.getUri()).thenReturn(uri);
         return builder;
     }
 
     private RequestBuilder mockDeleteBuilder(String relativeUri) throws URISyntaxException {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.delete(new URI(BASE_URL + relativeUri))).thenReturn(builder);
+        URI uri = new URI(BASE_URL + relativeUri);
+        when(RequestBuilder.delete(uri)).thenReturn(builder);
+        when(builder.getUri()).thenReturn(uri);
         return builder;
     }
 
@@ -642,9 +647,11 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.put(new URI(BASE_URL + relativeUri))).thenReturn(builder);
+        URI uri = new URI(BASE_URL + relativeUri);
+        when(RequestBuilder.put(uri)).thenReturn(builder);
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
+        when(builder.getUri()).thenReturn(uri);
         return builder;
     }
 
@@ -666,9 +673,11 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
 
         mockStatic(RequestBuilder.class);
-        when(RequestBuilder.post(new URI(BASE_URL + relativeUri))).thenReturn(builder);
+        URI uri = new URI(BASE_URL + relativeUri);
+        when(RequestBuilder.post(uri)).thenReturn(builder);
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
+        when(builder.getUri()).thenReturn(uri);
         return builder;
     }
 

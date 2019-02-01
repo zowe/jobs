@@ -3,22 +3,45 @@ package org.zowe.jobs.services;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.NoZosmfResponseEntityException;
+import org.zowe.api.common.exceptions.ServerErrorException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.stream.IntStream;
 
+@Slf4j
 public abstract class AbstractZosmfRequestRunner<T> {
 
-    public T processResponse(HttpResponse response, URI requestUrl, int... successStatuses) throws IOException {
+    public T run(ZosmfConnector zosmfconnector) {
+        try {
+            RequestBuilder requestBuilder = prepareQuery(zosmfconnector);
+            URI uri = requestBuilder.getUri();
+            HttpResponse response = zosmfconnector.request(requestBuilder);
+            return processResponse(response, uri);
+        } catch (IOException | URISyntaxException e) {
+            log.error("run", e);
+            throw new ServerErrorException(e);
+        }
+    }
+
+    abstract int[] getSuccessStatus();
+
+    abstract RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException, IOException;
+
+    T processResponse(HttpResponse response, URI requestUrl) throws IOException {
         int statusCode = ResponseUtils.getStatus(response);
-        boolean success = IntStream.of(successStatuses).anyMatch(x -> x == statusCode);
+        boolean success = IntStream.of(getSuccessStatus()).anyMatch(x -> x == statusCode);
         if (success) {
             return getResult(response);
         } else {

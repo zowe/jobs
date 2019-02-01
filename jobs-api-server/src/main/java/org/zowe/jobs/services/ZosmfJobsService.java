@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -48,62 +47,20 @@ public class ZosmfJobsService implements JobsService {
 
     @Override
     public List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
-        String queryPrefix = "*"; //$NON-NLS-1$
-        String queryOwner = "*"; //$NON-NLS-1$
-
-        if (prefix != null) {
-            queryPrefix = prefix;
-        }
-        if (owner != null) {
-            queryOwner = owner;
-        }
-
-        String query = String.format("owner=%s&prefix=%s", queryOwner, queryPrefix); //$NON-NLS-1$
-        try {
-            URI requestUrl = zosmfconnector.getFullUrl("restjobs/jobs", query);
-            HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
-            GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(status, queryPrefix, queryOwner);
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_OK);
-        } catch (IOException | URISyntaxException e) {
-            log.error("getJobs", e);
-            throw new ServerErrorException(e);
-        }
+        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
+        return runner.run(zosmfconnector);
     }
 
     @Override
     public Job getJob(String jobName, String jobId) {
-
-        String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
-        try {
-            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
-            HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
-            GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_OK);
-        } catch (IOException | URISyntaxException e) {
-            log.error("getJob", e);
-            throw new ServerErrorException(e);
-        }
+        GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
+        return runner.run(zosmfconnector);
     }
 
     @Override
     public Job submitJobString(String jcl) {
-        String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
-        try {
-            URI requestUrl = zosmfconnector.getFullUrl(urlPath);
-            RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(new StringEntity(jcl));
-            requestBuilder.addHeader("X-IBM-Intrdr-Class", "A");
-            requestBuilder.addHeader("X-IBM-Intrdr-Recfm", "F");
-            requestBuilder.addHeader("X-IBM-Intrdr-Lrecl", "80");
-            requestBuilder.addHeader("X-IBM-Intrdr-Mode", "TEXT");
-            requestBuilder.addHeader("Content-type", ContentType.TEXT_PLAIN.getMimeType());
-
-            HttpResponse response = zosmfconnector.request(requestBuilder);
-            SubmitJobStringZosmfRequestRunner runner = new SubmitJobStringZosmfRequestRunner();
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_CREATED);
-        } catch (IOException | URISyntaxException e) {
-            log.error("submitJobString", e);
-            throw new ServerErrorException(e);
-        }
+        SubmitJobStringZosmfRequestRunner runner = new SubmitJobStringZosmfRequestRunner(jcl);
+        return runner.run(zosmfconnector);
     }
 
     @Override
@@ -119,7 +76,7 @@ public class ZosmfJobsService implements JobsService {
 
             HttpResponse response = zosmfconnector.request(requestBuilder);
             SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(dataSet);
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_CREATED);
+            return runner.processResponse(response, requestUrl);
         } catch (IOException | URISyntaxException e) {
             log.error("submitJobFile", e);
             throw new ServerErrorException(e);
@@ -133,7 +90,7 @@ public class ZosmfJobsService implements JobsService {
             URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.delete(requestUrl));
             PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(jobName, jobId);
-            runner.processResponse(response, requestUrl, HttpStatus.SC_ACCEPTED);
+            runner.processResponse(response, requestUrl);
         } catch (IOException | URISyntaxException e) {
             log.error("purgeJob", e);
             throw new ServerErrorException(e);
@@ -147,7 +104,7 @@ public class ZosmfJobsService implements JobsService {
             URI requestUrl = zosmfconnector.getFullUrl(urlPath);
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             GetJobFilesZosmfRequestRunner runner = new GetJobFilesZosmfRequestRunner(jobName, jobId);
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_OK);
+            return runner.processResponse(response, requestUrl);
         } catch (IOException | URISyntaxException e) {
             log.error("getJobFiles", e);
             throw new ServerErrorException(e);
@@ -162,7 +119,7 @@ public class ZosmfJobsService implements JobsService {
             HttpResponse response = zosmfconnector.request(RequestBuilder.get(requestUrl));
             GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId,
                     fileId);
-            return runner.processResponse(response, requestUrl, HttpStatus.SC_OK);
+            return runner.processResponse(response, requestUrl);
         } catch (IOException | URISyntaxException e) {
             log.error("getJobFileContent", e);
             throw new ServerErrorException(e);

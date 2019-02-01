@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.RequestBuilder;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
@@ -14,6 +16,7 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 @Slf4j
 public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfRequestRunner<Job> {
@@ -22,6 +25,16 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfRequestRunner<
 
     public SubmitJobFileZosmfRequestRunner(String fileName) {
         this.fileName = fileName;
+    }
+
+    @Override
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        return null;
+    }
+
+    @Override
+    int[] getSuccessStatus() {
+        return new int[] { HttpStatus.SC_CREATED };
     }
 
     @Override

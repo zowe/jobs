@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.RequestBuilder;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
@@ -15,6 +17,8 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +26,35 @@ import java.util.List;
 public class GetJobsZosmfRequestRunner extends AbstractZosmfRequestRunner<List<Job>> {
 
     private JobStatus status;
-    private String queryPrefix;
-    private String queryOwner;
+    private String prefix;
+    private String owner;
 
-    public GetJobsZosmfRequestRunner(JobStatus status, String queryPrefix, String queryOwner) {
+    public GetJobsZosmfRequestRunner(String prefix, String owner, JobStatus status) {
         this.status = status;
-        this.queryPrefix = queryPrefix;
-        this.queryOwner = queryOwner;
+        this.prefix = prefix;
+        this.owner = owner;
     }
 
     @Override
-    public List<Job> getResult(HttpResponse response) throws IOException {
+    int[] getSuccessStatus() {
+        return new int[] { HttpStatus.SC_OK };
+    }
+
+    @Override
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        if (prefix == null) {
+            prefix = "*";
+        }
+        if (owner == null) {
+            owner = "*";
+        }
+        String query = String.format("owner=%s&prefix=%s", owner, prefix); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl("restjobs/jobs", query); //$NON-NLS-1$
+        return RequestBuilder.get(requestUrl);
+    }
+
+    @Override
+    List<Job> getResult(HttpResponse response) throws IOException {
         List<Job> jobs = new ArrayList<>();
         JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
@@ -49,14 +71,14 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfRequestRunner<List<J
     }
 
     @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();
                 if ("Value of prefix query parameter is not valid".equals(zosmfMessage)) {
-                    return new InvalidPrefixException(queryPrefix);
+                    return new InvalidPrefixException(prefix);
                 } else if ("Value of owner query parameter is not valid".equals(zosmfMessage)) {
-                    return new InvalidOwnerException(queryOwner);
+                    return new InvalidOwnerException(owner);
                 }
             }
         }

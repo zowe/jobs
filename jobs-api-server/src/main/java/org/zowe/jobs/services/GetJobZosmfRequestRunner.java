@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.RequestBuilder;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
@@ -15,6 +17,8 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Slf4j
 public class GetJobZosmfRequestRunner extends AbstractZosmfRequestRunner<Job> {
@@ -28,13 +32,25 @@ public class GetJobZosmfRequestRunner extends AbstractZosmfRequestRunner<Job> {
     }
 
     @Override
-    public Job getResult(HttpResponse response) throws IOException {
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        return RequestBuilder.get(requestUrl);
+    }
+
+    @Override
+    int[] getSuccessStatus() {
+        return new int[] { HttpStatus.SC_OK };
+    }
+
+    @Override
+    Job getResult(HttpResponse response) throws IOException {
         JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
         return getJobFromJson(jsonResponse.getAsJsonObject());
     }
 
     @Override
-    public ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.RequestBuilder;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
@@ -14,6 +16,7 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +29,16 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
     public GetJobFilesZosmfRequestRunner(String jobName, String jobId) {
         this.jobName = jobName;
         this.jobId = jobId;
+    }
+
+    @Override
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+        return null;
+    }
+
+    @Override
+    int[] getSuccessStatus() {
+        return new int[] { HttpStatus.SC_OK };
     }
 
     @Override
