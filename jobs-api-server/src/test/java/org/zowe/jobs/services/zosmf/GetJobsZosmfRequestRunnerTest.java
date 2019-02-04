@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
@@ -101,7 +102,8 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
 
         Exception expectedException = new NoZosmfResponseEntityException(status, path);
 
-        HttpResponse response = mockResponse(status.value());
+        HttpResponse response = mock(HttpResponse.class);
+        mockResponseCache(response, status.value());
         checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
     }
 

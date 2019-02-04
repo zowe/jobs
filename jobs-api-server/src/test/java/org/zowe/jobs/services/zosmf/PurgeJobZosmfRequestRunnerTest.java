@@ -15,6 +15,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
@@ -24,7 +25,8 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
         String jobName = "AJOB";
         String jobId = "Job12345";
 
-        HttpResponse response = mockResponse(HttpStatus.SC_ACCEPTED);
+        HttpResponse response = mock(HttpResponse.class);
+        mockResponseCache(response, HttpStatus.SC_ACCEPTED);
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 

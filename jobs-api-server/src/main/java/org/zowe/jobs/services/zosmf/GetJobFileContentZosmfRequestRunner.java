@@ -13,16 +13,14 @@ import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
-import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
-import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 
 import java.io.IOException;
@@ -48,15 +46,15 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRun
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
+    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId); //$NON-NLS-1$
-        URI requestUrl = zosmfConnector.getFullUrl(urlPath);
+        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
         return RequestBuilder.get(requestUrl);
     }
 
     @Override
-    JobFileContent getResult(HttpResponse response) throws IOException {
-        return new JobFileContent(ResponseUtils.getEntity(response));
+    JobFileContent getResult(ResponseCache responseCache) throws IOException {
+        return new JobFileContent(responseCache.getEntity());
     }
 
     // TODO NOW - review the createExceptions to look for common behaviour
@@ -81,12 +79,5 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRun
             }
         }
         return null;
-    }
-
-    private static JobFile getJobFileFromJson(JsonObject returned) {
-        return JobFile.builder().id(returned.get("id").getAsLong()).ddName(returned.get("ddname").getAsString())
-            .recordFormat(returned.get("recfm").getAsString()).recordLength(returned.get("lrecl").getAsLong())
-            .byteCount(returned.get("byte-count").getAsLong()).recordCount(returned.get("record-count").getAsLong())
-            .build();
     }
 }

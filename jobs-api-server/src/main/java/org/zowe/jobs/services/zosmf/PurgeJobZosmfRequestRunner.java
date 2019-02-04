@@ -13,11 +13,11 @@ import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ public class PurgeJobZosmfRequestRunner extends AbstractZosmfRequestRunner<Void>
     }
 
     @Override
-    Void getResult(HttpResponse response) throws IOException {
+    Void getResult(ResponseCache responseCache) throws IOException {
         return null;
     }
 

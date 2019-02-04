@@ -14,12 +14,11 @@ import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
-import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.model.Job;
@@ -63,9 +62,9 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    List<Job> getResult(HttpResponse response) throws IOException {
+    List<Job> getResult(ResponseCache responseCache) throws IOException {
+        JsonElement jsonResponse = responseCache.getEntityAsJson();
         List<Job> jobs = new ArrayList<>();
-        JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
             try {
                 Job job = getJobFromJson(jsonElement.getAsJsonObject());

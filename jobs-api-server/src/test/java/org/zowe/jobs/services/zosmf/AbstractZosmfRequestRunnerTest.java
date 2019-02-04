@@ -13,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
@@ -28,6 +27,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
+import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.api.common.utils.ResponseUtils;
 
 import java.io.IOException;
@@ -44,7 +44,8 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 //TODO NOW - review prepares
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ResponseUtils.class, RequestBuilder.class, JsonUtils.class, ContentType.class })
+@PrepareForTest({ ResponseUtils.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
+        AbstractZosmfRequestRunner.class })
 public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
 
     static final String BASE_URL = "https://dummy.com/zosmf/";
@@ -157,50 +158,47 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         return builder;
     }
 
-    HttpResponse mockJsonResponse(int statusCode, String jsonString) throws IOException {
+    HttpResponse mockJsonResponse(int statusCode, String jsonString) throws Exception {
 
-        HttpEntity entity = new StringEntity(jsonString);
-        HttpResponse response = mockResponse(statusCode);
-        when(response.getEntity()).thenReturn(entity);
+        HttpResponse response = mock(HttpResponse.class);
+        ResponseCache responseCache = mockResponseCache(response, statusCode);
+        when(responseCache.getEntity()).thenReturn(jsonString);
 
         JsonElement json = new Gson().fromJson(jsonString, JsonElement.class);
-        when(ResponseUtils.getEntityAsJson(response)).thenReturn(json);
+        when(responseCache.getEntityAsJson()).thenReturn(json);
 
         ContentType contentType = mock(ContentType.class);
-        mockStatic(ContentType.class);
-        when(ContentType.get(entity)).thenReturn(contentType);
+        when(responseCache.getContentType()).thenReturn(contentType);
         when(contentType.getMimeType()).thenReturn(ContentType.APPLICATION_JSON.getMimeType());
 
         if (json.isJsonArray()) {
-            when(ResponseUtils.getEntityAsJsonArray(response)).thenReturn(json.getAsJsonArray());
+            when(responseCache.getEntityAsJsonArray()).thenReturn(json.getAsJsonArray());
         } else if (json.isJsonObject()) {
-            when(ResponseUtils.getEntityAsJsonObject(response)).thenReturn(json.getAsJsonObject());
+            when(responseCache.getEntityAsJsonObject()).thenReturn(json.getAsJsonObject());
         }
 
         return response;
     }
 
-    HttpResponse mockTextResponse(int statusCode, String text) throws IOException {
+    // TODO - refactor with above?
+    HttpResponse mockTextResponse(int statusCode, String text) throws Exception {
 
-        HttpEntity entity = new StringEntity(text);
-        HttpResponse response = mockResponse(statusCode);
-        when(response.getEntity()).thenReturn(entity);
-
-        when(ResponseUtils.getEntity(response)).thenReturn(text);
+        HttpResponse response = mock(HttpResponse.class);
+        ResponseCache responseCache = mockResponseCache(response, statusCode);
+        when(responseCache.getEntity()).thenReturn(text);
 
         ContentType contentType = mock(ContentType.class);
-        mockStatic(ContentType.class);
-        when(ContentType.get(entity)).thenReturn(contentType);
+        when(responseCache.getContentType()).thenReturn(contentType);
         when(contentType.getMimeType()).thenReturn(ContentType.TEXT_PLAIN.getMimeType());
 
         return response;
     }
 
-    HttpResponse mockResponse(int statusCode) throws IOException {
-        HttpResponse response = mock(HttpResponse.class);
-        mockStatic(ResponseUtils.class);
-        when(ResponseUtils.getStatus(response)).thenReturn(statusCode);
-        return response;
+    ResponseCache mockResponseCache(HttpResponse response, int statusCode) throws Exception {
+        ResponseCache responseCache = mock(ResponseCache.class);
+        PowerMockito.whenNew(ResponseCache.class).withArguments(response).thenReturn(responseCache);
+        when(responseCache.getStatus()).thenReturn(statusCode);
+        return responseCache;
     }
 
     String loadTestFile(String relativePath) throws IOException {

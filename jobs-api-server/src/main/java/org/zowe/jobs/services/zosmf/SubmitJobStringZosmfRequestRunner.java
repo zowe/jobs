@@ -9,17 +9,14 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import com.google.gson.JsonElement;
-
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
-import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.model.Job;
 
 import java.io.IOException;
@@ -55,9 +52,7 @@ public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestR
     }
 
     @Override
-    // TODO - dup of getJob
-    Job getResult(HttpResponse response) throws IOException {
-        JsonElement jsonResponse = ResponseUtils.getEntityAsJson(response);
-        return getJobFromJson(jsonResponse.getAsJsonObject());
+    Job getResult(ResponseCache responseCache) throws IOException {
+        return getJobFromJson(responseCache.getEntityAsJsonObject());
     }
 }

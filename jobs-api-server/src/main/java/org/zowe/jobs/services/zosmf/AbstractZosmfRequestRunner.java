@@ -14,15 +14,15 @@ import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
+import org.springframework.util.StringUtils;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.NoZosmfResponseEntityException;
 import org.zowe.api.common.exceptions.ServerErrorException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
-import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.api.common.utils.ResponseCache;
 
 import java.io.IOException;
 import java.net.URI;
@@ -37,7 +37,8 @@ public abstract class AbstractZosmfRequestRunner<T> {
             RequestBuilder requestBuilder = prepareQuery(zosmfConnector);
             URI uri = requestBuilder.getUri();
             HttpResponse response = zosmfConnector.request(requestBuilder);
-            return processResponse(response, uri);
+            ResponseCache responseCache = new ResponseCache(response);
+            return processResponse(responseCache, uri);
         } catch (IOException | URISyntaxException e) {
             log.error("run", e);
             throw new ServerErrorException(e);
@@ -48,46 +49,45 @@ public abstract class AbstractZosmfRequestRunner<T> {
 
     abstract RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException, IOException;
 
-    T processResponse(HttpResponse response, URI requestUrl) throws IOException {
-        int statusCode = ResponseUtils.getStatus(response);
+    T processResponse(ResponseCache responseCache, URI uri) throws IOException {
+        int statusCode = responseCache.getStatus();
         boolean success = IntStream.of(getSuccessStatus()).anyMatch(x -> x == statusCode);
         if (success) {
-            return getResult(response);
+            return getResult(responseCache);
         } else {
-            throw createGeneralException(response, statusCode, requestUrl);
+            throw createGeneralException(responseCache, uri);
         }
     }
 
-    abstract T getResult(HttpResponse response) throws IOException;
+    abstract T getResult(ResponseCache responseCache) throws IOException;
 
-    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) throws IOException {
         return null;
     }
 
-    // TODO - consider adding requestUrl to responseCache?
-    private ZoweApiRestException createGeneralException(HttpResponse response, int statusCode, URI requestUrl)
-            throws IOException {
-        HttpEntity entity = response.getEntity();
-        if (entity != null) {
-            ContentType contentType = ContentType.get(entity);
+    private ZoweApiRestException createGeneralException(ResponseCache responseCache, URI uri) throws IOException {
+        String entityString = responseCache.getEntity();
+        org.springframework.http.HttpStatus springStatus = responseCache.getSpringHttpStatus();
+        if (StringUtils.hasText(entityString)) {
+            ContentType contentType = responseCache.getContentType();
             String mimeType = contentType.getMimeType();
             if (mimeType.equals(ContentType.APPLICATION_JSON.getMimeType())) {
-                JsonObject jsonResponse = ResponseUtils.getEntityAsJsonObject(response);
+                JsonObject jsonResponse = responseCache.getEntityAsJsonObject();
 
-                ZoweApiRestException exception = createException(jsonResponse, statusCode);
+                ZoweApiRestException exception = createException(jsonResponse, responseCache.getStatus());
                 if (exception != null) {
                     return exception;
                 }
                 if (jsonResponse.has("message")) {
                     String zosmfMessage = jsonResponse.get("message").getAsString();
-                    return new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), zosmfMessage);
+                    return new ZoweApiRestException(springStatus, zosmfMessage);
                 }
-                return new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), jsonResponse.toString());
+                return new ZoweApiRestException(springStatus, jsonResponse.toString());
             } else {
-                return new ZoweApiRestException(getSpringHttpStatusFromCode(statusCode), entity.toString());
+                return new ZoweApiRestException(springStatus, entityString);
             }
         } else {
-            return new NoZosmfResponseEntityException(getSpringHttpStatusFromCode(statusCode), requestUrl.toString());
+            return new NoZosmfResponseEntityException(springStatus, uri.toString());
         }
     }
 
@@ -98,9 +98,5 @@ public abstract class AbstractZosmfRequestRunner<T> {
             value = jsonElement.getAsString();
         }
         return value;
-    }
-
-    private org.springframework.http.HttpStatus getSpringHttpStatusFromCode(int statusCode) {
-        return org.springframework.http.HttpStatus.resolve(statusCode);
     }
 }
