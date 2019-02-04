@@ -44,8 +44,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 //TODO NOW - review prepares
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
-        SubmitJobStringZosmfRequestRunner.class, SubmitJobFileZosmfRequestRunner.class })
+@PrepareForTest({ ResponseUtils.class, RequestBuilder.class, JsonUtils.class, ContentType.class })
 public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
 
     static final String BASE_URL = "https://dummy.com/zosmf/";

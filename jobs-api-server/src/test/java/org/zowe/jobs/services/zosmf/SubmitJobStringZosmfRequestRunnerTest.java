@@ -14,6 +14,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -24,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@PrepareForTest({ SubmitJobStringZosmfRequestRunner.class })
 public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
 
     @Test

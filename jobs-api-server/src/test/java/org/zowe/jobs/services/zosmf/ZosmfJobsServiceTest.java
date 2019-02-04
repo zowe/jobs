@@ -9,8 +9,6 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,28 +18,20 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.test.ZoweApiTest;
-import org.zowe.api.common.utils.JsonUtils;
-import org.zowe.api.common.utils.ResponseUtils;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFileContent;
 
-import java.net.URI;
-
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 //TODO - review prepares
-@PrepareForTest({ ResponseUtils.class, ZosmfJobsService.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
-        SubmitJobStringZosmfRequestRunner.class, SubmitJobFileZosmfRequestRunner.class })
+@PrepareForTest({ ZosmfJobsService.class })
 public class ZosmfJobsServiceTest extends ZoweApiTest {
-
-    private static final String BASE_URL = "https://dummy.com/zosmf/";
 
     @Mock
     ZosmfConnector zosmfConnector;
@@ -52,21 +42,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
     public void setUp() throws Exception {
         jobsService = new ZosmfJobsService();
         jobsService.zosmfConnector = zosmfConnector;
-        when(zosmfConnector.getFullUrl(anyString())).thenAnswer(new org.mockito.stubbing.Answer<URI>() {
-            @Override
-            public URI answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                return new URI(BASE_URL + (String) args[0]);
-            }
-        });
-
-        when(zosmfConnector.getFullUrl(anyString(), anyString())).thenAnswer(new org.mockito.stubbing.Answer<URI>() {
-            @Override
-            public URI answer(org.mockito.invocation.InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                return new URI(BASE_URL + (String) args[0] + "?" + (String) args[1]);
-            }
-        });
     }
 
     @Test

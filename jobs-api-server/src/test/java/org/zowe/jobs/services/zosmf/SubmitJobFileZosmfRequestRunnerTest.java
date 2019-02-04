@@ -15,6 +15,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
+import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+@PrepareForTest({ SubmitJobFileZosmfRequestRunner.class })
 public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
 
     @Test
