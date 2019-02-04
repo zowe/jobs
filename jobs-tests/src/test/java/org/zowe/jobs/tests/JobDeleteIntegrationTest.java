@@ -13,7 +13,6 @@ package org.zowe.jobs.tests;
 import io.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
@@ -24,7 +23,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
-    @Ignore("See todo") // TODO - fix CIM server on river/change to pre-req JES2
     public void testDeleteJob() throws Exception {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
         deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
