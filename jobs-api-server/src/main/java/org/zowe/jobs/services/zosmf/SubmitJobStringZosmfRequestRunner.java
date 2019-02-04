@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services;
+package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonElement;
 
@@ -36,9 +36,9 @@ public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestR
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException, IOException {
+    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException, IOException {
         String urlPath = String.format("restjobs/jobs"); // $NON-NLS-1
-        URI requestUrl = zosmfconnector.getFullUrl(urlPath);
+        URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         StringEntity stringEntity = new StringEntity(jcl);
         RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(stringEntity);
         requestBuilder.addHeader("X-IBM-Intrdr-Class", "A");

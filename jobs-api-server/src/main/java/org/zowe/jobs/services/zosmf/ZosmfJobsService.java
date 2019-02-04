@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2018, 2019
  */
-package org.zowe.jobs.services;
+package org.zowe.jobs.services.zosmf;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +21,7 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.services.JobsService;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
 public class ZosmfJobsService implements JobsService {
 
     @Autowired
-    ZosmfConnector zosmfconnector;
+    ZosmfConnector zosmfConnector;
 
     // TODO LATER - review error handling, serviceability
     // TODO LATER - use the zomsf error categories to work out errors?
@@ -38,43 +39,43 @@ public class ZosmfJobsService implements JobsService {
     @Override
     public List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override
     public Job getJob(String jobName, String jobId) {
         GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override
     public Job submitJobString(String jcl) {
         SubmitJobStringZosmfRequestRunner runner = new SubmitJobStringZosmfRequestRunner(jcl);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override
     public Job submitJobFile(String dataSet) {
         SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(dataSet);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override
     public void purgeJob(String jobName, String jobId) {
         PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(jobName, jobId);
-        runner.run(zosmfconnector);
+        runner.run(zosmfConnector);
     }
 
     @Override
     public List<JobFile> getJobFiles(String jobName, String jobId) {
         GetJobFilesZosmfRequestRunner runner = new GetJobFilesZosmfRequestRunner(jobName, jobId);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override
     public JobFileContent getJobFileContent(String jobName, String jobId, String fileId) {
         GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
-        return runner.run(zosmfconnector);
+        return runner.run(zosmfConnector);
     }
 
     @Override

@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services;
+package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -50,7 +50,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
+    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         if (prefix == null) {
             prefix = "*";
         }
@@ -58,7 +58,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
             owner = "*";
         }
         String query = String.format("owner=%s&prefix=%s", owner, prefix); //$NON-NLS-1$
-        URI requestUrl = zosmfconnector.getFullUrl("restjobs/jobs", query); //$NON-NLS-1$
+        URI requestUrl = zosmfConnector.getFullUrl("restjobs/jobs", query); //$NON-NLS-1$
         return RequestBuilder.get(requestUrl);
     }
 

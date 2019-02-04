@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services;
+package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -32,11 +32,11 @@ import java.util.stream.IntStream;
 @Slf4j
 public abstract class AbstractZosmfRequestRunner<T> {
 
-    public T run(ZosmfConnector zosmfconnector) {
+    public T run(ZosmfConnector zosmfConnector) {
         try {
-            RequestBuilder requestBuilder = prepareQuery(zosmfconnector);
+            RequestBuilder requestBuilder = prepareQuery(zosmfConnector);
             URI uri = requestBuilder.getUri();
-            HttpResponse response = zosmfconnector.request(requestBuilder);
+            HttpResponse response = zosmfConnector.request(requestBuilder);
             return processResponse(response, uri);
         } catch (IOException | URISyntaxException e) {
             log.error("run", e);
@@ -46,7 +46,7 @@ public abstract class AbstractZosmfRequestRunner<T> {
 
     abstract int[] getSuccessStatus();
 
-    abstract RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException, IOException;
+    abstract RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException, IOException;
 
     T processResponse(HttpResponse response, URI requestUrl) throws IOException {
         int statusCode = ResponseUtils.getStatus(response);

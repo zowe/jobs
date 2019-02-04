@@ -193,7 +193,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
         actual.setJobName(null);
         actual.setPhaseName(null);
 
-        assertEquals(actual, builder.build());
+        assertEquals(builder.build(), actual);
     }
 
     static Response submitJobByFile(String fileString) throws Exception {
