@@ -33,7 +33,7 @@ public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestR
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException, IOException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException, IOException {
         String urlPath = String.format("restjobs/jobs"); // $NON-NLS-1
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         StringEntity stringEntity = new StringEntity(jcl);
@@ -47,12 +47,12 @@ public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestR
     }
 
     @Override
-    int[] getSuccessStatus() {
+    protected int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_CREATED };
     }
 
     @Override
-    Job getResult(ResponseCache responseCache) throws IOException {
+    protected Job getResult(ResponseCache responseCache) throws IOException {
         return getJobFromJson(responseCache.getEntityAsJsonObject());
     }
 }

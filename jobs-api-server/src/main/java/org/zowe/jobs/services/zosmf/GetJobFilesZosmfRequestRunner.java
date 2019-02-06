@@ -19,6 +19,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
+import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
@@ -41,19 +42,19 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s/files", jobName, jobId); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         return RequestBuilder.get(requestUrl);
     }
 
     @Override
-    int[] getSuccessStatus() {
+    protected int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_OK };
     }
 
     @Override
-    List<JobFile> getResult(ResponseCache responseCache) throws IOException {
+    protected List<JobFile> getResult(ResponseCache responseCache) throws IOException {
         JsonElement jsonResponse = responseCache.getEntityAsJson();
         List<JobFile> jobFiles = new ArrayList<>();
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
@@ -63,7 +64,7 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
     }
 
     @Override
-    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

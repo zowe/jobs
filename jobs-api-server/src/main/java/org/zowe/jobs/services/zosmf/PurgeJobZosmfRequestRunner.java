@@ -18,6 +18,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
+import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
 import java.io.IOException;
@@ -36,24 +37,24 @@ public class PurgeJobZosmfRequestRunner extends AbstractZosmfRequestRunner<Void>
     }
 
     @Override
-    int[] getSuccessStatus() {
+    protected int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_ACCEPTED };
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         return RequestBuilder.delete(requestUrl);
     }
 
     @Override
-    Void getResult(ResponseCache responseCache) throws IOException {
+    protected Void getResult(ResponseCache responseCache) throws IOException {
         return null;
     }
 
     @Override
-    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

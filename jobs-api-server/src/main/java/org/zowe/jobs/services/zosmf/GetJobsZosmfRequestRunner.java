@@ -44,12 +44,12 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    int[] getSuccessStatus() {
+    protected int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_OK };
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         if (prefix == null) {
             prefix = "*";
         }
@@ -62,7 +62,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    List<Job> getResult(ResponseCache responseCache) throws IOException {
+    protected List<Job> getResult(ResponseCache responseCache) throws IOException {
         JsonElement jsonResponse = responseCache.getEntityAsJson();
         List<Job> jobs = new ArrayList<>();
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
@@ -79,7 +79,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();

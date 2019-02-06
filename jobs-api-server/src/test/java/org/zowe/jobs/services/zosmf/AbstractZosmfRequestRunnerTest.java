@@ -29,6 +29,7 @@ import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.api.common.utils.ResponseUtils;
+import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
 
 import java.io.IOException;
 import java.net.URI;

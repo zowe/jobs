@@ -37,12 +37,12 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfJobsRequestRun
     }
 
     @Override
-    int[] getSuccessStatus() {
+    protected int[] getSuccessStatus() {
         return new int[] { HttpStatus.SC_CREATED };
     }
 
     @Override
-    RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         JsonObject body = new JsonObject();
@@ -54,12 +54,12 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfJobsRequestRun
     }
 
     @Override
-    Job getResult(ResponseCache responseCache) throws IOException {
+    protected Job getResult(ResponseCache responseCache) throws IOException {
         return getJobFromJson(responseCache.getEntityAsJsonObject());
     }
 
     @Override
-    ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();
