@@ -29,7 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-//TODO - review prepares
+//TODO NOW - create tests for good and error cases for all service endpoints?
 @PrepareForTest({ ZosmfJobsService.class })
 public class ZosmfJobsServiceTest extends ZoweApiTest {
 
