@@ -55,8 +55,8 @@ public class ZosmfJobsService implements JobsService {
     }
 
     @Override
-    public Job submitJobFile(String dataSet) {
-        SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(dataSet);
+    public Job submitJobFile(String fileName) {
+        SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(fileName);
         return runner.run(zosmfConnector);
     }
 
