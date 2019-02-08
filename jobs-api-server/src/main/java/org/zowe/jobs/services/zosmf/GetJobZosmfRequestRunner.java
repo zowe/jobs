@@ -18,8 +18,6 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
-import org.zowe.jobs.exceptions.JobIdNotFoundException;
-import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 
 import java.io.IOException;
@@ -56,21 +54,6 @@ public class GetJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Job
 
     @Override
     protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
-        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
-                    throw new JobNameNotFoundException(jobName, jobId);
-                }
-            }
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
-                    throw new JobIdNotFoundException(jobName, jobId);
-                }
-            }
-        }
-        return null;
+        return createJobNotFoundExceptions(jsonResponse, statusCode, jobName, jobId);
     }
 }

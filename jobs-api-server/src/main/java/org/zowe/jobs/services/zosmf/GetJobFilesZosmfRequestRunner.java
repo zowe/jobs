@@ -19,9 +19,6 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
-import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
-import org.zowe.jobs.exceptions.JobIdNotFoundException;
-import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
 
 import java.io.IOException;
@@ -31,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<List<JobFile>> {
+public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<List<JobFile>> {
 
     private String jobName;
     private String jobId;
@@ -65,22 +62,7 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfRequestRunner<Li
 
     @Override
     protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
-        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
-                    return new JobNameNotFoundException(jobName, jobId);
-                }
-            }
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
-                    return new JobIdNotFoundException(jobName, jobId);
-                }
-            }
-        }
-        return null;
+        return createJobNotFoundExceptions(jsonResponse, statusCode, jobName, jobId);
     }
 
     private static JobFile getJobFileFromJson(JsonObject returned) {

@@ -18,10 +18,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
-import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
-import org.zowe.jobs.exceptions.JobIdNotFoundException;
-import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFileContent;
 
 import java.io.IOException;
@@ -29,7 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 @Slf4j
-public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRunner<JobFileContent> {
+public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<JobFileContent> {
 
     private String jobName;
     private String jobId;
@@ -64,21 +61,12 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfRequestRun
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
-                    return new JobNameNotFoundException(jobName, jobId);
-                } else if (String.format("Job '%s(%s)' does not contain spool file id %s", jobName, jobId, fileId)
+                if (String.format("Job '%s(%s)' does not contain spool file id %s", jobName, jobId, fileId)
                     .equals(zosmfMessage)) {
                     return new JobFileIdNotFoundException(jobName, jobId, fileId);
                 }
             }
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
-                if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
-                    return new JobIdNotFoundException(jobName, jobId);
-                }
-            }
         }
-        return null;
+        return createJobNotFoundExceptions(jsonResponse, statusCode, jobName, jobId);
     }
 }
