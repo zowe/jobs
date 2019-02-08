@@ -62,7 +62,7 @@ public class JobsController {
     @Autowired
     private JobsService jobsService;
 
-    // TODO - push up into common?
+    // TODO https://github.com/zowe/explorer-api-common/issues/11 - push up into common?
     @GetMapping(value = "/username", produces = { "application/json" })
     @ApiOperation(value = "Get current userid", nickname = "getCurrentUserName", notes = "This API returns the caller's current TSO userid.", response = Username.class, tags = {
             "System APIs", })
@@ -141,10 +141,9 @@ public class JobsController {
         return ResponseEntity.created(location).body(job);
     }
 
-    // TODO - work out how to not have to pass controller base path in
     URI getJobUri(Job job) {
         return ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/jobs/{jobName}/{jobID}")
-                .buildAndExpand(job.getJobName(), job.getJobId()).toUri();
+            .buildAndExpand(job.getJobName(), job.getJobId()).toUri();
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files", produces = { "application/json" })
@@ -159,8 +158,6 @@ public class JobsController {
         return jobsService.getJobFiles(jobName, jobId);
     }
 
-    // TODO - name endpoint records/content? return list of records?
-    // TODO - support start and end later
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
     @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = JobFileContent.class, tags = {
             "JES job APIs", })
@@ -191,7 +188,6 @@ public class JobsController {
         }
     }
 
-    // TODO - refactor out private methods in utils class?
     private static final String JES_JCL_STEP_PATTERN = "^.*(\\/\\/|XX)([^*\\s][^\\s]{0,7}) .+?PGM=([^\\s,]{1,8})"; //$NON-NLS-1$
 
     private static List<JobStep> findJobSteps(String JCL) {

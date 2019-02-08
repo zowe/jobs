@@ -21,7 +21,7 @@ import org.junit.BeforeClass;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.Job.JobBuilder;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.tests.AbstractHttpComparisonTest;
+import org.zowe.tests.AbstractHttpIntegrationTest;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -32,7 +32,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class AbstractJobsIntegrationTest extends AbstractHttpComparisonTest {
+public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     static final String JOBS_ROOT_ENDPOINT = "jobs";
 

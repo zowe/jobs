@@ -77,7 +77,7 @@ public class JobsControllerTest extends ZoweApiTest {
     @InjectMocks
     private JobsController jobsController;
 
-    // TODO LATER - move up into ApiControllerTest?
+    // TODO LATER - move up into ApiControllerTest - https://github.com/zowe/explorer-api-common/issues/11?
     @Before
     public void init() {
         mockMvc = MockMvcBuilders.standaloneSetup(jobsController).setControllerAdvice(new ZoweRestExceptionHandler())
@@ -87,7 +87,7 @@ public class JobsControllerTest extends ZoweApiTest {
         when(ZosUtils.getUsername()).thenReturn(DUMMY_USER);
     }
 
-    // TODO LATER - job Name and prefix validation?
+    // TODO LATER - job Name and prefix validation - https://github.com/zowe/jobs/issues/10
     @Test
     public void test_get_jobs_with_owner_and_prefix_works() throws Exception {
 

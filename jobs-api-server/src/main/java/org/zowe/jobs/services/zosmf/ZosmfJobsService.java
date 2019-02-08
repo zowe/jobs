@@ -32,8 +32,8 @@ public class ZosmfJobsService implements JobsService {
     @Autowired
     ZosmfConnector zosmfConnector;
 
-    // TODO LATER - review error handling, serviceability
-    // TODO LATER - use the zomsf error categories to work out errors?
+    // TODO LATER - review error handling, serviceability https://github.com/zowe/jobs/issues/18
+    // use the zomsf error categories to work out errors?
     // https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.izua700/IZUHPINFO_API_Error_Categories.htm?
 
     @Override

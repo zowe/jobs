@@ -43,8 +43,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-//TODO MARK - speak to Mark about how to get this moved to common test
-//TODO NOW - review prepares
+//TODO MARK - speak to Mark about how to get this moved to common test - https://github.com/zowe/explorer-api-common/issues/11
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ResponseUtils.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
         AbstractZosmfRequestRunner.class })
@@ -78,7 +77,6 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         verifyInteractions(requestBuilder, false);
     }
 
-    // TODO - improve code - remove bool?
     void verifyInteractions(RequestBuilder requestBuilder, boolean path) throws IOException, URISyntaxException {
         verify(zosmfConnector, times(1)).request(requestBuilder);
         if (path) {

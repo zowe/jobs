@@ -21,8 +21,8 @@ import org.zowe.api.common.test.ZoweApiTest;
 import static io.restassured.RestAssured.preemptive;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-//TODO - refactor with Data-sets
-public abstract class AbstractHttpComparisonTest extends ZoweApiTest {
+//TODO - refactor with Data-sets https://github.com/zowe/explorer-api-common/issues/11
+public abstract class AbstractHttpIntegrationTest extends ZoweApiTest {
 
     private final static String SERVER_HOST = System.getProperty("server.host");
     private final static int SERVER_PORT = Integer.valueOf(System.getProperty("server.port"));
