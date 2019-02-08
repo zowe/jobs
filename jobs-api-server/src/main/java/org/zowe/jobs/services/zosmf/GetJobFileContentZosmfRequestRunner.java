@@ -55,7 +55,6 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfJobsReques
         return new JobFileContent(responseCache.getEntity());
     }
 
-    // TODO NOW - review the createExceptions to look for common behaviour
     @Override
     protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {

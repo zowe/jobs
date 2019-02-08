@@ -43,7 +43,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-//TODO MARK - speak to Mark about how to get this moved to common test - https://github.com/zowe/explorer-api-common/issues/11
+//TODO MARK - speak to Mark about how to get this moved to common test https://github.com/zowe/explorer-api-common/issues/11
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ResponseUtils.class, RequestBuilder.class, JsonUtils.class, ContentType.class,
         AbstractZosmfRequestRunner.class })
@@ -53,6 +53,9 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
 
     @Mock
     ZosmfConnector zosmfConnector;
+
+    @Mock
+    HttpResponse response;
 
     @Before
     public void setUp() throws Exception {
@@ -92,8 +95,8 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
         URI uri = new URI(BASE_URL + relativeUri);
-        when(RequestBuilder.get(uri)).thenReturn(builder);
         when(builder.getUri()).thenReturn(uri);
+        when(RequestBuilder.get(uri)).thenReturn(builder);
         return builder;
     }
 
@@ -101,8 +104,8 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         RequestBuilder builder = mock(RequestBuilder.class);
         mockStatic(RequestBuilder.class);
         URI uri = new URI(BASE_URL + relativeUri);
-        when(RequestBuilder.delete(uri)).thenReturn(builder);
         when(builder.getUri()).thenReturn(uri);
+        when(RequestBuilder.delete(uri)).thenReturn(builder);
         return builder;
     }
 
@@ -116,19 +119,17 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         StringEntity stringEntity = mock(StringEntity.class);
         PowerMockito.whenNew(StringEntity.class).withArguments(json.toString(), ContentType.APPLICATION_JSON)
             .thenReturn(stringEntity);
-
         return mockPutBuilder(relativeUri, stringEntity);
     }
 
-    RequestBuilder mockPutBuilder(String relativeUri, StringEntity stringEntity) throws Exception {
+    private RequestBuilder mockPutBuilder(String relativeUri, StringEntity stringEntity) throws Exception {
         RequestBuilder builder = mock(RequestBuilder.class);
-
         mockStatic(RequestBuilder.class);
         URI uri = new URI(BASE_URL + relativeUri);
+        when(builder.getUri()).thenReturn(uri);
         when(RequestBuilder.put(uri)).thenReturn(builder);
         when(builder.setHeader(HttpHeaders.CONTENT_TYPE, "application/json")).thenReturn(builder);
         when(builder.setEntity(stringEntity)).thenReturn(builder);
-        when(builder.getUri()).thenReturn(uri);
         return builder;
     }
 
@@ -158,18 +159,12 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
         return builder;
     }
 
-    HttpResponse mockJsonResponse(int statusCode, String jsonString) throws Exception {
+    ResponseCache mockJsonResponse(int statusCode, String jsonString) throws Exception {
 
-        HttpResponse response = mock(HttpResponse.class);
-        ResponseCache responseCache = mockResponseCache(response, statusCode);
-        when(responseCache.getEntity()).thenReturn(jsonString);
+        ResponseCache responseCache = mockResponseAndContentType(statusCode, jsonString, ContentType.APPLICATION_JSON);
 
         JsonElement json = new Gson().fromJson(jsonString, JsonElement.class);
         when(responseCache.getEntityAsJson()).thenReturn(json);
-
-        ContentType contentType = mock(ContentType.class);
-        when(responseCache.getContentType()).thenReturn(contentType);
-        when(contentType.getMimeType()).thenReturn(ContentType.APPLICATION_JSON.getMimeType());
 
         if (json.isJsonArray()) {
             when(responseCache.getEntityAsJsonArray()).thenReturn(json.getAsJsonArray());
@@ -177,24 +172,27 @@ public abstract class AbstractZosmfRequestRunnerTest extends ZoweApiTest {
             when(responseCache.getEntityAsJsonObject()).thenReturn(json.getAsJsonObject());
         }
 
-        return response;
+        return responseCache;
     }
 
-    // TODO - refactor with above?
-    HttpResponse mockTextResponse(int statusCode, String text) throws Exception {
+    ResponseCache mockTextResponse(int statusCode, String text) throws Exception {
+        return mockResponseAndContentType(statusCode, text, ContentType.TEXT_PLAIN);
+    }
 
-        HttpResponse response = mock(HttpResponse.class);
-        ResponseCache responseCache = mockResponseCache(response, statusCode);
-        when(responseCache.getEntity()).thenReturn(text);
+    private ResponseCache mockResponseAndContentType(int statusCode, String entityString, ContentType contentType)
+            throws Exception {
 
-        ContentType contentType = mock(ContentType.class);
+        ResponseCache responseCache = mockResponseCache(statusCode);
+        when(responseCache.getEntity()).thenReturn(entityString);
+
+        ContentType mockContentType = mock(ContentType.class);
         when(responseCache.getContentType()).thenReturn(contentType);
-        when(contentType.getMimeType()).thenReturn(ContentType.TEXT_PLAIN.getMimeType());
+        when(mockContentType.getMimeType()).thenReturn(contentType.getMimeType());
 
-        return response;
+        return responseCache;
     }
 
-    ResponseCache mockResponseCache(HttpResponse response, int statusCode) throws Exception {
+    ResponseCache mockResponseCache(int statusCode) throws Exception {
         ResponseCache responseCache = mock(ResponseCache.class);
         PowerMockito.whenNew(ResponseCache.class).withArguments(response).thenReturn(responseCache);
         when(responseCache.getStatus()).thenReturn(statusCode);

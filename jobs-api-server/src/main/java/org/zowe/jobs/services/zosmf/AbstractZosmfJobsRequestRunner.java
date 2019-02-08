@@ -24,19 +24,15 @@ import org.zowe.jobs.model.JobStatus;
 @Slf4j
 public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunner<T> {
 
-    // TODO NOW - extract out message
     ZoweApiRestException createJobNotFoundExceptions(JsonObject jsonResponse, int statusCode, String jobName,
             String jobId) {
-        if (statusCode == HttpStatus.SC_BAD_REQUEST) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
+        if (jsonResponse.has("message")) {
+            String zosmfMessage = jsonResponse.get("message").getAsString();
+            if (statusCode == HttpStatus.SC_BAD_REQUEST) {
                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
                     return new JobNameNotFoundException(jobName, jobId);
                 }
-            }
-        } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
-            if (jsonResponse.has("message")) {
-                String zosmfMessage = jsonResponse.get("message").getAsString();
+            } else if (statusCode == HttpStatus.SC_INTERNAL_SERVER_ERROR) {
                 if (String.format("Failed to lookup job %s(%s)", jobName, jobId).equals(zosmfMessage)) {
                     return new JobIdNotFoundException(jobName, jobId);
                 }

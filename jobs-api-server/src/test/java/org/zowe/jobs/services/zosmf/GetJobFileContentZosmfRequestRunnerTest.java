@@ -9,7 +9,6 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
                 "        1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\n"
                         + "          //*        TEST JOB\n        2 //UNIT     EXEC PGM=IEFBR14\n" + "");
 
-        HttpResponse response = mockTextResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFileRecordsResponse.txt"));
+        mockTextResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFileRecordsResponse.txt"));
 
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId));
@@ -87,7 +86,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
 
     private void checkGetJobFileContentExceptionAndVerify(String jobName, String jobId, String fileId,
             Exception expectedException, int statusCode, String file) throws IOException, Exception {
-        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+        mockJsonResponse(statusCode, loadTestFile(file));
 
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId));

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
@@ -57,7 +56,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         String owner = "*";
         String prefix = "ZO*";
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponse.json"));
+        mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponse.json"));
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix));
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
@@ -88,7 +87,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
     private void testInvalidGetJob(String prefix, String owner, String responsePath, Exception expectedException)
             throws Exception {
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
+        mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
         checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
     }
 
@@ -102,8 +101,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
 
         Exception expectedException = new NoZosmfResponseEntityException(status, path);
 
-        HttpResponse response = mock(HttpResponse.class);
-        mockResponseCache(response, status.value());
+        mockResponseCache(status.value());
         checkExceptionThrownForGetJobsAndVerifyCalls(prefix, owner, expectedException, response);
     }
 

@@ -11,7 +11,6 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
@@ -35,7 +34,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
                 "Job is on the hard copy queue", "CANCELED");
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
+        mockJsonResponse(HttpStatus.SC_CREATED, loadTestFile("zosmf_getJobResponse.json"));
 
         // TODO MAYBE map zosmf model object?
         JsonObject body = new JsonObject();
@@ -70,7 +69,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
     private void checkSubmitJobFileExceptionAndVerify(String fileName, Exception expectedException, int statusCode,
             String file) throws IOException, Exception {
 
-        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+        mockJsonResponse(statusCode, loadTestFile(file));
 
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + fileName + "'");

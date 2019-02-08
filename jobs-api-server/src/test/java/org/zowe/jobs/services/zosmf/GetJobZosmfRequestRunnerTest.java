@@ -9,7 +9,6 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
@@ -33,7 +32,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
         Job expected = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT,
                 "Job is on the hard copy queue", "CANCELED");
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobResponse.json"));
+        mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobResponse.json"));
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
@@ -69,7 +68,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
 
     private void checkGetJobExceptionAndVerify(String jobName, String jobId, Exception expectedException,
             int statusCode, String file) throws IOException, Exception {
-        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+        mockJsonResponse(statusCode, loadTestFile(file));
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 

@@ -9,7 +9,6 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
@@ -38,7 +37,7 @@ public class GetJobFilesZosmfRequestRunnerTest extends AbstractZosmfRequestRunne
             .byteCount(820l).recordCount(13l).build();
         List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
 
-        HttpResponse response = mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
+        mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s/files", jobName, jobId));
 
@@ -74,7 +73,7 @@ public class GetJobFilesZosmfRequestRunnerTest extends AbstractZosmfRequestRunne
 
     private void checkGetJobFilesExceptionAndVerify(String jobName, String jobId, Exception expectedException,
             int statusCode, String file) throws IOException, Exception {
-        HttpResponse response = mockJsonResponse(statusCode, loadTestFile(file));
+        mockJsonResponse(statusCode, loadTestFile(file));
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s/files", jobName, jobId));
 
