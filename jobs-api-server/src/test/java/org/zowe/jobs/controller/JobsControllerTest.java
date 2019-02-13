@@ -87,7 +87,7 @@ public class JobsControllerTest extends ZoweApiTest {
         when(ZosUtils.getUsername()).thenReturn(DUMMY_USER);
     }
 
-    // TODO LATER - job Name and prefix validation - https://github.com/zowe/jobs/issues/10
+    // TODO LATER - job Name and prefix validation - https://github.com/zowe/jobs/issues/10?
     @Test
     public void test_get_jobs_with_owner_and_prefix_works() throws Exception {
 
@@ -192,6 +192,25 @@ public class JobsControllerTest extends ZoweApiTest {
     @Test
     // TODO - refactor with purge with exception?
     public void get_job_with_exception_should_be_converted_to_error_message() throws Exception {
+        String errorMessage = "JobId could not be found";
+
+        String jobId = "jobId";
+        String jobName = "jobName";
+
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.I_AM_A_TEAPOT).build();
+
+        doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).getJob(jobName, jobId);
+
+        mockMvc.perform(get("/api/v1/jobs/{jobName}/{jobId}/", jobName, jobId)).andExpect(status().isIAmATeapot())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+            .andExpect(jsonPath("$.message").value(errorMessage));
+
+        verify(jobsService, times(1)).getJob(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+
+    public void checkExceptionConvertedToError() throws Exception {
         String errorMessage = "JobId could not be found";
 
         String jobId = "jobId";

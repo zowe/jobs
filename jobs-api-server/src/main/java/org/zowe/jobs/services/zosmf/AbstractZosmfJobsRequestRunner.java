@@ -11,8 +11,6 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.http.HttpStatus;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunner;
@@ -21,7 +19,6 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
-@Slf4j
 public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunner<T> {
 
     ZoweApiRestException createJobNotFoundExceptions(JsonObject jsonResponse, int statusCode, String jobName,

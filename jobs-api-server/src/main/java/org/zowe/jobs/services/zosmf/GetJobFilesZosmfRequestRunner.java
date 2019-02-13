@@ -12,8 +12,6 @@ package org.zowe.jobs.services.zosmf;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
@@ -27,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<List<JobFile>> {
 
     private String jobName;
