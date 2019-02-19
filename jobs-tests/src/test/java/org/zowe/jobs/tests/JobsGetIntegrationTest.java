@@ -64,7 +64,7 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     @Test
-    public void testGetJobsWithInvalidPrefix() {
+    public void testGetJobsWithInvalidPrefix() throws Exception {
         String prefix = "123456789";
         ZoweApiRestException expected = new InvalidPrefixException(prefix);
 
@@ -82,7 +82,7 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     @Test
-    public void testGetJobsWithInvalidOwner() {
+    public void testGetJobsWithInvalidOwner() throws Exception {
         String owner = "123456789";
         ZoweApiRestException expected = new InvalidOwnerException(owner);
 
@@ -91,6 +91,19 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
         getJobs(null, owner).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
+    }
+
+    @Test
+    public void testGetJobsWithHtmlOwner() throws Exception {
+        String owner = "*s23y3%3cscript%3ealert(1)%3c%2fscript%3evpgqn";
+
+        ZoweApiRestException expected = new InvalidOwnerException(owner);
+
+        ApiError expectedError = expected.getApiError();
+
+        getJobs(null, owner).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name())).body("message",
+                    equalTo("An invalid job owner of '*s23y3&lt;script&gt;alert(1)&lt;/script&gt;vpgqn' was supplied"));
     }
 
     @Test

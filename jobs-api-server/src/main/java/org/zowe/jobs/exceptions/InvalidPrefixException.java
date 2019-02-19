@@ -5,13 +5,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+
+import java.io.UnsupportedEncodingException;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidPrefixException extends ZoweApiRestException {
@@ -21,8 +23,8 @@ public class InvalidPrefixException extends ZoweApiRestException {
      */
     private static final long serialVersionUID = 2568539995597255984L;
 
-    public InvalidPrefixException(String prefix) {
-        super(HttpStatus.BAD_REQUEST, "An invalid job prefix of ''{0}'' was supplied", prefix);
+    public InvalidPrefixException(String prefix) throws UnsupportedEncodingException {
+        super(HttpStatus.BAD_REQUEST, "An invalid job prefix of ''{0}'' was supplied", htmlEncodeString(prefix));
     }
 
 }

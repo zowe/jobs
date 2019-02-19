@@ -95,7 +95,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
     public void get_jobs_with_no_response_entity_from_zosmf_should_throw_exception() throws Exception {
 
         String prefix = "PREFIX";
-        String owner = "OWNER";
+        String owner = "*s23y3%3cscript%3ealert(1)%3c%2fscript%3evpgqn";
         String path = String.format(BASE_URL + "restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
         org.springframework.http.HttpStatus status = org.springframework.http.HttpStatus.I_AM_A_TEAPOT;
 

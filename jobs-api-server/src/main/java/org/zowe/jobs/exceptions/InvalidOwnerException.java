@@ -5,13 +5,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+
+import java.io.UnsupportedEncodingException;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidOwnerException extends ZoweApiRestException {
@@ -21,8 +23,8 @@ public class InvalidOwnerException extends ZoweApiRestException {
      */
     private static final long serialVersionUID = -4902506967951928596L;
 
-    public InvalidOwnerException(String owner) {
-        super(HttpStatus.BAD_REQUEST, "An invalid job owner of ''{0}'' was supplied", owner);
+    public InvalidOwnerException(String owner) throws UnsupportedEncodingException {
+        super(HttpStatus.BAD_REQUEST, "An invalid job owner of ''{0}'' was supplied", htmlEncodeString(owner));
     }
 
 }
