@@ -88,7 +88,6 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
 //        submitAndVerifySuccessfulJob(submitJobUssPath);
 //    }
 
-    // TODO - work out better solution?
     static String getTestJclMemberPath(String member) {
         return USER.toUpperCase() + ".TEST.JCL(" + member + ")";
     }

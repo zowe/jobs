@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.junit.Assert.assertThat;
 
-//TODO - rewrite using rest assured
 public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
 
     private static Job job;
