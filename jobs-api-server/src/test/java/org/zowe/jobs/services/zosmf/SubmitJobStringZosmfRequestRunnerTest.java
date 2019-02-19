@@ -14,7 +14,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.exceptions.HtmlEscapedZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
@@ -53,23 +53,24 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
     @Test
     public void submit_job_string_with_no_slash_should_call_zosmf_parse_and_throw_exception() throws Exception {
-        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
-                "Submit input data does not start with a slash");
+        Exception expectedException = new HtmlEscapedZoweApiRestException(
+                org.springframework.http.HttpStatus.BAD_REQUEST, "Submit input data does not start with a slash");
         checkExceptionThrownForSubmitJclStringAndVerifyCalls("junkJCL\n", "zosmf_submitJcl_noSlash.json",
                 expectedException);
     }
 
     @Test
     public void submit_job_string_with_bad_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
-        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
-                "Job input was not recognized by system as a job");
+        Exception expectedException = new HtmlEscapedZoweApiRestException(
+                org.springframework.http.HttpStatus.BAD_REQUEST, "Job input was not recognized by system as a job");
         checkExceptionThrownForSubmitJclStringAndVerifyCalls("//But still junkJCL\n", "zosmf_submitJcl_invalid.json",
                 expectedException);
     }
 
     @Test
     public void submit_job_string_with_too_long_jcl_should_call_zosmf_parse_and_throw_exception() throws Exception {
-        Exception expectedException = new ZoweApiRestException(org.springframework.http.HttpStatus.BAD_REQUEST,
+        Exception expectedException = new HtmlEscapedZoweApiRestException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
                 "Job submission error. Record length 103 too long for JCL submission, maxlen=80");
         checkExceptionThrownForSubmitJclStringAndVerifyCalls(
                 "//ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440//*        TEST JOB//UNIT     EXEC PGM=IEFBR14",

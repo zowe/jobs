@@ -79,7 +79,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) {
+    protected ZoweApiRestException createException(JsonObject jsonResponse, int statusCode) throws IOException {
         if (statusCode == HttpStatus.SC_BAD_REQUEST) {
             if (jsonResponse.has("message")) {
                 String zosmfMessage = jsonResponse.get("message").getAsString();
