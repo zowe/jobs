@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.api.common.model.Username;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
@@ -73,9 +74,8 @@ public class JobsController {
 
     @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Ok", response = Job.class, responseContainer = "List") })
-    public List<Job> getJobs(
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
+    public ItemsWrapper<Job> getJobs(
             @ApiParam(value = "Job name prefix. If omitted, defaults to '*'.", defaultValue = "*") @Valid @RequestParam(value = "prefix", required = false, defaultValue = "*") String prefix,
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
             @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status) {
@@ -84,8 +84,7 @@ public class JobsController {
         if (status == null) {
             status = JobStatus.ALL;
         }
-        List<Job> jobs = jobsService.getJobs(prefix, ownerFilter, status);
-        return jobs;
+        return jobsService.getJobs(prefix, ownerFilter, status);
     }
 
     private String getOwnerFilterValue(String owner) {
@@ -149,9 +148,8 @@ public class JobsController {
     @GetMapping(value = "/{jobName}/{jobId}/files", produces = { "application/json" })
     @ApiOperation(value = "Get a list of output file names for a job", nickname = "getJobOutputFiles", notes = "This API returns the output file names for a given job.", response = JobFile.class, responseContainer = "List", tags = {
             "JES job APIs", })
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Ok", response = JobFile.class, responseContainer = "List") })
-    public List<JobFile> getJobOutputFiles(
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
+    public ItemsWrapper<JobFile> getJobOutputFiles(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
 

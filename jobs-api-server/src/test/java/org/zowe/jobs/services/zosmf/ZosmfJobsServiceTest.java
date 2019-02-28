@@ -19,6 +19,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.api.common.test.ZoweApiTest;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
@@ -63,7 +64,8 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         Job job1 = Job.builder().jobId("1").owner("owner").status(JobStatus.ACTIVE).jobName("prefix1").build();
         Job job2 = Job.builder().jobId("2").owner("owner").status(JobStatus.ACTIVE).jobName("prefix2").build();
 
-        List<Job> expected = Arrays.asList(job1, job2);
+        List<Job> jobs = Arrays.asList(job1, job2);
+        ItemsWrapper<Job> expected = new ItemsWrapper<Job>(jobs);
 
         GetJobsZosmfRequestRunner runner = mock(GetJobsZosmfRequestRunner.class);
         when(runner.run(zosmfConnector)).thenReturn(expected);
@@ -200,7 +202,8 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         JobFile file1 = JobFile.builder().id(1l).build();
         JobFile file2 = JobFile.builder().id(2l).build();
 
-        List<JobFile> expected = Arrays.asList(file1, file2);
+        List<JobFile> jobsFiles = Arrays.asList(file1, file2);
+        ItemsWrapper<JobFile> expected = new ItemsWrapper<JobFile>(jobsFiles);
 
         GetJobFilesZosmfRequestRunner runner = mock(GetJobFilesZosmfRequestRunner.class);
         when(runner.run(zosmfConnector)).thenReturn(expected);

@@ -14,6 +14,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.api.common.exceptions.NoZosmfResponseEntityException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.model.Job;
@@ -62,7 +63,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
-        assertEquals(expected, runner.run(zosmfConnector));
+        assertEquals(new ItemsWrapper<>(expected), runner.run(zosmfConnector));
 
         verifyInteractions(requestBuilder, true);
     }

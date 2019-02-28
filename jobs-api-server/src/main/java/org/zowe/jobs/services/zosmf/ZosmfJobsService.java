@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.model.Job;
@@ -22,8 +23,6 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.services.JobsService;
-
-import java.util.List;
 
 @Slf4j
 @Service
@@ -37,7 +36,7 @@ public class ZosmfJobsService implements JobsService {
     // https://www.ibm.com/support/knowledgecenter/SSLTBW_2.3.0/com.ibm.zos.v2r3.izua700/IZUHPINFO_API_Error_Categories.htm?
 
     @Override
-    public List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
+    public ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
         return runner.run(zosmfConnector);
     }
@@ -67,7 +66,7 @@ public class ZosmfJobsService implements JobsService {
     }
 
     @Override
-    public List<JobFile> getJobFiles(String jobName, String jobId) {
+    public ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId) {
         GetJobFilesZosmfRequestRunner runner = new GetJobFilesZosmfRequestRunner(jobName, jobId);
         return runner.run(zosmfConnector);
     }

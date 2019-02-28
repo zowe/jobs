@@ -12,6 +12,7 @@ package org.zowe.jobs.services.zosmf;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
@@ -35,7 +36,8 @@ public class GetJobFilesZosmfRequestRunnerTest extends AbstractZosmfRequestRunne
             .recordCount(3l).build();
         JobFile jesysmsg = JobFile.builder().id(4l).ddName("JESYSMSG").recordFormat("VA").recordLength(137l)
             .byteCount(820l).recordCount(13l).build();
-        List<JobFile> expected = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
+        List<JobFile> jobFiles = Arrays.asList(jesmsglg, jesjcl, jesysmsg);
+        ItemsWrapper<JobFile> expected = new ItemsWrapper<JobFile>(jobFiles);
 
         mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFilesResponse.json"));
 
