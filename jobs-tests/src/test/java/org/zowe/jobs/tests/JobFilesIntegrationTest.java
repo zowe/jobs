@@ -55,7 +55,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
         JobFile jessysmsg = JobFile.builder().ddName("JESYSMSG").recordFormat("VA").recordLength(137l).id(4l).build();
 
         List<JobFile> actual = getJobFiles(jobName, jobId).then().statusCode(HttpStatus.SC_OK).extract().body()
-            .jsonPath().getList("", JobFile.class);
+            .jsonPath().getList("items", JobFile.class);
 
         // Different systems have different byte and record counts
         for (JobFile jobFile : actual) {

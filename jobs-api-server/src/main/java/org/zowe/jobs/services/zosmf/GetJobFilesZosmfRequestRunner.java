@@ -16,6 +16,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.model.JobFile;
 
@@ -25,7 +26,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<List<JobFile>> {
+public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<ItemsWrapper<JobFile>> {
 
     private String jobName;
     private String jobId;
@@ -48,13 +49,13 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunne
     }
 
     @Override
-    protected List<JobFile> getResult(ResponseCache responseCache) throws IOException {
+    protected ItemsWrapper<JobFile> getResult(ResponseCache responseCache) throws IOException {
         JsonElement jsonResponse = responseCache.getEntityAsJson();
         List<JobFile> jobFiles = new ArrayList<>();
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
             jobFiles.add(getJobFileFromJson(jsonElement.getAsJsonObject()));
         }
-        return jobFiles;
+        return new ItemsWrapper<JobFile>(jobFiles);
     }
 
     @Override

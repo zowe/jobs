@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<List<Job>> {
+public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<ItemsWrapper<Job>> {
 
     private JobStatus status;
     private String prefix;
@@ -62,7 +63,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
     }
 
     @Override
-    protected List<Job> getResult(ResponseCache responseCache) throws IOException {
+    protected ItemsWrapper<Job> getResult(ResponseCache responseCache) throws IOException {
         JsonElement jsonResponse = responseCache.getEntityAsJson();
         List<Job> jobs = new ArrayList<>();
         for (JsonElement jsonElement : jsonResponse.getAsJsonArray()) {
@@ -75,7 +76,7 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Li
                 log.error("getJobs", e);
             }
         }
-        return jobs;
+        return new ItemsWrapper<Job>(jobs);
     }
 
     @Override

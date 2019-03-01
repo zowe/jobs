@@ -10,16 +10,15 @@
 package org.zowe.jobs.services;
 
 import org.zowe.api.common.exceptions.ZoweApiException;
+import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
-import java.util.List;
-
 public interface JobsService {
 
-    List<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
+    ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
 
     Job getJob(String jobName, String jobId);
 
@@ -29,7 +28,7 @@ public interface JobsService {
 
     Job submitJobFile(String file);
 
-    List<JobFile> getJobFiles(String jobName, String jobId);
+    ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId);
 
     JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
 
