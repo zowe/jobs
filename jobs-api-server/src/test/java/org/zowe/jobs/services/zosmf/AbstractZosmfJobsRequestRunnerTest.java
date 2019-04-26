@@ -9,6 +9,7 @@
  */
 package org.zowe.jobs.services.zosmf;
 
+import org.zowe.api.common.test.services.zosmf.AbstractZosmfRequestRunnerTest;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 

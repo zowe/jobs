@@ -9,7 +9,6 @@
  */
 package org.zowe.jobs.controller;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,16 +19,13 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.api.common.exceptions.ZoweApiErrorException;
-import org.zowe.api.common.exceptions.ZoweRestExceptionHandler;
 import org.zowe.api.common.model.ItemsWrapper;
-import org.zowe.api.common.test.ZoweApiTest;
+import org.zowe.api.common.test.controller.ApiControllerTest;
 import org.zowe.api.common.utils.JsonUtils;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
@@ -66,14 +62,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ ZosUtils.class, ServletUriComponentsBuilder.class })
-public class JobsControllerTest extends ZoweApiTest {
+public class JobsControllerTest extends ApiControllerTest {
 
     private static final String ENDPOINT_ROOT = "/api/v1/jobs";
-
-    private static final String DUMMY_USER = "A_USER";
-    private static final String EMPTY_ITEMS = "{\"items\":[]}";
-
-    private MockMvc mockMvc;
 
     @Mock
     private JobsService jobsService;
@@ -81,14 +72,9 @@ public class JobsControllerTest extends ZoweApiTest {
     @InjectMocks
     private JobsController jobsController;
 
-    // TODO LATER - move up into ApiControllerTest - https://github.com/zowe/explorer-api-common/issues/11?
-    @Before
-    public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(jobsController).setControllerAdvice(new ZoweRestExceptionHandler())
-            .build();
-
-        PowerMockito.mockStatic(ZosUtils.class);
-        when(ZosUtils.getUsername()).thenReturn(DUMMY_USER);
+    @Override
+    public Object getController() {
+        return jobsController;
     }
 
     // TODO LATER - job Name and prefix validation - https://github.com/zowe/jobs/issues/10?
