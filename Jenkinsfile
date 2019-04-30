@@ -38,6 +38,10 @@ node('ibm-jenkins-slave-nvm') {
     operation     : {
         sh './gradlew coverage'
     },
+    junit         : [
+      allowEmptyResults : true,
+      testResults       : '**/test-results/**/*.xml'
+    ],
     htmlReports   : [
       [dir: "build/reports/jacoco/jacocoFullReport/html", files: "index.html", name: "Report: Code Coverage"],
       [dir: "jobs-api-server/build/reports/tests/test", files: "index.html", name: "Report: Unit Test"],
