@@ -61,6 +61,7 @@ node('ibm-jenkins-slave-nvm') {
 
   // how we packaging jars/zips
   pipeline.packaging(
+      name: 'explorer-jobs',
       operation: {
           sh './gradlew packageJobsApiServer'
       }
