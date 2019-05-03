@@ -38,10 +38,7 @@ node('ibm-jenkins-slave-nvm') {
     operation     : {
         sh './gradlew coverage'
     },
-    junit         : [
-      allowEmptyResults : true,
-      testResults       : '**/test-results/**/*.xml'
-    ],
+    junit         : '**/test-results/test/*.xml',
     htmlReports   : [
       [dir: "build/reports/jacoco/jacocoFullReport/html", files: "index.html", name: "Report: Code Coverage"],
       [dir: "jobs-api-server/build/reports/tests/test", files: "index.html", name: "Report: Unit Test"],
@@ -50,18 +47,18 @@ node('ibm-jenkins-slave-nvm') {
 
   // TODO: define integration test
 
-  // pipeline.sonarScan(
-  //     operation: {
-  //       withSonarQubeEnv('sonar-default-server') {
-  //           def scannerParam = readJSON text: env.SONARQUBE_SCANNER_PARAMS
-  //           if (!scannerParam || !scannerParam['sonar.host.url']) {
-  //               error "Unable to find sonar host url from SONARQUBE_SCANNER_PARAMS: ${scannerParam}"
-  //           }
-  //           // Per Sonar Doc - It's important to add --info because of SONARJNKNS-281
-  //           sh "./gradlew --info sonarqube -Psonar.host.url=${scannerParam['sonar.host.url']}"
-  //       }
-  //     }
-  // )
+  pipeline.sonarScan(
+      operation: {
+        withSonarQubeEnv('sonar-default-server') {
+            def scannerParam = readJSON text: env.SONARQUBE_SCANNER_PARAMS
+            if (!scannerParam || !scannerParam['sonar.host.url']) {
+                error "Unable to find sonar host url from SONARQUBE_SCANNER_PARAMS: ${scannerParam}"
+            }
+            // Per Sonar Doc - It's important to add --info because of SONARJNKNS-281
+            sh "./gradlew --info sonarqube -Psonar.host.url=${scannerParam['sonar.host.url']}"
+        }
+      }
+  )
 
   // how we packaging jars/zips
   pipeline.packaging(
