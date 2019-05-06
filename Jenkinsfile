@@ -19,7 +19,6 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.admins.add("jackjia")
 
   pipeline.setup(
-    packageName: 'org.zowe.explorer.jobs',
     github: [
       email                      : 'zowe.robot@gmail.com',
       usernamePasswordCredential : 'zowe-robot-github',
@@ -70,11 +69,11 @@ node('ibm-jenkins-slave-nvm') {
 
   // define we need publish stage
   pipeline.publish(
-    operation: {
-        withCredentials([usernamePassword(credentialsId: 'GizaArtifactory', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-            sh "./gradlew publishArtifacts --info -Pdeploy.username=$USERNAME -Pdeploy.password=$PASSWORD"
-        }
-    }
+    // NOTE: task publishArtifacts will publish to lib-release-local because we don't have SNAPSHOT in version
+    artifacts: [
+      'jobs-api-server/build/libs/jobs-api-server-*.jar',
+      'jobs-zowe-server-package/build/distributions/jobs-server-zowe-package.zip'
+    ]
   )
 
   // define we need release stage
