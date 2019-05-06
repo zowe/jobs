@@ -71,7 +71,6 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.publish(
     // NOTE: task publishArtifacts will publish to lib-release-local because we don't have SNAPSHOT in version
     artifacts: [
-      'jobs-api-server/build/libs/jobs-api-server-*.jar',
       'jobs-zowe-server-package/build/distributions/jobs-server-zowe-package.zip'
     ]
   )
