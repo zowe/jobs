@@ -12,6 +12,7 @@ package org.zowe.jobs.services.zosmf;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
+import org.zowe.api.common.test.services.zosmf.AbstractZosmfRequestRunnerTest;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;

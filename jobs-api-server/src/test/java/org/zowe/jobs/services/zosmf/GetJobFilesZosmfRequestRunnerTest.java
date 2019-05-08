@@ -13,6 +13,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.api.common.model.ItemsWrapper;
+import org.zowe.api.common.test.services.zosmf.AbstractZosmfRequestRunnerTest;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;

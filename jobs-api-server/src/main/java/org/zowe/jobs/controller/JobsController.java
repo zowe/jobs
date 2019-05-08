@@ -15,8 +15,8 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.api.common.model.ItemsWrapper;
-import org.zowe.api.common.model.Username;
 import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
@@ -53,24 +53,14 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/jobs")
 @Api(value = "JES Jobs APIs", tags = "JES job APIs")
-public class JobsController {
-
-    private static final Logger log = LoggerFactory.getLogger(JobsController.class);
+public class JobsController extends AbstractApiController {
 
     @Autowired
     private JobsService jobsService;
-
-    // TODO https://github.com/zowe/explorer-api-common/issues/11 - push up into common?
-    @GetMapping(value = "/username", produces = { "application/json" })
-    @ApiOperation(value = "Get current userid", nickname = "getCurrentUserName", notes = "This API returns the caller's current TSO userid.", response = Username.class, tags = {
-            "System APIs", })
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = Username.class) })
-    public Username getCurrentUserName() {
-        return new Username(ZosUtils.getUsername());
-    }
 
     @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")

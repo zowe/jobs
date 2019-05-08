@@ -18,10 +18,10 @@ import com.google.gson.JsonObject;
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.zowe.api.common.test.AbstractHttpIntegrationTest;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.Job.JobBuilder;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.tests.AbstractHttpIntegrationTest;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
