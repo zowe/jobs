@@ -46,7 +46,9 @@ node('ibm-jenkins-slave-nvm') {
 
   // TODO: define integration test
 
-  pipeline.sonarScan()
+  pipeline.sonarScan(
+    scannerServer   : 'sonar-default-server'
+  )
 
   // how we packaging jars/zips
   pipeline.packaging(
