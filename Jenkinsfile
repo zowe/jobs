@@ -106,7 +106,6 @@ node('ibm-jenkins-slave-nvm') {
 -Pserver.port=8443 \
 -Pserver.username=${USERNAME} \
 -Pserver.password=${PASSWORD}"""
-        }
       }
     },
     junit         : '**/test-results/test/*.xml',
