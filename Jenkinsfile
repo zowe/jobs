@@ -19,7 +19,7 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.admins.add("jackjia")
 
   // we have extra parameters for integration test
-  pipeline.addBuildParameter(
+  pipeline.addBuildParameters(
     string(
       name: 'INTEGRATION_TEST_ZOSMF_HOST',
       description: 'z/OSMF server for integration test',
