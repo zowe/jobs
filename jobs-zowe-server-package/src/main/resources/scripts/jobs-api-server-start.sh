@@ -16,8 +16,6 @@ else
   echo "Done."
 fi
 
-DIR=`dirname $0`
-
 java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp -Xquickstart \
     -Dserver.port=${JOBS_API_PORT} \
