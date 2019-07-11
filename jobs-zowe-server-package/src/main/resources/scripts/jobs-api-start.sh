@@ -16,7 +16,8 @@ else
   echo "Done."
 fi
 
-java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
+ZOWE_EXPL_JOBS=EAJ1
+_BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp -Xquickstart \
     -Dserver.port=${JOBS_API_PORT} \
     -Dserver.ssl.keyAlias=${KEY_ALIAS} \
