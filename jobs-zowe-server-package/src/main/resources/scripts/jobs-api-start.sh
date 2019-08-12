@@ -7,15 +7,6 @@
 # - ZOSMF_PORT - The SSL port z/OSMF is listening on.
 # - ZOSMF_IP_ADDRESS - The IP Address z/OSMF can be reached
 
-export JAVA_HOME=$ZOWE_JAVA_HOME
-if [[ ":$PATH:" == *":$JAVA_HOME/bin:"* ]]; then
-  echo "ZOWE_JAVA_HOME already exists on the PATH"
-else
-  echo "Appending ZOWE_JAVA_HOME/bin to the PATH..."
-  export PATH=$PATH:$JAVA_HOME/bin
-  echo "Done."
-fi
-
 ZOWE_EXPL_JOBS=EAJ1
 _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp -Xquickstart \
