@@ -5,10 +5,10 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-# Copyright IBM Corporation 2018, 2019
+# Copyright IBM Corporation 2019
 ################################################################################
 
-# Variables required on shell:
+#Configure and start require:
 # - ZOWE_PREFIX
 # - JOBS_API_PORT - The port the data sets server will use
 # - KEY_ALIAS
@@ -17,15 +17,18 @@
 # - KEY_ALIAS - The alias of the key within the keystore
 # - ZOSMF_PORT - The SSL port z/OSMF is listening on.
 # - ZOSMF_IP_ADDRESS - The IP Address z/OSMF can be reached
+# - STATIC_DEF_CONFIG_DIR
+# - ZOWE_EXPLORER_HOST
+# - ZOWE_JAVA_HOME
 
-COMPONENT_CODE=EAJ1
-_BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
-    -Djava.io.tmpdir=/tmp -Xquickstart \
-    -Dserver.port=${JOBS_API_PORT} \
-    -Dserver.ssl.keyAlias=${KEY_ALIAS} \
-    -Dserver.ssl.keyStore=${KEYSTORE} \
-    -Dserver.ssl.keyStorePassword=${KEYSTORE_PASSWORD} \
-    -Dserver.ssl.keyStoreType=PKCS12 \
-    -Dzosmf.httpsPort=${ZOSMF_PORT} \
-    -Dzosmf.ipAddress=${ZOSMF_IP_ADDRESS} \
-    -jar {{jar_path}} &
+
+
+#Make sure Java is available on the path - TODO needed at all, move to a all zowe setup/validate?
+export JAVA_HOME=$ZOWE_JAVA_HOME
+if [[ ":$PATH:" == *":$JAVA_HOME/bin:"* ]]; then
+  echo "ZOWE_JAVA_HOME already exists on the PATH"
+else
+  echo "Appending ZOWE_JAVA_HOME/bin to the PATH..."
+  export PATH=$PATH:$JAVA_HOME/bin
+  echo "Done."
+fi
