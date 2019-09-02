@@ -1,3 +1,5 @@
+#!/bin/sh
+
 ################################################################################
 # This program and the accompanying materials are made available under the terms of the
 # Eclipse Public License v2.0 which accompanies this distribution, and is available at
@@ -18,7 +20,7 @@
 # - ZOSMF_PORT - The SSL port z/OSMF is listening on.
 # - ZOSMF_IP_ADDRESS - The IP Address z/OSMF can be reached
 
-COMPONENT_CODE=EAJ1
+COMPONENT_CODE=EJ
 _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp -Xquickstart \
     -Dserver.port=${JOBS_API_PORT} \
