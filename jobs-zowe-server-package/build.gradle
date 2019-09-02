@@ -20,13 +20,14 @@ task packageJobsApiServer(type: Zip) {
     }
 
     into('scripts/') {
-        from "$buildDir/convert/jobs-api-server-start.sh"
+        from "$buildDir/convert/jobs-api-start.sh", "$buildDir/convert/jobs-api-configure.sh"
     }
 }
 
 packageJobsApiServer.doFirst {
     List<File> scriptFiles =  new ArrayList<File>() {{
-        add(file('src/main/resources/scripts/jobs-api-server-start.sh'));
+        add(file('src/main/resources/scripts/jobs-api-start.sh'));
+        add(file('src/main/resources/scripts/jobs-api-configure.sh'));
     }};
     for (File scriptFile : scriptFiles){
         def inputStream = new InputStreamReader(new FileInputStream(scriptFile), "ISO-8859-1");
