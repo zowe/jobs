@@ -28,6 +28,7 @@ services:
       - apiId: com.ibm.jobs
         gatewayUrl: api/v1
         version: 1.0.0
+        https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v2/api-docs
         documentationUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/swagger-ui.html
 catalogUiTiles:
   jobs:
