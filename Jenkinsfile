@@ -63,12 +63,7 @@ node('ibm-jenkins-slave-nvm') {
         // sh './gradlew coverage'
         echo 'Dummy'
     },
-    allowMissingJunit : true,
-    junit         : '**/test-results/test/*.xml',
-    htmlReports   : [
-      [dir: "build/reports/jacoco/jacocoFullReport/html", files: "index.html", name: "Report: Code Coverage"],
-      [dir: "jobs-api-server/build/reports/tests/test", files: "index.html", name: "Report: Unit Test"],
-    ],
+    allowMissingJunit : true
   )
 
   pipeline.sonarScan(
