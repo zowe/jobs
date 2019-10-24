@@ -68,6 +68,7 @@ node('ibm-jenkins-slave-nvm') {
 
   pipeline.sonarScan(
     scannerServer   : lib.Constants.DEFAULT_SONARQUBE_SERVER,
+    allowBranchScan : true,
     failBuild       : true
   )
 
