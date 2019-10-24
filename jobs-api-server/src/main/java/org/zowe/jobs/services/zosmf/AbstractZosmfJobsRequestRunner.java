@@ -25,7 +25,7 @@ public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfReq
             String jobId) {
         if (jsonResponse.has("message")) {
             String zosmfMessage = jsonResponse.get("message").getAsString();
-            if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+            if (statusCode = HttpStatus.SC_BAD_REQUEST) {
                 if (String.format("No job found for reference: '%s(%s)'", jobName, jobId).equals(zosmfMessage)) {
                     return new JobNameNotFoundException(jobName, jobId);
                 }
