@@ -70,7 +70,8 @@ node('ibm-jenkins-slave-nvm') {
   )
 
   pipeline.sonarScan(
-    scannerServer   : lib.Constants.DEFAULT_SONARQUBE_SERVER
+    scannerServer   : lib.Constants.DEFAULT_SONARQUBE_SERVER,
+    failBuild       : true
   )
 
   // how we packaging jars/zips
