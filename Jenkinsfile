@@ -12,7 +12,7 @@
 
 
 node('ibm-jenkins-slave-nvm') {
-  def lib = library("jenkins-library").org.zowe.jenkins_shared_library
+  def lib = library("jenkins-library@staging").org.zowe.jenkins_shared_library
 
   def pipeline = lib.pipelines.gradle.GradlePipeline.new(this)
 
@@ -69,50 +69,50 @@ node('ibm-jenkins-slave-nvm') {
     ],
   )
 
-  pipeline.test(
-    name          : 'Integration',
-    operation     : {
-      echo "Preparing certificates ..."
-      sh """keytool -genkeypair -keystore localhost.keystore.p12 -storetype PKCS12 \
--storepass password -alias localhost -keyalg RSA -keysize 2048 -validity 99999 \
--dname \"CN=Zowe Jobs Explorer API Default Certificate, OU=Zowe API Squad, O=Zowe, L=Hursley, ST=Hampshire, C=UK\" \
--ext san=dns:localhost,ip:127.0.0.1"""
+//   pipeline.test(
+//     name          : 'Integration',
+//     operation     : {
+//       echo "Preparing certificates ..."
+//       sh """keytool -genkeypair -keystore localhost.keystore.p12 -storetype PKCS12 \
+// -storepass password -alias localhost -keyalg RSA -keysize 2048 -validity 99999 \
+// -dname \"CN=Zowe Jobs Explorer API Default Certificate, OU=Zowe API Squad, O=Zowe, L=Hursley, ST=Hampshire, C=UK\" \
+// -ext san=dns:localhost,ip:127.0.0.1"""
 
-      echo "Starting test server ..."
-      sh """java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
--Djava.io.tmpdir=/tmp \
--Dserver.port=8443 \
--Dserver.ssl.keyAlias=localhost \
--Dserver.ssl.keyStore=localhost.keystore.p12 \
--Dserver.ssl.keyStorePassword=password \
--Dserver.ssl.keyStoreType=PKCS12 \
--Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
--Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
--jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*-boot.jar) &"""
+//       echo "Starting test server ..."
+//       sh """java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
+// -Djava.io.tmpdir=/tmp \
+// -Dserver.port=8443 \
+// -Dserver.ssl.keyAlias=localhost \
+// -Dserver.ssl.keyStore=localhost.keystore.p12 \
+// -Dserver.ssl.keyStorePassword=password \
+// -Dserver.ssl.keyStoreType=PKCS12 \
+// -Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
+// -Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
+// -jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*-boot.jar) &"""
 
-      // give it a little time to start the server
-      sleep time: 1, unit: 'MINUTES'
+//       // give it a little time to start the server
+//       sleep time: 1, unit: 'MINUTES'
 
-      echo "Starting test ..."
-      withCredentials([
-        usernamePassword(
-          credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
-          usernameVariable: 'USERNAME',
-          passwordVariable: 'PASSWORD'
-        )
-      ]) {
-        sh """./gradlew runIntegrationTests \
--Pserver.host=localhost \
--Pserver.port=8443 \
--Pserver.username=${USERNAME} \
--Pserver.password=${PASSWORD}"""
-      }
-    },
-    junit         : '**/test-results/test/*.xml',
-    htmlReports   : [
-      [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
-    ],
-  )
+//       echo "Starting test ..."
+//       withCredentials([
+//         usernamePassword(
+//           credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
+//           usernameVariable: 'USERNAME',
+//           passwordVariable: 'PASSWORD'
+//         )
+//       ]) {
+//         sh """./gradlew runIntegrationTests \
+// -Pserver.host=localhost \
+// -Pserver.port=8443 \
+// -Pserver.username=${USERNAME} \
+// -Pserver.password=${PASSWORD}"""
+//       }
+//     },
+//     junit         : '**/test-results/test/*.xml',
+//     htmlReports   : [
+//       [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
+//     ],
+//   )
 
   pipeline.sonarScan(
     scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
