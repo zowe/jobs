@@ -115,8 +115,9 @@ node('ibm-jenkins-slave-nvm') {
   )
 
   pipeline.sonarScan(
-    scannerServer   : lib.Constants.DEFAULT_SONARQUBE_SERVER
-  )
+    scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
+    allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH
+)
 
   // how we packaging jars/zips
   pipeline.packaging(

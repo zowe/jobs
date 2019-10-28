@@ -1,6 +1,6 @@
 # Explorer Jobs API
 
-[![Code Quality](https://jayne.zowe.org:9000/api/project_badges/measure?project=explorer%3Ajobs-api-server&metric=alert_status)](https://jayne.zowe.org:9000/dashboard/index/explorer:jobs-api-server)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=zowe_jobs&metric=alert_status)](https://sonarcloud.io/dashboard?id=zowe_jobs)
 
 ## Build
 
