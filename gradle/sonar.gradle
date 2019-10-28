@@ -16,7 +16,6 @@ sonarqube {
         property "sonar.links.scm_dev", "https://github.com/zowe/jobs.git"
         property "sonar.links.ci", project.hasProperty('sonar.links.ci') ? project.getProperty('sonar.links.ci') : null
         if (pullRequest != null) {
-            property "sonar.analysis.mode", "preview"
             property "sonar.github.pullRequest", pullRequest
             property "sonar.github.repository", "zowe/jobs"
             property "sonar.github.oauth",  project.hasProperty('sonar.github.oauth') ? project.getProperty('sonar.github.oauth') : null
