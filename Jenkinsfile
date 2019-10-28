@@ -115,11 +115,11 @@ node('ibm-jenkins-slave-nvm') {
 //   )
 
   pipeline.sonarScan(
-    scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
-    scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
-    allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
-    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD,
-    disableSonarGradlePlugin  : true
+    scannerServer             : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
+    scannerTool               : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
+    allowBranchScan           : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
+    failBuild                 : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD,
+    disableSonarGradlePlugin  : lib.Constants.DEFAULT_LFJ_DISABLE_SONARQUBE_GRADLE_PLUGIN
 )
 
   // how we packaging jars/zips
