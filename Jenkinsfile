@@ -12,7 +12,7 @@
 
 
 node('ibm-jenkins-slave-nvm') {
-  def lib = library("jenkins-library@users/jack/gradle-sonarcloud").org.zowe.jenkins_shared_library
+  def lib = library("jenkins-library").org.zowe.jenkins_shared_library
 
   def pipeline = lib.pipelines.gradle.GradlePipeline.new(this)
 
@@ -115,11 +115,10 @@ node('ibm-jenkins-slave-nvm') {
   )
 
   pipeline.sonarScan(
-    scannerServer             : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
-    scannerTool               : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
-    allowBranchScan           : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
-    failBuild                 : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD,
-    disableSonarGradlePlugin  : lib.Constants.DEFAULT_LFJ_DISABLE_SONARQUBE_GRADLE_PLUGIN
+    scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
+    scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
+    allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
+    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
 )
 
   // how we packaging jars/zips
