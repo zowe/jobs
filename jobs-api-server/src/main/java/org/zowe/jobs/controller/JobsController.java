@@ -157,6 +157,22 @@ public class JobsController extends AbstractApiController {
 
         return jobsService.getJobFileContent(jobName, jobId, fileId);
     }
+    
+    @GetMapping(value = "/{jobName}/{jobId}/files/content", produces = { "application/json" })
+    @ApiOperation(value = "Get the contents of all job output files for a given job", nickname = "getConcatenatedJobOutputFiles", notes = "This API reads the contents of all job files of a given job.", response = JobFileContent.class, tags = {
+            "JES job APIs", })
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = JobFileContent.class) })
+    public JobFileContent getConcatenatedJobOutputFiles(
+            @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+        ItemsWrapper<JobFile> jobFiles = getJobOutputFiles(jobName, jobId);
+        JobFileContent output = new JobFileContent();
+        for (JobFile file : jobFiles.getItems()) {
+            output.setContent(output.getContent() + getJobOutputFile(jobName, jobId, file.getId().toString()));
+        }
+        return output;
+    }
+    
 
     @GetMapping(value = "/{jobName}/{jobId}/steps", produces = { "application/json" })
     @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = JobStep.class, responseContainer = "List", tags = {
