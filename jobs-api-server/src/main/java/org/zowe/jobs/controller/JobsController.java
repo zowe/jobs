@@ -166,10 +166,12 @@ public class JobsController extends AbstractApiController {
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
         ItemsWrapper<JobFile> jobFiles = getJobOutputFiles(jobName, jobId);
-        JobFileContent output = new JobFileContent();
+        StringBuffer outputBuffer = new StringBuffer();
         for (JobFile file : jobFiles.getItems()) {
-            output.setContent(output.getContent() + getJobOutputFile(jobName, jobId, file.getId().toString()));
+            outputBuffer.append(getJobOutputFile(jobName, jobId, file.getId().toString()).getContent());
         }
+        JobFileContent output = new JobFileContent();
+        output.setContent(outputBuffer.toString());
         return output;
     }
     
