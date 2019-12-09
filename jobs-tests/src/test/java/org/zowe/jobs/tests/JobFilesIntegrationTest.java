@@ -34,6 +34,9 @@ import static org.junit.Assert.assertThat;
 public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
 
     private static Job job;
+    private static String expectedContentRegexJESMSGLG = ".*J E S 2  J O B  L O G.*------ JES2 JOB STATISTICS ------.*3 CARDS READ.*"
+            + "-           .* SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
+            + "-            5 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
 
     @BeforeClass
     public static void submitJob() throws Exception {
@@ -88,10 +91,8 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     public void testGetJobOutputFileContents() throws Exception {
         String jobName = job.getJobName();
         String jobId = job.getJobId();
-        String expectedContentRegex = ".*J E S 2  J O B  L O G.*------ JES2 JOB STATISTICS ------.*3 CARDS READ.*"
-                + "-           .* SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
-                + "-            5 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
-        Pattern regex = Pattern.compile(expectedContentRegex, Pattern.DOTALL);
+        
+        Pattern regex = Pattern.compile(expectedContentRegexJESMSGLG, Pattern.DOTALL);
         getJobFileContent(jobName, jobId, "2").then().statusCode(HttpStatus.SC_OK).body("content",
                 MatchesPattern.matchesPattern(regex));
     }
@@ -121,5 +122,22 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
 
     public static Response getJobFileContent(String jobName, String jobId, String fileId) throws Exception {
         return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files/" + fileId + "/content");
+    }
+    
+    @Test
+    public void testGetConcatenatedJobOutputFiles() throws Exception {
+        String jobName = job.getJobName();
+        String jobId = job.getJobId();
+        String expectedContentRegexJESJCL = "        2 //UNIT     EXEC PGM=IEFBR14.*";
+        String expectedContentRegexJESYMSG = ".*IEFA111I ATLJ0000 IS USING THE FOLLOWING JOB RELATED SETTINGS:.*";
+        String pattern = expectedContentRegexJESMSGLG + expectedContentRegexJESJCL + expectedContentRegexJESYMSG;
+        
+        Pattern regex = Pattern.compile(pattern, Pattern.DOTALL);
+        getConcatenatedJobFiles(jobName, jobId).then().statusCode(HttpStatus.SC_OK).body("content",
+                MatchesPattern.matchesPattern(regex));
+    }
+    
+    public static Response getConcatenatedJobFiles(String jobName, String jobId) throws Exception {
+        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files/content");
     }
 }

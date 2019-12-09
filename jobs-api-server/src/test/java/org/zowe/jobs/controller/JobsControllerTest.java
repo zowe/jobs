@@ -306,6 +306,45 @@ public class JobsControllerTest extends ApiControllerTest {
         verify(jobsService, times(1)).getJobFileContent(jobName, jobId, fileId);
         verifyNoMoreInteractions(jobsService);
     }
+    
+    @Test
+    public void get_concatenated_job_files_content() throws Exception {
+        JobFile jesjcl = JobFile.builder().id(3l).ddName("JESJCL").recordFormat("V").recordLength(136l).byteCount(182l)
+                .recordCount(3l).build();
+        JobFile jesmsglg = JobFile.builder().id(2l).ddName("JESMSGLG").recordFormat("UA").recordLength(133l)
+            .byteCount(1103l).recordCount(20l).build();
+        List<JobFile> jobFiles = Arrays.asList(jesjcl, jesmsglg);
+        ItemsWrapper<JobFile> items = new ItemsWrapper<JobFile>(jobFiles);
+        
+        String jobId = "jobId";
+        String jobName = "jobName";
+        when(jobsService.getJobFiles(jobName, jobId)).thenReturn(items);
+        
+        mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files", jobName, jobId)).andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(JsonUtils.convertToJsonString(items)));
+        
+        JobFileContent jobFileContent1 = new JobFileContent("1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\\n");
+        JobFileContent jobFileContent2 = new JobFileContent("Job completed");
+        
+        String fileId1 = "3";
+        String fileId2 = "2";
+        when(jobsService.getJobFileContent(jobName, jobId, fileId1)).thenReturn(jobFileContent1);
+        when(jobsService.getJobFileContent(jobName, jobId, fileId2)).thenReturn(jobFileContent2);
+        
+        mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId1))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent1)));
+        mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId2))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent2)));
+        
+        JobFileContent concatenatedContent = new JobFileContent(jobFileContent1.getContent() + jobFileContent2.getContent());
+        
+        mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/content", jobName, jobId))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+        .andExpect(content().string(JsonUtils.convertToJsonString(concatenatedContent)));
+    }
 
     @Test
     public void test_get_job_steps_with_jobId_and_jobName() throws Exception {
