@@ -38,7 +38,7 @@ node('ibm-jenkins-slave-nvm') {
       name: 'INTEGRATION_TEST_ZOSMF_CREDENTIAL',
       description: 'z/OSMF credential for integration test',
       credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
-      defaultValue: 'ssh-marist-server-zzow01',
+      defaultValue: 'ssh-marist-server-zzow01-zowep',
       required: true
     )
   )
