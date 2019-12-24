@@ -23,6 +23,8 @@ public interface JobsService {
     Job getJob(String jobName, String jobId);
 
     void purgeJob(String jobName, String jobId);
+    
+    void modifyJob(String jobName, String jobId, String command);
 
     Job submitJobString(String jclString);
 

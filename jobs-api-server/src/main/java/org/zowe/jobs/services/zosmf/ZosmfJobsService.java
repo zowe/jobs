@@ -64,6 +64,12 @@ public class ZosmfJobsService implements JobsService {
         PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(jobName, jobId);
         runner.run(zosmfConnector);
     }
+    
+    @Override
+    public void modifyJob(String jobName, String jobId, String command) {
+        ModifyJobZosmfRequestRunner runner = new ModifyJobZosmfRequestRunner(jobName, jobId, command);
+        runner.run(zosmfConnector);
+    }
 
     @Override
     public ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId) {

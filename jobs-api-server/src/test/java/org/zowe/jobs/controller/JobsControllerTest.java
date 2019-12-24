@@ -36,6 +36,7 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
+import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -55,6 +56,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -438,6 +440,43 @@ public class JobsControllerTest extends ApiControllerTest {
             .andExpect(jsonPath("$.message").value(errorMessage));
 
         verify(jobsService, times(1)).purgeJob(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+    
+    @Test
+    public void modify_job_calls_job_service() throws Exception {
+        String jobName = "TESTJOB";
+        String jobId = "JOB12345";
+        
+        ModifyJobRequest request = new ModifyJobRequest("cancel");
+        
+        mockMvc.perform(put(ENDPOINT_ROOT + "/{jobName}/{jobId}", jobName, jobId)
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JsonUtils.convertToJsonString(request)))
+                .andExpect(status().isNoContent());
+        
+        verify(jobsService, times(1)).modifyJob(jobName, jobId, request.getCommand());
+        verifyNoMoreInteractions(jobsService);
+    }
+    
+    @Test
+    public void modify_job_with_exceptions_sould_be_converted_to_error_message() throws Exception {
+        String errorMessage = "JobId could not be found";
+        
+        String jobId = "job1234";
+        String jobName = "TESTJOB";
+        
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.NOT_FOUND).build();
+
+        ModifyJobRequest request = new ModifyJobRequest("cancel");
+        
+        doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).modifyJob(jobName, jobId, request.getCommand());
+        
+        mockMvc.perform(put(ENDPOINT_ROOT + "/{jobName}/{jobId}", jobName, jobId)
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JsonUtils.convertToJsonString(request)))
+            .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+            .andExpect(jsonPath("$.message").value(errorMessage));
+        
+        verify(jobsService, times(1)).modifyJob(jobName, jobId, request.getCommand());
         verifyNoMoreInteractions(jobsService);
     }
 

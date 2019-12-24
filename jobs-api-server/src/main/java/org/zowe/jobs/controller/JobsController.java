@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +41,7 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
+import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -95,7 +97,7 @@ public class JobsController extends AbstractApiController {
     }
 
     @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
-    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This api purges a Job", tags = {
+    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This API purges a Job", tags = {
             "JES job APIs", })
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purge succesfully requested") })
     public ResponseEntity<Void> purgeJob(
@@ -103,6 +105,19 @@ public class JobsController extends AbstractApiController {
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
         jobsService.purgeJob(jobName, jobId);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+    }
+    
+    @PutMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
+    @ApiOperation(value = "Modify a job", nickname = "modifyJob", notes = "This API modifies a job (cancel, hold, release)", tags = { "JES job APIs" })
+    @ApiResponses(value = { 
+            @ApiResponse(code = 202, message = "Job modify requested"), 
+            @ApiResponse(code = 200, message = "Job modified")})
+    public ResponseEntity<Void> modifyJob(
+            @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
+            @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
+            @RequestBody ModifyJobRequest request) {
+        jobsService.modifyJob(jobName, jobId, request.getCommand());
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping(value = "string", produces = { "application/json" })
