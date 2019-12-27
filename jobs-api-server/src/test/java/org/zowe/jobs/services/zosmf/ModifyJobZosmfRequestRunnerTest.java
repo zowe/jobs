@@ -33,7 +33,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         mockResponseCache(HttpStatus.SC_ACCEPTED);
         
         JsonObject body = new JsonObject();
-        body.addProperty("command", command);
+        body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
                 
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
@@ -54,7 +54,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile("zosmf_getJob_noJobNameResponse.json"));
         
         JsonObject body = new JsonObject();
-        body.addProperty("command", command);
+        body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
         
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
