@@ -452,7 +452,7 @@ public class JobsControllerTest extends ApiControllerTest {
         
         mockMvc.perform(put(ENDPOINT_ROOT + "/{jobName}/{jobId}", jobName, jobId)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JsonUtils.convertToJsonString(request)))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isAccepted());
         
         verify(jobsService, times(1)).modifyJob(jobName, jobId, request.getCommand());
         verifyNoMoreInteractions(jobsService);
