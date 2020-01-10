@@ -48,7 +48,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
                     break;
                 }
             }
-            Thread.sleep(1200);
+            Thread.sleep(1200); //NOSONAR
         }
     }
     

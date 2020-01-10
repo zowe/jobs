@@ -49,8 +49,7 @@ public class ModifyJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<
         body.addProperty("request", command); //$NON-NLS-1$
         
         StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
-        RequestBuilder requestBuilder = RequestBuilder.put(requestUrl).setEntity(requestEntity);
-        return requestBuilder;
+        return RequestBuilder.put(requestUrl).setEntity(requestEntity);
     }
 
     @Override

@@ -9,14 +9,13 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-import org.junit.Test;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.zowe.jobs.exceptions.JobNameNotFoundException;
-
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
+import org.junit.Test;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
 import static org.mockito.Mockito.when;
 
