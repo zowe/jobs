@@ -32,7 +32,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
         for (Job job : jobs) {
-            deleteJob(job).then().statusCode(HttpStatus.SC_OK);
+            deleteJob(job).then().log().all().statusCode(HttpStatus.SC_NO_CONTENT);
         }
     }
     
@@ -71,6 +71,6 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         .body("status", equalTo(expectedError.getStatus().name()))
         .body("message", equalTo(expectedError.getMessage()));
         
-        deleteJob(job).then().statusCode(HttpStatus.SC_OK);
+        deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
     }
 }
