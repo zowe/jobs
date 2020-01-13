@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
 package org.zowe.jobs.tests;
 
@@ -38,6 +38,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     static final String JOB_IEFBR14 = "IEFBR14";
     static final String JOB_WITH_STEPS = "JOB1DD";
+    static final String LONGJOB = "LONGJOB";
 
     static final String TEST_JCL_PDS = USER.toUpperCase() + ".TEST.JCL";
 
