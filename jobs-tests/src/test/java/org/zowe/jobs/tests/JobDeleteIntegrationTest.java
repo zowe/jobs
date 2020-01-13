@@ -24,7 +24,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
-    @Ignore("See TODO") // TODO https://github.com/zowe/zowe-install-packaging/issues/374)
     public void testDeleteJob() throws Exception {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
         deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
