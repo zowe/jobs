@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2020
  */
 
 package org.zowe.jobs.tests;
@@ -17,6 +17,9 @@ import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
+import com.google.gson.JsonObject;
+
+import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
@@ -72,5 +75,12 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         .body("message", equalTo(expectedError.getMessage()));
         
         deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+    
+    public static Response modifyJob(Job job, String command) throws Exception {
+        JsonObject body = new JsonObject();
+        body.addProperty("command", command);
+        Response response = RestAssured.given().contentType("application/json").body(body.toString()).when().put(getJobPath(job));
+        return response;
     }
 }

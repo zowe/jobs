@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
 package org.zowe.jobs.tests;
 
@@ -78,13 +78,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     public static Response deleteJob(Job job) throws Exception {
         return RestAssured.given().when().delete(getJobPath(job));
-    }
-    
-    public static Response modifyJob(Job job, String command) throws Exception {
-        JsonObject body = new JsonObject();
-        body.addProperty("command", command);
-        Response response = RestAssured.given().contentType("application/json").body(body.toString()).when().put(getJobPath(job));
-        return response;
     }
 
     static Response getJobs(String prefix, String owner) {

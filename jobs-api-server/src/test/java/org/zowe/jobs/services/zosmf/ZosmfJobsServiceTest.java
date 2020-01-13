@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -30,7 +30,6 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.model.ModifyJobRequest;
 
 import java.util.Arrays;
 import java.util.List;
