@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -62,6 +62,12 @@ public class ZosmfJobsService implements JobsService {
     @Override
     public void purgeJob(String jobName, String jobId) {
         PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(jobName, jobId);
+        runner.run(zosmfConnector);
+    }
+    
+    @Override
+    public void modifyJob(String jobName, String jobId, String command) {
+        ModifyJobZosmfRequestRunner runner = new ModifyJobZosmfRequestRunner(jobName, jobId, command);
         runner.run(zosmfConnector);
     }
 

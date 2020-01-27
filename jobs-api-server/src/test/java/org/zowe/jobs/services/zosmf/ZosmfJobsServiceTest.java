@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -313,5 +313,33 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(subException);
 
         shouldThrow(expectedException, () -> jobsService.getJobJcl(jobName, jobId));
+    }
+    
+    @Test
+    public void testModifyJobRunnerValueCorrectlyReturned() throws Exception {
+        String jobName = "jobName";
+        String jobId = "jobId";
+        String modifyCommand = "cancel";
+
+        ModifyJobZosmfRequestRunner runner = mock(ModifyJobZosmfRequestRunner.class);
+        PowerMockito.whenNew(ModifyJobZosmfRequestRunner.class).withArguments(jobName, jobId, modifyCommand).thenReturn(runner);
+        jobsService.modifyJob(jobName, jobId, modifyCommand);
+
+        verify(runner).run(zosmfConnector);
+    }
+    
+    @Test
+    public void testModifyJobRequestRunnerExceptionThrown() throws Exception {
+        String jobName = "jobName";
+        String jobId = "jobId";
+        String modifyCommand = "cancel";
+
+        ZoweApiRestException expectedException = new JobIdNotFoundException(jobName, jobId);
+
+        ModifyJobZosmfRequestRunner runner = mock(ModifyJobZosmfRequestRunner.class);
+        when(runner.run(zosmfConnector)).thenThrow(expectedException);
+        PowerMockito.whenNew(ModifyJobZosmfRequestRunner.class).withArguments(jobName, jobId, modifyCommand).thenReturn(runner);
+
+        shouldThrow(expectedException, () -> jobsService.modifyJob(jobName, jobId, modifyCommand));
     }
 }

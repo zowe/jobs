@@ -86,6 +86,7 @@ node('ibm-jenkins-slave-nvm') {
 -Dserver.ssl.keyStore=localhost.keystore.p12 \
 -Dserver.ssl.keyStorePassword=password \
 -Dserver.ssl.keyStoreType=PKCS12 \
+-Dserver.compression.enabled=true \
 -Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
 -Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
 -jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*-boot.jar) &"""

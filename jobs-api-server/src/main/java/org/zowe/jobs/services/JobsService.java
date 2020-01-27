@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018
+ * Copyright IBM Corporation 2018, 2019
  */
 package org.zowe.jobs.services;
 
@@ -23,6 +23,8 @@ public interface JobsService {
     Job getJob(String jobName, String jobId);
 
     void purgeJob(String jobName, String jobId);
+    
+    void modifyJob(String jobName, String jobId, String command);
 
     Job submitJobString(String jclString);
 
