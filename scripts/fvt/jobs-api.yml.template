@@ -1,0 +1,22 @@
+#
+services:
+  - serviceId: jobs
+    title: IBM z/OS Jobs
+    description: IBM z/OS Jobs REST API service
+    catalogUiTileId: jobs
+    instanceBaseUrls:
+      - https://localhost:{API_PORT}/
+    homePageRelativeUrl:  # Home page is at the same URL
+    routedServices:
+      - gatewayUrl: api/v1  # [api/ui/ws]/v{majorVersion}
+        serviceRelativeUrl: api/v1/jobs
+    apiInfo:
+      - apiId: org.zowe.jobs
+        gatewayUrl: api/v1
+        version: 1.0.0
+        swaggerUrl: https://localhost:{API_PORT}/v2/api-docs
+        documentationUrl: https://localhost:{API_PORT}/swagger-ui.html
+catalogUiTiles:
+  jobs:
+    title: z/OS Jobs services
+    description: IBM z/OS Jobs REST services
