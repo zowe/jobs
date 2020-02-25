@@ -54,10 +54,12 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<It
         if (prefix == null) {
             prefix = "*";
         }
+        String query;
         if (owner == null) {
-            owner = "*";
+            query = String.format("prefix=%s", prefix); //$NON-NLS-1$
+        } else {
+            query = String.format("owner=%s&prefix=%s", owner, prefix); //$NON-NLS-1$
         }
-        String query = String.format("owner=%s&prefix=%s", owner, prefix); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl("restjobs/jobs", query); //$NON-NLS-1$
         return RequestBuilder.get(requestUrl);
     }

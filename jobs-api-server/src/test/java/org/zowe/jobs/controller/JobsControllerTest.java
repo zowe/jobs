@@ -27,7 +27,6 @@ import org.zowe.api.common.exceptions.ZoweApiErrorException;
 import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.api.common.test.controller.ApiControllerTest;
 import org.zowe.api.common.utils.JsonUtils;
-import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
@@ -63,7 +62,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ZosUtils.class, ServletUriComponentsBuilder.class })
+@PrepareForTest({ ServletUriComponentsBuilder.class })
 public class JobsControllerTest extends ApiControllerTest {
 
     private static final String ENDPOINT_ROOT = "/api/v1/jobs";
@@ -126,13 +125,13 @@ public class JobsControllerTest extends ApiControllerTest {
         List<Job> jobs = Arrays.asList(dummyJob, dummyJob2);
         ItemsWrapper<Job> items = new ItemsWrapper<Job>(jobs);
 
-        when(jobsService.getJobs("TESTNAME", DUMMY_USER, JobStatus.ALL)).thenReturn(items);
+        when(jobsService.getJobs("TESTNAME", null, JobStatus.ALL)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "?prefix={prefix}", "TESTNAME")).andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(items)));
 
-        verify(jobsService, times(1)).getJobs("TESTNAME", DUMMY_USER, JobStatus.ALL);
+        verify(jobsService, times(1)).getJobs("TESTNAME", null, JobStatus.ALL);
         verifyNoMoreInteractions(jobsService);
     }
 
@@ -141,13 +140,13 @@ public class JobsControllerTest extends ApiControllerTest {
 
         ItemsWrapper<Job> items = new ItemsWrapper<Job>(Collections.emptyList());
 
-        when(jobsService.getJobs("TESTNAME", DUMMY_USER, JobStatus.ALL)).thenReturn(items);
+        when(jobsService.getJobs("TESTNAME", null, JobStatus.ALL)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "?prefix={prefix}", "TESTNAME")).andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(EMPTY_ITEMS));
 
-        verify(jobsService, times(1)).getJobs("TESTNAME", DUMMY_USER, JobStatus.ALL);
+        verify(jobsService, times(1)).getJobs("TESTNAME", null, JobStatus.ALL);
         verifyNoMoreInteractions(jobsService);
     }
 
