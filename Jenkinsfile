@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 
 
@@ -147,13 +147,14 @@ node('ibm-jenkins-slave-nvm') {
 -Pserver.username=${USERNAME} \
 -Pserver.password=${PASSWORD} \
 -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}"""
-      }
-    },
-    junit         : '**/test-results/test/*.xml',
-    htmlReports   : [
-      [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
-    ],
-    timeout: [time: 30, unit: 'MINUTES']
+        }
+      },
+      junit         : '**/test-results/test/*.xml',
+      htmlReports   : [
+        [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
+      ],
+      timeout: [time: 30, unit: 'MINUTES']
+    }
   )
 
   pipeline.sonarScan(
