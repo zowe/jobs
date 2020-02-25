@@ -148,13 +148,13 @@ node('ibm-jenkins-slave-nvm') {
 -Pserver.password=${PASSWORD} \
 -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}"""
         }
-      },
+      } //end of lock
+    },
       junit         : '**/test-results/test/*.xml',
       htmlReports   : [
         [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
       ],
       timeout: [time: 30, unit: 'MINUTES']
-    }
   )
 
   pipeline.sonarScan(
