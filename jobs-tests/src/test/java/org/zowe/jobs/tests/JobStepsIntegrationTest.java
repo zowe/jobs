@@ -68,6 +68,6 @@ public class JobStepsIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     public static Response getJobSteps(String jobName, String jobId) throws Exception {
-        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/steps");
+        return RestAssured.given().header(AUTH_HEADER).when().get(getJobPath(jobName, jobId) + "/steps");
     }
 }

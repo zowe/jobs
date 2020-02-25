@@ -80,7 +80,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     public static Response modifyJob(Job job, String command) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("command", command);
-        Response response = RestAssured.given().contentType("application/json").body(body.toString()).when().put(getJobPath(job));
+        Response response = RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put(getJobPath(job));
         return response;
     }
 }
