@@ -81,7 +81,7 @@ if [ -z "$(which ssh-agent)" ]; then
   exit 1
 fi
 if [ -z "$FVT_APIML_ARTIFACT" ]; then
-  FVT_APIML_ARTIFACT="libs-release-local/com/ca/mfaas/sdk/mfaas-zowe-install/*/mfaas-zowe-install-*.zip"
+  FVT_APIML_ARTIFACT="libs-release-local/org/zowe/apiml/sdk/zowe-install/*/zowe-install-*.zip"
   echo "[${SCRIPT_NAME}][warn] API-ML artifact is not defined, using default value."
 fi
 echo
