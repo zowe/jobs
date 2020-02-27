@@ -278,6 +278,7 @@ java -Xms32m -Xmx256m \
     -Dapiml.service.port=${FVT_DISCOVERY_PORT} \
     -Dapiml.service.ipAddress=127.0.0.1 \
     -Dapiml.service.preferIpAddress=true \
+    -Dapiml.service.allowEncodedSlashes=true \
     -Dapiml.discovery.staticApiDefinitionsDirectories="${FVT_WORKSPACE}/${FVT_CONFIG_DIR}" \
     -Dapiml.security.ssl.verifySslCertificatesOfServices=false \
     -Dserver.ssl.enabled=true \
@@ -306,6 +307,7 @@ java -Xms32m -Xmx256m \
     -Dapiml.service.port=${FVT_GATEWAY_PORT} \
     -Dapiml.service.discoveryServiceUrls="https://localhost:${FVT_DISCOVERY_PORT}/eureka/" \
     -Dapiml.service.preferIpAddress=true \
+    -Dapiml.service.allowEncodedSlashes=true \
     -Denvironment.ipAddress=127.0.0.1 \
     -Dapiml.gateway.timeoutMillis=30000 \
     -Dapiml.security.ssl.verifySslCertificatesOfServices=false \
