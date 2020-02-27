@@ -56,6 +56,18 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
             assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
         }
     }
+    
+    @Test
+    public void testGetJobsNoOwnerShouldDefaultToTestUser() {
+        List<Job> actual = getJobs("*", null).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+            .getList("items", Job.class);
+
+        // We have results, they are of type job and all have owner = user
+        assertTrue(actual.size() > 0);
+        for (Job job : actual) {
+            assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
+        }
+    }
 
     @Test
     public void testGetJobsWithUnlikelyPrefix() {

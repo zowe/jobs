@@ -35,7 +35,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
         for (Job job : jobs) {
-            deleteJob(job).then().log().all().statusCode(HttpStatus.SC_NO_CONTENT);
+            deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
         }
     }
     
