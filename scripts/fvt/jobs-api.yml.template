@@ -16,6 +16,9 @@ services:
         version: 1.0.0
         swaggerUrl: https://localhost:{API_PORT}/v2/api-docs
         documentationUrl: https://localhost:{API_PORT}/swagger-ui.html
+    customMetadata:
+      apiml:
+        enableUrlEncodedCharacters: true
 catalogUiTiles:
   jobs:
     title: z/OS Jobs services
