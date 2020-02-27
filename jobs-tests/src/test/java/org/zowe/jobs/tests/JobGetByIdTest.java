@@ -55,6 +55,7 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobByNameWithHashAndId() throws Exception {
+        System.out.println(jobWithHash);
         Job actualJob = getJob(jobWithHash).then().log().all().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
         verifyJobIsAsExpected(actualJob);
     }
