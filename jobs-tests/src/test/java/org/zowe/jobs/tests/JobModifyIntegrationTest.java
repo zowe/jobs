@@ -32,7 +32,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     @Before
     public void prepareSystemForTest() throws Exception {
         //Ensure there are no existing LONGJOB jobs on the system
-        List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+        List<Job> jobs = getJobs("LONGJOB", "*").then().log().all().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
         for (Job job : jobs) {
             deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
