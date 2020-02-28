@@ -57,10 +57,10 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
     public void get_output_jobs_null_owner_should_call_zosmf_and_parse_response_correctly() throws Exception {
         Job job1 = createJob("STC16867", "ZOEJC", "IZUSVR", "STC", JobStatus.OUTPUT, "Job is on the hard copy queue",
                 "CANCELED");
-        Job job4 = createJob("TSU14480", "ZOWESH", "STEVENH", "TSU", JobStatus.OUTPUT, "Job is on the hard copy queue",
+        Job job4 = createJob("TSU14480", "ZOWESH", "IZUSVR", "TSU", JobStatus.OUTPUT, "Job is on the hard copy queue",
                 "ABEND S222");
         
-        mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponse.json"));
+        mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponseSameOwner.json"));
         RequestBuilder requestBuilder = mockGetBuilder("restjobs/jobs?prefix=*");
         when(zosmfConnector.request(requestBuilder)).thenReturn(response);
 
