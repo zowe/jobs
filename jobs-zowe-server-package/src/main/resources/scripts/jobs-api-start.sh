@@ -17,8 +17,8 @@
 # - KEYSTORE - The keystore to use for SSL certificates
 # - KEYSTORE_PASSWORD - The password to access the keystore supplied by KEYSTORE
 # - KEY_ALIAS - The alias of the key within the keystore
-# - ZOSMF_PORT - The SSL port z/OSMF is listening on.
-# - ZOSMF_HOST - The IP Address z/OSMF can be reached
+# - GATEWAY_PORT - The SSL port z/OSMF is listening on.
+# - ZOWE_EXPLORER_HOST - The IP Address z/OSMF can be reached
 
 COMPONENT_CODE=EJ
 _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
@@ -30,7 +30,7 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.servers
     -Dserver.ssl.keyStoreType=PKCS12 \
     -Dcom.ibm.jsse2.overrideDefaultTLS=true \
     -Dserver.compression.enabled=true \
-    -Dgateway.httpsPort=${ZOSMF_PORT} \
-    -Dgateway.ipAddress=${ZOSMF_HOST} \
+    -Dgateway.httpsPort=${GATEWAY_PORT} \
+    -Dgateway.ipAddress=${ZOWE_EXPLORER_HOST} \
     -Dspring.main.banner-mode=off \
     -jar {{jar_path}} &
