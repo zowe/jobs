@@ -15,6 +15,7 @@
 # - JOBS_API_PORT - The port the data sets server will use
 # - KEY_ALIAS
 # - KEYSTORE - The keystore to use for SSL certificates
+# - KEYSTORE_TYPE - The keystore type to use for SSL certificates
 # - KEYSTORE_PASSWORD - The password to access the keystore supplied by KEYSTORE
 # - KEY_ALIAS - The alias of the key within the keystore
 # - GATEWAY_PORT - The SSL port z/OSMF is listening on.
@@ -29,6 +30,7 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.servers
     -Dserver.ssl.keyStorePassword=${KEYSTORE_PASSWORD} \
     -Dserver.ssl.keyStoreType=PKCS12 \
     -Dcom.ibm.jsse2.overrideDefaultTLS=true \
+    -Dserver.ssl.keyStoreType=${KEYSTORE_TYPE} \
     -Dserver.compression.enabled=true \
     -Dgateway.httpsPort=${GATEWAY_PORT} \
     -Dgateway.ipAddress=${ZOWE_EXPLORER_HOST} \
