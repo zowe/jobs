@@ -11,7 +11,7 @@
 package org.zowe.jobs.tests;
 
 import org.apache.http.HttpStatus;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
@@ -29,13 +29,13 @@ import java.util.List;
 
 public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     
-    @Before
-    public void prepareSystemForTest() throws Exception {
+    @BeforeClass
+    public static void prepareSystemForTest() throws Exception {
         //Ensure there are no existing LONGJOB jobs on the system
         List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
         for (Job job : jobs) {
-            deleteJob(job).then().log().all().statusCode(HttpStatus.SC_NO_CONTENT);
+            deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
         }
     }
     
@@ -80,7 +80,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     public static Response modifyJob(Job job, String command) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("command", command);
-        Response response = RestAssured.given().contentType("application/json").body(body.toString()).when().put(getJobPath(job));
+        Response response = RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put(getJobPath(job));
         return response;
     }
 }

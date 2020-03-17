@@ -13,7 +13,6 @@ package org.zowe.jobs.tests;
 import io.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;

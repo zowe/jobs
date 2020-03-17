@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
 
 package org.zowe.jobs.tests;
@@ -84,7 +84,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     public static Response getJobFiles(String jobName, String jobId) throws Exception {
-        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files");
+        return RestAssured.given().header(AUTH_HEADER).when().get(getJobPath(jobName, jobId) + "/files");
     }
 
     @Test
@@ -121,7 +121,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     public static Response getJobFileContent(String jobName, String jobId, String fileId) throws Exception {
-        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files/" + fileId + "/content");
+        return RestAssured.given().header(AUTH_HEADER).when().get(getJobPath(jobName, jobId) + "/files/" + fileId + "/content");
     }
     
     @Test
@@ -138,6 +138,6 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     }
     
     public static Response getConcatenatedJobFiles(String jobName, String jobId) throws Exception {
-        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/files/content");
+        return RestAssured.given().header(AUTH_HEADER).when().get(getJobPath(jobName, jobId) + "/files/content");
     }
 }

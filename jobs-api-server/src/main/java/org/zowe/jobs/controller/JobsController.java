@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
 package org.zowe.jobs.controller;
 
@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.api.common.model.ItemsWrapper;
-import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
 import org.zowe.jobs.model.Job;
@@ -59,7 +57,7 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api/v1/jobs")
 @Api(value = "JES Jobs APIs", tags = "JES job APIs")
-public class JobsController extends AbstractApiController {
+public class JobsController {
 
     @Autowired
     private JobsService jobsService;
@@ -72,19 +70,10 @@ public class JobsController extends AbstractApiController {
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
             @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status) {
 
-        String ownerFilter = getOwnerFilterValue(owner);
         if (status == null) {
             status = JobStatus.ALL;
         }
-        return jobsService.getJobs(prefix, ownerFilter, status);
-    }
-
-    private String getOwnerFilterValue(String owner) {
-        if (owner == null) {
-            String username = ZosUtils.getUsername();
-            owner = (username != null) ? username : "*";
-        }
-        return owner;
+        return jobsService.getJobs(prefix, owner, status);
     }
 
     @GetMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })

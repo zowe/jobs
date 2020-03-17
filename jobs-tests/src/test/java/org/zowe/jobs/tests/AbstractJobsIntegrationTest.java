@@ -10,6 +10,7 @@
 package org.zowe.jobs.tests;
 
 import io.restassured.RestAssured;
+import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -36,10 +37,10 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     static final String JOBS_ROOT_ENDPOINT = "jobs";
 
+    static final Header AUTH_HEADER = new Header("Authorization", "Bearer " + AUTH_TOKEN);
     static final String JOB_IEFBR14 = "IEFBR14";
     static final String JOB_WITH_STEPS = "JOB1DD";
     static final String LONGJOB = "LONGJOB";
-
     static final String TEST_JCL_PDS = USER.toUpperCase() + ".TEST.JCL";
 
     @BeforeClass
@@ -73,11 +74,11 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
     static Response submitJobJclString(String jclString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("jcl", jclString);
-        return RestAssured.given().contentType("application/json").body(body.toString()).when().post("/string");
+        return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().post("/string");
     }
 
     public static Response deleteJob(Job job) throws Exception {
-        return RestAssured.given().when().delete(getJobPath(job));
+        return RestAssured.given().header(AUTH_HEADER).when().delete(getJobPath(job));
     }
 
     static Response getJobs(String prefix, String owner) {
@@ -85,7 +86,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
     }
 
     static Response getJobs(String prefix, String owner, JobStatus status) {
-        RequestSpecification request = RestAssured.given();
+        RequestSpecification request = RestAssured.given().header(AUTH_HEADER);
         if (prefix != null) {
             request = request.queryParam("prefix", prefix);
         }
@@ -103,7 +104,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
     }
 
     static Response getJob(String jobName, String jobId) throws Exception {
-        return RestAssured.given().when().get(jobName + "/" + jobId);
+        return RestAssured.given().header(AUTH_HEADER).when().get(jobName + "/" + jobId);
     }
 
     protected static String getJobPath(Job job) {
@@ -200,6 +201,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
     static Response submitJobByFile(String fileString) throws Exception {
         JsonObject body = new JsonObject();
         body.addProperty("file", fileString);
-        return RestAssured.given().contentType("application/json").body(body.toString()).when().post("/dataset");
+        return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().post("/dataset");
     }
 }

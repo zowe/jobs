@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
 
 package org.zowe.jobs.tests;
@@ -68,6 +68,6 @@ public class JobStepsIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     public static Response getJobSteps(String jobName, String jobId) throws Exception {
-        return RestAssured.given().when().get(getJobPath(jobName, jobId) + "/steps");
+        return RestAssured.given().header(AUTH_HEADER).when().get(getJobPath(jobName, jobId) + "/steps");
     }
 }
