@@ -55,7 +55,7 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
         for (Job job : actual) {
             assertThat(job.getOwner(), IsEqualIgnoringCase.equalToIgnoringCase(USER));
         }
-    }
+    }    
 
     @Test
     public void testGetJobsWithUnlikelyPrefix() {

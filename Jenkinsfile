@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 
 
@@ -15,11 +15,19 @@ node('ibm-jenkins-slave-nvm') {
   def lib = library("jenkins-library").org.zowe.jenkins_shared_library
 
   def pipeline = lib.pipelines.gradle.GradlePipeline.new(this)
+  def uniqueBuildId
 
   pipeline.admins.add("jackjia", "jcain", "stevenh")
 
   // we have extra parameters for integration test
   pipeline.addBuildParameters(
+    string(
+      name: 'INTEGRATION_TEST_APIML_BUILD',
+      description: 'APIML build for integration test',
+      defaultValue: 'libs-release-local/org/zowe/apiml/sdk/zowe-install/*/zowe-install-*.zip',
+      trim: true,
+      required: true
+    ),
     string(
       name: 'INTEGRATION_TEST_ZOSMF_HOST',
       description: 'z/OSMF server for integration test',
@@ -37,6 +45,27 @@ node('ibm-jenkins-slave-nvm') {
     credentials(
       name: 'INTEGRATION_TEST_ZOSMF_CREDENTIAL',
       description: 'z/OSMF credential for integration test',
+      credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
+      defaultValue: 'ssh-zdt-test-image-guest',
+      required: true
+    ),
+    string(
+      name: 'INTEGRATION_TEST_SSH_PORT',
+      description: 'SSH port for integration test server',
+      defaultValue: '2022',
+      trim: true,
+      required: true
+    ),
+    string(
+      name: 'INTEGRATION_TEST_DIRECTORY_ROOT',
+      description: 'Root directory for integration test',
+      defaultValue: '/zaas1',
+      trim: true,
+      required: true
+    ),
+    credentials(
+      name: 'INTEGRATION_TEST_DIRECTORY_INIT_USER',
+      description: 'z/OSMF credential to initialize integration test folders / files',
       credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
       defaultValue: 'ssh-zdt-test-image-guest',
       required: true
@@ -72,27 +101,37 @@ node('ibm-jenkins-slave-nvm') {
   pipeline.test(
     name          : 'Integration',
     operation     : {
-      echo "Preparing certificates ..."
-      sh """keytool -genkeypair -keystore localhost.keystore.p12 -storetype PKCS12 \
--storepass password -alias localhost -keyalg RSA -keysize 2048 -validity 99999 \
--dname \"CN=Zowe Jobs Explorer API Default Certificate, OU=Zowe API Squad, O=Zowe, L=Hursley, ST=Hampshire, C=UK\" \
--ext san=dns:localhost,ip:127.0.0.1"""
+      lock("jobs-integration-test-at-${params.INTEGRATION_TEST_ZOSMF_HOST}-${params.INTEGRATION_TEST_ZOSMF_PORT}") {
+      
+      def buildIdentifier = lib.Utils.getBuildIdentifier(env)
+      uniqueBuildId = "jobs-integration-test-${buildIdentifier}"
+      if (!uniqueBuildId) {
+          error "Cannot determine unique build ID."
+      }
 
-      echo "Starting test server ..."
-      sh """java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \
--Djava.io.tmpdir=/tmp \
--Dserver.port=8443 \
--Dserver.ssl.keyAlias=localhost \
--Dserver.ssl.keyStore=localhost.keystore.p12 \
--Dserver.ssl.keyStorePassword=password \
--Dserver.ssl.keyStoreType=PKCS12 \
--Dserver.compression.enabled=true \
--Dzosmf.httpsPort=${params.INTEGRATION_TEST_ZOSMF_PORT} \
--Dzosmf.ipAddress=${params.INTEGRATION_TEST_ZOSMF_HOST} \
--jar \$(ls -1 jobs-api-server/build/libs/jobs-api-server-*-boot.jar) &"""
-
+      echo "Preparing services for test ..."
+      withCredentials([
+        usernamePassword(
+          credentialsId: params.INTEGRATION_TEST_DIRECTORY_INIT_USER,
+          usernameVariable: 'USERNAME',
+          passwordVariable: 'PASSWORD'
+        )
+      ]) {
+        withEnv([
+          "FVT_ZOSMF_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
+          "FVT_ZOSMF_PORT=${params.INTEGRATION_TEST_ZOSMF_PORT}",
+          "FVT_SERVER_SSH_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
+          "FVT_SERVER_SSH_PORT=${params.INTEGRATION_TEST_SSH_PORT}",
+          "FVT_SERVER_SSH_USERNAME=${USERNAME}",
+          "FVT_SERVER_SSH_PASSWORD=${PASSWORD}",
+          "FVT_SERVER_DIRECTORY_ROOT=${params.INTEGRATION_TEST_DIRECTORY_ROOT}",
+          "FVT_UID=${uniqueBuildId}"
+        ]) {
+          sh "scripts/prepare-fvt.sh '${params.INTEGRATION_TEST_APIML_BUILD}'"
+        }
+      }
       // give it a little time to start the server
-      sleep time: 1, unit: 'MINUTES'
+      sleep time: 2, unit: 'MINUTES'
 
       echo "Starting test ..."
       withCredentials([
@@ -104,15 +143,18 @@ node('ibm-jenkins-slave-nvm') {
       ]) {
         sh """./gradlew runIntegrationTests \
 -Pserver.host=localhost \
--Pserver.port=8443 \
+-Pserver.port=7554 \
 -Pserver.username=${USERNAME} \
--Pserver.password=${PASSWORD}"""
-      }
+-Pserver.password=${PASSWORD} \
+-Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}"""
+        }
+      } //end of lock
     },
-    junit         : '**/test-results/test/*.xml',
-    htmlReports   : [
-      [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
-    ],
+      junit         : '**/test-results/test/*.xml',
+      htmlReports   : [
+        [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
+      ],
+      timeout: [time: 30, unit: 'MINUTES']
   )
 
   pipeline.sonarScan(
@@ -120,7 +162,7 @@ node('ibm-jenkins-slave-nvm') {
     scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
     allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
     failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
-)
+  )
 
   // how we packaging jars/zips
   pipeline.packaging(
@@ -141,5 +183,31 @@ node('ibm-jenkins-slave-nvm') {
   // define we need release stage
   pipeline.release()
 
-  pipeline.end()
+  pipeline.end(
+    always: {
+      // display fvt test logs
+      // this should match FVT_WORKSPACE and FVT_LOGS_DIR defined in scripts/prepare-fvt.sh
+      dir('.fvt/logs') {
+        sh "find . -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'"
+      }
+      // clean up integration test folder
+      if (uniqueBuildId) {
+        withCredentials([
+          usernamePassword(
+            credentialsId: params.INTEGRATION_TEST_DIRECTORY_INIT_USER, 
+            usernameVariable: 'USERNAME',
+            passwordVariable: 'PASSWORD'
+          )
+        ]) {
+          // delete TEST_DIRECTORY_ROOT/uniqueBuildId
+          sh """SSHPASS=${PASSWORD} sshpass -e ssh -tt -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p ${params.INTEGRATION_TEST_SSH_PORT} ${USERNAME}@${params.INTEGRATION_TEST_ZOSMF_HOST} << EOF
+cd ~ && \
+  [ -d "${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}" ] && \
+  rm -fr "${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}"
+echo "[cleanup-integration-test-folders] done" && exit 0
+EOF"""
+        }
+      }
+    }
+  )
 }

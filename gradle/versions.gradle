@@ -1,6 +1,6 @@
 ext {
 
-    springBootVersion = '2.1.6.RELEASE'
+    springBootVersion = '2.1.7.RELEASE'
     springFoxVersion = '2.8.0'
     lombokVersion = '1.16.20'
     mockitoCoreVersion = '2.23.4'
@@ -12,7 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.12"
-    explorerApiCommonVersion = "0.3.10"
+    explorerApiCommonVersion = "1.0.0"
 
     libraries = [
         lombok                             : "org.projectlombok:lombok:${lombokVersion}",
