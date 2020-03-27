@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services.zosmf;
+package org.zowe.jobs.services.zosmf.v1;
 
 import com.google.gson.JsonObject;
 
@@ -15,7 +15,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV2;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV1;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
@@ -39,7 +39,7 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfJobsRequestRun
     }
 
     @Override
-    protected RequestBuilder prepareQuery(ZosmfConnectorV2 zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnectorV1 zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs"); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
         JsonObject body = new JsonObject();

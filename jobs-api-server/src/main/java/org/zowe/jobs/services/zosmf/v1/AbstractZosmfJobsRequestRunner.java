@@ -7,19 +7,19 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services.zosmf;
+package org.zowe.jobs.services.zosmf.v1;
 
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
-import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunnerV2;
+import org.zowe.api.common.zosmf.services.AbstractZosmfRequestRunnerV1;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
-public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunnerV2<T> {
+public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunnerV1<T> {
 
     ZoweApiRestException createJobNotFoundExceptions(JsonObject jsonResponse, int statusCode, String jobName,
             String jobId) {

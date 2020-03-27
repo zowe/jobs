@@ -7,45 +7,46 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.services.zosmf;
+package org.zowe.jobs.services.zosmf.v1;
 
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV2;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV1;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
+import org.zowe.jobs.model.Job;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class PurgeJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Void> {
+public class GetJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Job> {
 
     private String jobName;
     private String jobId;
 
-    public PurgeJobZosmfRequestRunner(String jobName, String jobId) {
+    public GetJobZosmfRequestRunner(String jobName, String jobId) {
         this.jobName = jobName;
         this.jobId = jobId;
     }
 
     @Override
-    protected int[] getSuccessStatus() {
-        return new int[] { HttpStatus.SC_ACCEPTED };
-    }
-
-    @Override
-    protected RequestBuilder prepareQuery(ZosmfConnectorV2 zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnectorV1 zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
-        return RequestBuilder.delete(requestUrl);
+        return RequestBuilder.get(requestUrl);
     }
 
     @Override
-    protected Void getResult(ResponseCache responseCache) throws IOException {
-        return null;
+    protected int[] getSuccessStatus() {
+        return new int[] { HttpStatus.SC_OK };
+    }
+
+    @Override
+    protected Job getResult(ResponseCache responseCache) throws IOException {
+        return getJobFromJson(responseCache.getEntityAsJsonObject());
     }
 
     @Override

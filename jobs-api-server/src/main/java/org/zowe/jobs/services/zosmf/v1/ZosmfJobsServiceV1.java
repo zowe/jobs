@@ -7,13 +7,13 @@
  *
  * Copyright IBM Corporation 2018, 2020
  */
-package org.zowe.jobs.services.zosmf;
+package org.zowe.jobs.services.zosmf.v1;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV2;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV1;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
@@ -22,14 +22,14 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.services.JobsService;
+import org.zowe.jobs.services.JobsServiceV1;
 
 @Slf4j
 @Service
-public class ZosmfJobsService implements JobsService {
+public class ZosmfJobsServiceV1 implements JobsServiceV1 {
 
     @Autowired
-    ZosmfConnectorV2 zosmfConnector;
+    ZosmfConnectorV1 zosmfConnector;
 
     // TODO LATER - review error handling, serviceability https://github.com/zowe/jobs/issues/18
     // use the zomsf error categories to work out errors?
