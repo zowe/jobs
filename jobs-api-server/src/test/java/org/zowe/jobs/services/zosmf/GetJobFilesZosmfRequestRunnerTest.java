@@ -17,6 +17,7 @@ import org.zowe.api.common.test.services.zosmf.AbstractZosmfRequestRunnerTest;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFile;
+import org.zowe.jobs.v2.services.zosmf.GetJobFilesZosmfRequestRunner;
 
 import java.io.IOException;
 import java.util.Arrays;

@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2018, 2019
  */
-package org.zowe.jobs.services;
+package org.zowe.jobs.v1.services;
 
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
@@ -16,7 +16,7 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
-public interface JobsService {
+public interface JobsServiceV1 {
 
     ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
 

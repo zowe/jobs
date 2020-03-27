@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2020
  */
-package org.zowe.jobs.services.zosmf;
+package org.zowe.jobs.v2.services.zosmf;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

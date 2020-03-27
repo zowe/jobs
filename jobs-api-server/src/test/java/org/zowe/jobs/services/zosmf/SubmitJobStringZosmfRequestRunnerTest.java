@@ -17,6 +17,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.exceptions.HtmlEscapedZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.v2.services.zosmf.SubmitJobStringZosmfRequestRunner;
 
 import java.io.IOException;
 

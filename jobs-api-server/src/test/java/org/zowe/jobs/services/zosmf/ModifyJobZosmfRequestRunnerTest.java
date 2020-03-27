@@ -16,6 +16,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
+import org.zowe.jobs.v2.services.zosmf.ModifyJobZosmfRequestRunner;
 
 import static org.mockito.Mockito.when;
 

@@ -38,7 +38,8 @@ import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
-import org.zowe.jobs.services.JobsService;
+import org.zowe.jobs.v1.services.JobsServiceV1;
+import org.zowe.jobs.v2.controller.JobsControllerV2;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -68,10 +69,10 @@ public class JobsControllerTest extends ApiControllerTest {
     private static final String ENDPOINT_ROOT = "/api/v1/jobs";
 
     @Mock
-    private JobsService jobsService;
+    private JobsServiceV1 jobsService;
 
     @InjectMocks
-    private JobsController jobsController;
+    private JobsControllerV2 jobsController;
 
     @Override
     public Object getController() {

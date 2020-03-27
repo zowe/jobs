@@ -19,6 +19,7 @@ import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.v2.services.zosmf.GetJobsZosmfRequestRunner;
 
 import java.io.IOException;
 import java.util.Arrays;

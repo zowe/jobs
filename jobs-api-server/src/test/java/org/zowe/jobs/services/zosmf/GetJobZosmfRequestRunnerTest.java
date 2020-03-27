@@ -16,6 +16,7 @@ import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.v2.services.zosmf.GetJobZosmfRequestRunner;
 
 import java.io.IOException;
 

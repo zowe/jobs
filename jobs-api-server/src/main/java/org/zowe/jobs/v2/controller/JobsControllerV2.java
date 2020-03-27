@@ -5,9 +5,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2016, 2019
+ * Copyright IBM Corporation 2016, 2020
  */
-package org.zowe.jobs.controller;
+package org.zowe.jobs.v2.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -31,9 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.api.common.model.ItemsWrapper;
-import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
 import org.zowe.jobs.model.Job;
@@ -44,7 +42,7 @@ import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
-import org.zowe.jobs.services.JobsServiceV1;
+import org.zowe.jobs.v2.services.JobsServiceV2;
 
 import javax.validation.Valid;
 
@@ -57,12 +55,12 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/jobs")
+@RequestMapping("/api/v2/jobs")
 @Api(value = "JES Jobs APIs", tags = "JES job APIs")
-public class JobsControllerV1 extends AbstractApiController {
+public class JobsControllerV2 {
 
     @Autowired
-    private JobsServiceV1 jobsService;
+    private JobsServiceV2 jobsService;
 
     @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
@@ -72,19 +70,10 @@ public class JobsControllerV1 extends AbstractApiController {
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
             @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status) {
 
-        String ownerFilter = getOwnerFilterValue(owner);
         if (status == null) {
             status = JobStatus.ALL;
         }
-        return jobsService.getJobs(prefix, ownerFilter, status);
-    }
-
-    private String getOwnerFilterValue(String owner) {
-        if (owner == null) {
-            String username = ZosUtils.getUsername();
-            owner = (username != null) ? username : "*";
-        }
-        return owner;
+        return jobsService.getJobs(prefix, owner, status);
     }
 
     @GetMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })

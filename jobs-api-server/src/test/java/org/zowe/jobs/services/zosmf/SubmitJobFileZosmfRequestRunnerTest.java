@@ -18,6 +18,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.v2.services.zosmf.SubmitJobFileZosmfRequestRunner;
 
 import java.io.IOException;
 
