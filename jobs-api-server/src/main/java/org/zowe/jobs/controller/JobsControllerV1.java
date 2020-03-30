@@ -7,7 +7,7 @@
  *
  * Copyright IBM Corporation 2016, 2019
  */
-package org.zowe.jobs.v1.controller;
+package org.zowe.jobs.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -18,6 +18,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -44,7 +45,7 @@ import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
-import org.zowe.jobs.v1.services.JobsServiceV1;
+import org.zowe.jobs.services.JobsServiceV1;
 
 import javax.validation.Valid;
 
@@ -61,7 +62,8 @@ import java.util.regex.Pattern;
 @Api(value = "JES Jobs APIs", tags = "JES job APIs")
 public class JobsControllerV1 extends AbstractApiController {
 
-    @Autowired 
+    @Autowired
+    @Qualifier("ZosmfJobsServiceV1")
     private JobsServiceV1 jobsService;
 
     @GetMapping(value = "", produces = { "application/json" })

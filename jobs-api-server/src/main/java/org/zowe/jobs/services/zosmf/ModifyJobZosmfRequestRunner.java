@@ -7,13 +7,15 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.v2.services.zosmf;
+package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV2;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
 
@@ -21,26 +23,33 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class PurgeJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Void> {
+public class ModifyJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Void> {
 
     private String jobName;
     private String jobId;
+    private String command;
 
-    public PurgeJobZosmfRequestRunner(String jobName, String jobId) {
+    public ModifyJobZosmfRequestRunner(String jobName, String jobId, String command) {
         this.jobName = jobName;
         this.jobId = jobId;
+        this.command = command;
     }
 
     @Override
     protected int[] getSuccessStatus() {
-        return new int[] { HttpStatus.SC_ACCEPTED };
+        return new int[] { HttpStatus.SC_OK, HttpStatus.SC_ACCEPTED };
     }
 
     @Override
-    protected RequestBuilder prepareQuery(ZosmfConnectorV2 zosmfConnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfConnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s", jobName, jobId); //$NON-NLS-1$
         URI requestUrl = zosmfConnector.getFullUrl(urlPath);
-        return RequestBuilder.delete(requestUrl);
+        
+        JsonObject body = new JsonObject();
+        body.addProperty("request", command); //$NON-NLS-1$
+        
+        StringEntity requestEntity = new StringEntity(body.toString(), ContentType.APPLICATION_JSON);
+        return RequestBuilder.put(requestUrl).setEntity(requestEntity);
     }
 
     @Override

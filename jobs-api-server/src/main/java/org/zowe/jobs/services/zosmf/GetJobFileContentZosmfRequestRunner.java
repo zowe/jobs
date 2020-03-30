@@ -7,13 +7,13 @@
  *
  * Copyright IBM Corporation 2019
  */
-package org.zowe.jobs.v2.services.zosmf;
+package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnectorV2;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.utils.ResponseCache;
 import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
@@ -41,7 +41,7 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfJobsReques
     }
 
     @Override
-    protected RequestBuilder prepareQuery(ZosmfConnectorV2 zosmfconnector) throws URISyntaxException {
+    protected RequestBuilder prepareQuery(ZosmfConnector zosmfconnector) throws URISyntaxException {
         String urlPath = String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId); //$NON-NLS-1$
         URI requestUrl = zosmfconnector.getFullUrl(urlPath);
         return RequestBuilder.get(requestUrl);
