@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
@@ -41,7 +40,7 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractJobsController extends AbstractApiController {
+public abstract class AbstractJobsController {
     
     abstract JobsService getJobsService();
     
@@ -70,8 +69,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
 
     @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
-    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This API purges a Job", tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Cancel a Job and Purge it's associated files", nickname = "purgeJob", notes = "This API purges a Job")
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purge succesfully requested") })
     public ResponseEntity<Void> purgeJob(
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
@@ -81,7 +79,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
     
     @PutMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
-    @ApiOperation(value = "Modify a job", nickname = "modifyJob", notes = "This API modifies a job (cancel, hold, release)", tags = { "JES job APIs" })
+    @ApiOperation(value = "Modify a job", nickname = "modifyJob", notes = "This API modifies a job (cancel, hold, release)")
     @ApiResponses(value = { 
             @ApiResponse(code = 202, message = "Job modify requested"), 
             @ApiResponse(code = 200, message = "Job modified")})
@@ -94,8 +92,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
 
     @PostMapping(value = "string", produces = { "application/json" })
-    @ApiOperation(value = "Submit a job given a string of JCL", nickname = "submitJob", notes = "This API submits a job given jcl as a string", tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Submit a job given a string of JCL", nickname = "submitJob", notes = "This API submits a job given jcl as a string")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
     public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
 
@@ -106,8 +103,8 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
 
     @PostMapping(value = "dataset", produces = { "application/json" })
-    @ApiOperation(value = "Submit a job given a data set", nickname = "submitJob", notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.", tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Submit a job given a data set", nickname = "submitJob", 
+        notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
     public ResponseEntity<?> submitJob(@RequestBody SubmitJobFileRequest request) {
 
@@ -124,8 +121,8 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files", produces = { "application/json" })
-    @ApiOperation(value = "Get a list of output file names for a job", nickname = "getJobOutputFiles", notes = "This API returns the output file names for a given job.", response = JobFile.class, responseContainer = "List", tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Get a list of output file names for a job", nickname = "getJobOutputFiles", 
+        notes = "This API returns the output file names for a given job.", response = JobFile.class, responseContainer = "List")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
     public ItemsWrapper<JobFile> getJobOutputFiles(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
@@ -135,8 +132,8 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
-    @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = JobFileContent.class, tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Get content from a specific job output file", nickname = "getJobOutputFile", 
+        notes = "This API reads content from a specific job output file. The API can read all output, or a relative record range.", response = JobFileContent.class)
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = JobFileContent.class) })
     public JobFileContent getJobOutputFile(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
@@ -147,8 +144,8 @@ public abstract class AbstractJobsController extends AbstractApiController {
     }
     
     @GetMapping(value = "/{jobName}/{jobId}/files/content", produces = { "application/json" })
-    @ApiOperation(value = "Get the contents of all job output files for a given job", nickname = "getConcatenatedJobOutputFiles", notes = "This API reads the contents of all job files of a given job.", response = JobFileContent.class, tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Get the contents of all job output files for a given job", nickname = "getConcatenatedJobOutputFiles", 
+        notes = "This API reads the contents of all job files of a given job.", response = JobFileContent.class)
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = JobFileContent.class) })
     public JobFileContent getConcatenatedJobOutputFiles(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
@@ -165,8 +162,8 @@ public abstract class AbstractJobsController extends AbstractApiController {
     
 
     @GetMapping(value = "/{jobName}/{jobId}/steps", produces = { "application/json" })
-    @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = JobStep.class, responseContainer = "List", tags = {
-            "JES job APIs", })
+    @ApiOperation(value = "Get job steps for a given job", nickname = "getJobSteps", 
+        notes = "This API returns the step name and executed program for each job step for a given job name and identifier.", response = JobStep.class, responseContainer = "List")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Ok", response = JobStep.class, responseContainer = "List") })
     public List<JobStep> getJobSteps(

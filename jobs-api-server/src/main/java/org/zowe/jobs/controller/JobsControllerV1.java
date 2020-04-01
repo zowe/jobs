@@ -15,11 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.jobs.services.JobsService;
 
 @RestController
 @RequestMapping("/api/v1/jobs")
-@Api(value = "JES Jobs APIs", tags = "JES job APIs")
+@Api(value = "JES Jobs APIs V1", tags = "JES job APIs V1")
 public class JobsControllerV1 extends AbstractJobsController {
 
     @Autowired
@@ -29,5 +30,12 @@ public class JobsControllerV1 extends AbstractJobsController {
     @Override
     public JobsService getJobsService() {
         return jobsService;
+    }
+    
+    @RestController
+    @RequestMapping("/api/v1/jobs")
+    @Api(value = "JES Jobs APIs V1", tags = "JES job APIs V1")
+    public class UsernameController extends AbstractApiController {
+        
     }
 }

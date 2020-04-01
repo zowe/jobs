@@ -19,7 +19,7 @@ import org.zowe.jobs.services.JobsService;
 
 @RestController
 @RequestMapping("/api/v2/jobs")
-@Api(value = "JES Jobs APIs", tags = "JES job APIs")
+@Api(value = "JES Jobs APIs V2", tags = "JES job APIs V2")
 public class JobsControllerV2 extends AbstractJobsController {
 
     @Autowired 
