@@ -13,11 +13,11 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.services.JobsServiceV2;
+import org.zowe.jobs.services.JobsService;
 
 @Slf4j
 @Service("ZosmfJobsServiceV2")
-public class ZosmfJobsServiceV2 implements JobsServiceV2 {
+public class ZosmfJobsServiceV2 implements JobsService {
     @Autowired
     ZosmfConnector zosmfConnector;
 

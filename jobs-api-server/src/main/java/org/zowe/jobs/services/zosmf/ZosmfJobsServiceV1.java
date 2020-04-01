@@ -22,11 +22,11 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.services.JobsServiceV1;
+import org.zowe.jobs.services.JobsService;
 
 @Slf4j
 @Service("ZosmfJobsServiceV1")
-public class ZosmfJobsServiceV1 implements JobsServiceV1 {
+public class ZosmfJobsServiceV1 implements JobsService {
 
     @Autowired
     ZosmfConnector zosmfConnector;

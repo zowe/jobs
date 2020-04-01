@@ -16,7 +16,7 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
-public interface JobsServiceV2 {
+public interface JobsService {
 
     ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
 
