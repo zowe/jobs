@@ -17,7 +17,7 @@ import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFileContent;
-import org.zowe.jobs.v2.services.zosmf.GetJobFileContentZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobFileContentZosmfRequestRunner;
 
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
 
@@ -93,7 +93,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs/%s/%s/files/%s/records", jobName, jobId, fileId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));

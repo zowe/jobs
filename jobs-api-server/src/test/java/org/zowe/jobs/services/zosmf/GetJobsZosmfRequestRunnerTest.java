@@ -19,7 +19,7 @@ import org.zowe.jobs.exceptions.InvalidOwnerException;
 import org.zowe.jobs.exceptions.InvalidPrefixException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.v2.services.zosmf.GetJobsZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobsZosmfRequestRunner;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -63,7 +63,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         
         mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponseSameOwner.json"));
         RequestBuilder requestBuilder = mockGetBuilder("restjobs/jobs?prefix=*");
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner("*", null, JobStatus.OUTPUT);
         assertEquals(new ItemsWrapper<>(Arrays.asList(job1, job4)), runner.run(zosmfConnector));
@@ -78,7 +78,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponse.json"));
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix));
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
         assertEquals(new ItemsWrapper<>(expected), runner.run(zosmfConnector));
@@ -129,7 +129,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
 
         String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
         RequestBuilder requestBuilder = mockGetBuilder(path);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, JobStatus.ALL);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));

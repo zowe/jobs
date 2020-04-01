@@ -16,7 +16,7 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
-import org.zowe.jobs.v2.services.zosmf.ModifyJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.ModifyJobZosmfRequestRunner;
 
 import static org.mockito.Mockito.when;
 
@@ -36,7 +36,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
                 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
         new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector);
         
@@ -57,7 +57,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
         
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
         shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector));
         

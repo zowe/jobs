@@ -39,7 +39,7 @@ import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
-import org.zowe.jobs.v2.controller.JobsControllerV2;
+import org.zowe.jobs.controller.JobsControllerV2;
 
 import java.net.URI;
 import java.text.MessageFormat;
@@ -66,7 +66,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @PrepareForTest({ ServletUriComponentsBuilder.class })
 public class JobsControllerTest extends ApiControllerTest {
 
-    private static final String ENDPOINT_ROOT = "/api/v1/jobs";
+    private static final String ENDPOINT_ROOT = "/api/v2/jobs";
 
     @Mock
     private JobsService jobsService;

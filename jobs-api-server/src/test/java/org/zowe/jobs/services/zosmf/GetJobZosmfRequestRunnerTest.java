@@ -16,7 +16,7 @@ import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.v2.services.zosmf.GetJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobZosmfRequestRunner;
 
 import java.io.IOException;
 
@@ -37,7 +37,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
         assertEquals(expected, runner.run(zosmfConnector));
@@ -73,7 +73,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));

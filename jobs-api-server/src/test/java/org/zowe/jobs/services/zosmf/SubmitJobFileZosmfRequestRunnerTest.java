@@ -18,7 +18,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.v2.services.zosmf.SubmitJobFileZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.SubmitJobFileZosmfRequestRunner;
 
 import java.io.IOException;
 
@@ -42,7 +42,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         body.addProperty("file", "//'" + dataSet + "'");
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         assertEquals(expected, new SubmitJobFileZosmfRequestRunner(dataSet).run(zosmfConnector));
 
@@ -75,7 +75,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + fileName + "'");
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new SubmitJobFileZosmfRequestRunner(fileName).run(zosmfConnector));
         verifyInteractions(requestBuilder);

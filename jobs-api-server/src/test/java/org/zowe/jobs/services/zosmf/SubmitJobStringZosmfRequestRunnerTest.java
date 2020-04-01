@@ -17,7 +17,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.api.common.exceptions.HtmlEscapedZoweApiRestException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.v2.services.zosmf.SubmitJobStringZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.SubmitJobStringZosmfRequestRunner;
 
 import java.io.IOException;
 
@@ -40,7 +40,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", jclString);
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         assertEquals(expected, new SubmitJobStringZosmfRequestRunner(jclString).run(zosmfConnector));
 
@@ -83,7 +83,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
         mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new SubmitJobStringZosmfRequestRunner(badJcl).run(zosmfConnector));
         verifyInteractions(requestBuilder);

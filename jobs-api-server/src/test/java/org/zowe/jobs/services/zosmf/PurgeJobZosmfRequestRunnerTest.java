@@ -13,7 +13,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
-import org.zowe.jobs.v2.services.zosmf.PurgeJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.PurgeJobZosmfRequestRunner;
 
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector);
 
@@ -46,7 +46,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector));
         verifyInteractions(requestBuilder);

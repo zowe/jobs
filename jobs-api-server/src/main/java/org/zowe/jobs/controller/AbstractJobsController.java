@@ -116,7 +116,7 @@ public abstract class AbstractJobsController {
     }
 
     URI getJobUri(Job job) {
-        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v1/jobs/{jobName}/{jobID}")
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/v2/jobs/{jobName}/{jobID}")
             .buildAndExpand(job.getJobName(), job.getJobId()).toUri();
     }
 

@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnectorJWTAuth;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.model.ItemsWrapper;
@@ -30,15 +30,15 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.v2.services.zosmf.GetJobFileContentZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.GetJobFilesZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.GetJobZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.GetJobsZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.ModifyJobZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.PurgeJobZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.SubmitJobFileZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.SubmitJobStringZosmfRequestRunner;
-import org.zowe.jobs.v2.services.zosmf.ZosmfJobsServiceV2;
+import org.zowe.jobs.services.zosmf.GetJobFileContentZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobFilesZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.GetJobsZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.ModifyJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.PurgeJobZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.SubmitJobFileZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.SubmitJobStringZosmfRequestRunner;
+import org.zowe.jobs.services.zosmf.ZosmfJobsServiceV2;
 
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +53,7 @@ import static org.mockito.Mockito.when;
 public class ZosmfJobsServiceTest extends ZoweApiTest {
 
     @Mock
-    ZosmfConnector zosmfConnector;
+    ZosmfConnectorJWTAuth zosmfConnector;
 
     ZosmfJobsServiceV2 jobsService;
 
