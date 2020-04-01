@@ -25,9 +25,9 @@ public class JobsControllerV2 extends AbstractJobsController {
     @Autowired 
     @Qualifier("ZosmfJobsServiceV2")
     private JobsService jobsService;
-    
-    public JobsControllerV2() {
-        setJobsService(jobsService);
+
+    @Override
+    public JobsService getJobsService() {
+        return jobsService;
     }
-    
 }

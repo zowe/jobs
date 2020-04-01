@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.api.common.model.ItemsWrapper;
-import org.zowe.api.common.utils.ZosUtils;
 import org.zowe.jobs.exceptions.JobJesjclNotFoundException;
 import org.zowe.jobs.exceptions.JobStepsNotFoundException;
 import org.zowe.jobs.model.Job;
@@ -44,11 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractJobsController extends AbstractApiController {
     
-    private JobsService jobsService;
-    
-    public void setJobsService(JobsService jobsService) {
-        this.jobsService = jobsService;
-    }
+    abstract JobsService getJobsService();
     
     @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
@@ -58,20 +53,12 @@ public abstract class AbstractJobsController extends AbstractApiController {
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
             @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status) {
 
-        String ownerFilter = getOwnerFilterValue(owner);
         if (status == null) {
             status = JobStatus.ALL;
         }
-        return jobsService.getJobs(prefix, ownerFilter, status);
+        return getJobsService().getJobs(prefix, owner, status);
     }
 
-    private String getOwnerFilterValue(String owner) {
-        if (owner == null) {
-            String username = ZosUtils.getUsername();
-            owner = (username != null) ? username : "*";
-        }
-        return owner;
-    }
 
     @GetMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
     @ApiOperation(value = "Get the details of a job for a given job name and identifier", nickname = "getJobByNameAndId", notes = "This API returns the details of a job for a given job name and identifier.", response = Job.class)
@@ -79,7 +66,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     public Job getJobByNameAndId(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-        return jobsService.getJob(jobName, jobId);
+        return getJobsService().getJob(jobName, jobId);
     }
 
     @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
@@ -89,7 +76,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     public ResponseEntity<Void> purgeJob(
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
-        jobsService.purgeJob(jobName, jobId);
+        getJobsService().purgeJob(jobName, jobId);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
@@ -102,7 +89,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
             @RequestBody ModifyJobRequest request) {
-        jobsService.modifyJob(jobName, jobId, request.getCommand());
+        getJobsService().modifyJob(jobName, jobId, request.getCommand());
         return ResponseEntity.accepted().build();
     }
 
@@ -112,7 +99,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
     public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
 
-        Job job = jobsService.submitJobString(request.getJcl());
+        Job job = getJobsService().submitJobString(request.getJcl());
 
         URI location = getJobUri(job);
         return ResponseEntity.created(location).body(job);
@@ -125,7 +112,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
     public ResponseEntity<?> submitJob(@RequestBody SubmitJobFileRequest request) {
 
         String file = request.getFile();
-        Job job = jobsService.submitJobFile(file);
+        Job job = getJobsService().submitJobFile(file);
 
         URI location = getJobUri(job);
         return ResponseEntity.created(location).body(job);
@@ -144,7 +131,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
 
-        return jobsService.getJobFiles(jobName, jobId);
+        return getJobsService().getJobFiles(jobName, jobId);
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
@@ -156,7 +143,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
             @ApiParam(value = "Job file id.", required = true) @PathVariable("fileId") String fileId) {
 
-        return jobsService.getJobFileContent(jobName, jobId, fileId);
+        return getJobsService().getJobFileContent(jobName, jobId, fileId);
     }
     
     @GetMapping(value = "/{jobName}/{jobId}/files/content", produces = { "application/json" })
@@ -187,7 +174,7 @@ public abstract class AbstractJobsController extends AbstractApiController {
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
 
         try {
-            JobFileContent jcl = jobsService.getJobJcl(jobName, jobId);
+            JobFileContent jcl = getJobsService().getJobJcl(jobName, jobId);
             return findJobSteps(jcl.getContent());
         } catch (JobJesjclNotFoundException e) {
             log.error("getJobSteps", e);
