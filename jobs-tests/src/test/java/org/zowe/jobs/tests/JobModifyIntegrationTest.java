@@ -35,7 +35,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
         for (Job job : jobs) {
-            deleteJob(job).then().log().all().statusCode(HttpStatus.SC_NO_CONTENT);
+            deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT);
         }
     }
     
@@ -70,7 +70,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
         ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.BAD_REQUEST)
                 .message("Update request is not &#39;cancel, hold or release&#39;").build();
-        modifyJob(job, "burn").then().log().all().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+        modifyJob(job, "burn").then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
         .body("status", equalTo(expectedError.getStatus().name()))
         .body("message", equalTo(expectedError.getMessage()));
         

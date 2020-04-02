@@ -85,8 +85,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     static Response getJobs(String prefix, String owner, JobStatus status) {
         RequestSpecification request = RestAssured.given().header(AUTH_HEADER);
-        System.out.println(RestAssured.basePath);
-        System.out.println(RestAssured.baseURI);
         if (prefix != null) {
             request = request.queryParam("prefix", prefix);
         }
