@@ -148,7 +148,7 @@ node('ibm-jenkins-slave-nvm') {
               -Pserver.username=${USERNAME} \
               -Pserver.password=${PASSWORD} \
               -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-              -Pversion.test=1"""
+              -Ptest.version=1"""
           echo "Testing version 2 - v2 JWT"
           sh """./gradlew runIntegrationTests \
               -Pserver.host=localhost \
@@ -156,11 +156,11 @@ node('ibm-jenkins-slave-nvm') {
               -Pserver.username=${USERNAME} \
               -Pserver.password=${PASSWORD} \
               -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-              -Pversion.test=2"""
+              -Ptest.version=2"""
         }          
       } //end of lock
     },
-      junit         : '**/test-results/test/*.xml',
+      junit         : '**/test-results/**/*.xml',
       htmlReports   : [
         [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
       ],
