@@ -44,6 +44,6 @@ ext {
         junit                              : "junit:junit:${junitVersion}",
 
         explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
-        explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:1.0.2-PR-54-20200401.230525-5"
+        explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:1.0.2-PR-54-20200402.184910-10"
     ]
 }
