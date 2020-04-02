@@ -162,7 +162,8 @@ node('ibm-jenkins-slave-nvm') {
     },
       junit         : '**/test-results/**/*.xml',
       htmlReports   : [
-        [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
+        [dir: "jobs-tests/build/reports/tests/test-1", files: "index.html", name: "Report: Integration Test v1"],
+        [dir: "jobs-tests/build/reports/tests/test-2", files: "index.html", name: "Report: Integration Test v2"],
       ],
       timeout: [time: 30, unit: 'MINUTES']
   )
