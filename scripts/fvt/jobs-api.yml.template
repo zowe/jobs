@@ -8,11 +8,11 @@ services:
       - https://localhost:{API_PORT}/
     homePageRelativeUrl:  # Home page is at the same URL
     routedServices:
-      - gatewayUrl: api/v1  # [api/ui/ws]/v{majorVersion}
-        serviceRelativeUrl: api/v1/jobs
+      - gatewayUrl: api/v2  # [api/ui/ws]/v{majorVersion}
+        serviceRelativeUrl: api/v2/jobs
     apiInfo:
       - apiId: org.zowe.jobs
-        gatewayUrl: api/v1
+        gatewayUrl: api/v2
         version: 1.0.0
         swaggerUrl: https://localhost:{API_PORT}/v2/api-docs
         documentationUrl: https://localhost:{API_PORT}/swagger-ui.html

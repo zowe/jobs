@@ -13,7 +13,6 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
-import org.zowe.jobs.services.zosmf.PurgeJobZosmfRequestRunner;
 
 import static org.mockito.Mockito.when;
 

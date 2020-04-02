@@ -17,7 +17,6 @@ import org.zowe.jobs.exceptions.JobFileIdNotFoundException;
 import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFileContent;
-import org.zowe.jobs.services.zosmf.GetJobFileContentZosmfRequestRunner;
 
 import java.io.IOException;
 

@@ -30,15 +30,6 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
-import org.zowe.jobs.services.zosmf.GetJobFileContentZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.GetJobFilesZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.GetJobZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.GetJobsZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.ModifyJobZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.PurgeJobZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.SubmitJobFileZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.SubmitJobStringZosmfRequestRunner;
-import org.zowe.jobs.services.zosmf.ZosmfJobsServiceV2;
 
 import java.util.Arrays;
 import java.util.List;

@@ -12,7 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.12"
-    explorerApiCommonVersion = "1.0.2-PR-54-20200401.142650-3"
+    explorerApiCommonVersion = "1.0.2-PR-54-20200402.151153-6"
 
     libraries = [
         lombok                             : "org.projectlombok:lombok:${lombokVersion}",
@@ -44,6 +44,6 @@ ext {
         junit                              : "junit:junit:${junitVersion}",
 
         explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
-        explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:1.0.2-PR-54-20200401.173303-4"
+        explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:1.0.2-PR-54-20200401.230525-5"
     ]
 }

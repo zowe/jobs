@@ -1,5 +1,7 @@
 package org.zowe.jobs.services.zosmf;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
@@ -11,10 +13,8 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.services.JobsService;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
-public abstract class AbstractZosmfJobsService implements JobsService{
+public abstract class AbstractZosmfJobsService implements JobsService {
     
     abstract ZosmfConnector getZosmfConnector();
 

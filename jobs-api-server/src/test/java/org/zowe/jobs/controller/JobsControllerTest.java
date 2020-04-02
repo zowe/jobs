@@ -39,7 +39,6 @@ import org.zowe.jobs.model.ModifyJobRequest;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
-import org.zowe.jobs.controller.JobsControllerV2;
 
 import java.net.URI;
 import java.text.MessageFormat;
