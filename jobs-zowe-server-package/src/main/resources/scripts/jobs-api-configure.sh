@@ -24,10 +24,17 @@ services:
     routedServices:
       - gatewayUrl: api/v1
         serviceRelativeUrl: api/v1/jobs
+      - gatewayUrl: api/v2
+        serviceRelativeUrl: api/v2/jobs
     apiInfo:
-      - apiId: com.ibm.jobs
+      - apiId: com.ibm.jobs.v1
         gatewayUrl: api/v1
         version: 1.0.0
+        swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v2/api-docs
+        documentationUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/swagger-ui.html
+      - apiId: com.ibm.jobs.v2
+        gatewayUrl: api/v2
+        version: 2.0.0
         swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v2/api-docs
         documentationUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/swagger-ui.html
 catalogUiTiles:
