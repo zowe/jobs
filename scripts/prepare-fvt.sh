@@ -302,7 +302,6 @@ java -Xms32m -Xmx256m \
     -Dibm.serversocket.recover=true \
     -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp \
-    -Dspring.profiles.include=debug \
     -Dapiml.service.hostname=localhost \
     -Dapiml.service.port=${FVT_GATEWAY_PORT} \
     -Dapiml.service.discoveryServiceUrls="https://localhost:${FVT_DISCOVERY_PORT}/eureka/" \
