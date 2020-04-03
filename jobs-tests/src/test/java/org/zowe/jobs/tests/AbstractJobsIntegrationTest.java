@@ -10,7 +10,6 @@
 package org.zowe.jobs.tests;
 
 import io.restassured.RestAssured;
-import io.restassured.http.Header;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -37,7 +36,6 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     static final String JOBS_ROOT_ENDPOINT = "jobs";
 
-    static final Header AUTH_HEADER = new Header("Authorization", "Bearer " + AUTH_TOKEN);
     static final String JOB_IEFBR14 = "IEFBR14";
     static final String JOB_WITH_STEPS = "JOB1DD";
     static final String LONGJOB = "LONGJOB";

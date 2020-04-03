@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2019, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -27,7 +27,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector);
 
@@ -45,7 +45,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         RequestBuilder requestBuilder = mockDeleteBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector));
         verifyInteractions(requestBuilder);

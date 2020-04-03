@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2019, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -36,7 +36,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
         assertEquals(expected, runner.run(zosmfConnector));
@@ -72,7 +72,7 @@ public class GetJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunner
 
         RequestBuilder requestBuilder = mockGetBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId));
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));

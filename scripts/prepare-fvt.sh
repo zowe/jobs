@@ -255,8 +255,8 @@ java -Xms16m -Xmx512m \
     -Dserver.ssl.keyStorePassword=password \
     -Dserver.ssl.keyStoreType=PKCS12 \
     -Dserver.compression.enabled=true \
-    -Dgateway.httpsPort=${FVT_GATEWAY_PORT} \
-    -Dgateway.ipAddress=localhost \
+    -Dconnection.httpsPort=${FVT_GATEWAY_PORT} \
+    -Dconnection.ipAddress=localhost \
     -Dspring.main.banner-mode=off \
     -jar "${JOBS_API_JAR}" \
     > "${FVT_WORKSPACE}/${FVT_LOGS_DIR}/jobs-api.log" &
@@ -302,7 +302,6 @@ java -Xms32m -Xmx256m \
     -Dibm.serversocket.recover=true \
     -Dfile.encoding=UTF-8 \
     -Djava.io.tmpdir=/tmp \
-    -Dspring.profiles.include=debug \
     -Dapiml.service.hostname=localhost \
     -Dapiml.service.port=${FVT_GATEWAY_PORT} \
     -Dapiml.service.discoveryServiceUrls="https://localhost:${FVT_DISCOVERY_PORT}/eureka/" \

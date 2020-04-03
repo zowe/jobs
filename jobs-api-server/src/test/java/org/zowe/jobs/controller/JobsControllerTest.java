@@ -65,13 +65,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @PrepareForTest({ ServletUriComponentsBuilder.class })
 public class JobsControllerTest extends ApiControllerTest {
 
-    private static final String ENDPOINT_ROOT = "/api/v1/jobs";
+    private static final String ENDPOINT_ROOT = "/api/v2/jobs";
 
     @Mock
     private JobsService jobsService;
 
     @InjectMocks
-    private JobsController jobsController;
+    private JobsControllerV2 jobsController;
 
     @Override
     public Object getController() {
