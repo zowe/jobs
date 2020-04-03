@@ -48,6 +48,11 @@ test {
 		"/test-" + 
 		test_version
 	)
+	reports.html.destination = file(
+		file(reports.html.destination).getParent() + 
+		"/test-" + 
+		test_version
+	)
 }
 
 task validate << {
