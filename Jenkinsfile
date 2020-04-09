@@ -134,30 +134,39 @@ node('ibm-jenkins-slave-nvm') {
         sleep time: 2, unit: 'MINUTES'
 
         echo "Starting test ..."
-        withCredentials([
-          usernamePassword(
-            credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
-            usernameVariable: 'USERNAME',
-            passwordVariable: 'PASSWORD'
-          )
-        ]) {
-          echo "Testing version 1 - v1 Ltpa"
-          sh """./gradlew runIntegrationTests \
-              -Pserver.host=localhost \
-              -Pserver.port=7554 \
-              -Pserver.username=${USERNAME} \
-              -Pserver.password=${PASSWORD} \
-              -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-              -Ptest.version=1"""
-          echo "Testing version 2 - v2 JWT"
-          sh """./gradlew runIntegrationTests \
-              -Pserver.host=localhost \
-              -Pserver.port=7554 \
-              -Pserver.username=${USERNAME} \
-              -Pserver.password=${PASSWORD} \
-              -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-              -Ptest.version=2"""
-        }          
+        try {
+          withCredentials([
+            usernamePassword(
+              credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
+              usernameVariable: 'USERNAME',
+              passwordVariable: 'PASSWORD'
+            )
+          ]) {
+            echo "Testing version 1 - v1 Ltpa"
+            sh """./gradlew runIntegrationTests \
+                -Pserver.host=localhost \
+                -Pserver.port=7554 \
+                -Pserver.username=${USERNAME} \
+                -Pserver.password=${PASSWORD} \
+                -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
+                -Ptest.version=1"""
+            echo "Testing version 2 - v2 JWT"
+            sh """./gradlew runIntegrationTests \
+                -Pserver.host=localhost \
+                -Pserver.port=7554 \
+                -Pserver.username=${USERNAME} \
+                -Pserver.password=${PASSWORD} \
+                -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
+                -Ptest.version=2"""
+          }          
+        } catch (e) {
+          echo "Error with integration test: ${e}"
+          throw e
+        } finally {
+          // show logs (the folder should match the folder defined in prepare-fvt.sh)
+          sh "find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'"
+        }
+
       } //end of lock
     },
       junit         : '**/test-results/**/*.xml',
