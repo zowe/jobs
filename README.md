@@ -4,7 +4,9 @@
 
 ## Development
 
-These instructions are intended for developers using Eclipse as their IDE ( Other IDEs may be used but setup is your own responsibility). Development requires an API ML [Quick Start here](https://github.com/zowe/api-layer#quick-start).
+These instructions are intended for developers using Eclipse as their IDE ( Other IDEs may be used but setup is your own responsibility). 
+
+Development requires an API ML [Quick Start here](https://github.com/zowe/api-layer#quick-start) - The optional step of enabling z/OSMF Authentication is required, an api-definition file for the jobs api service is also required. (Sample api-definition can be found in scripts/fvt/jobs-api.yml.template) (sample api-definition for z/OSMF can be found in scripts/fvt/zosmf.yml.template)
 
 1. Git clone repo
 2. Import > Gradle > Existing Gradle Project
