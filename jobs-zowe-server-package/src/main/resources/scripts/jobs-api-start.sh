@@ -29,6 +29,7 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.servers
     -Dserver.ssl.keyStore=${KEYSTORE} \
     -Dserver.ssl.keyStorePassword=${KEYSTORE_PASSWORD} \
     -Dserver.ssl.keyStoreType=PKCS12 \
+    -Dserver.connection-timeout=60000 \
     -Dcom.ibm.jsse2.overrideDefaultTLS=true \
     -Dserver.ssl.keyStoreType=${KEYSTORE_TYPE} \
     -Dserver.compression.enabled=true \
