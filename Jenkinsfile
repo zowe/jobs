@@ -103,56 +103,76 @@ node('ibm-jenkins-slave-nvm') {
     operation     : {
       lock("jobs-integration-test-at-${params.INTEGRATION_TEST_ZOSMF_HOST}-${params.INTEGRATION_TEST_ZOSMF_PORT}") {
       
-      def buildIdentifier = lib.Utils.getBuildIdentifier(env)
-      uniqueBuildId = "jobs-integration-test-${buildIdentifier}"
-      if (!uniqueBuildId) {
-          error "Cannot determine unique build ID."
-      }
+        def buildIdentifier = lib.Utils.getBuildIdentifier(env)
+        uniqueBuildId = "jobs-integration-test-${buildIdentifier}"
+        if (!uniqueBuildId) {
+            error "Cannot determine unique build ID."
+        }
 
-      echo "Preparing services for test ..."
-      withCredentials([
-        usernamePassword(
-          credentialsId: params.INTEGRATION_TEST_DIRECTORY_INIT_USER,
-          usernameVariable: 'USERNAME',
-          passwordVariable: 'PASSWORD'
-        )
-      ]) {
-        withEnv([
-          "FVT_ZOSMF_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
-          "FVT_ZOSMF_PORT=${params.INTEGRATION_TEST_ZOSMF_PORT}",
-          "FVT_SERVER_SSH_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
-          "FVT_SERVER_SSH_PORT=${params.INTEGRATION_TEST_SSH_PORT}",
-          "FVT_SERVER_SSH_USERNAME=${USERNAME}",
-          "FVT_SERVER_SSH_PASSWORD=${PASSWORD}",
-          "FVT_SERVER_DIRECTORY_ROOT=${params.INTEGRATION_TEST_DIRECTORY_ROOT}",
-          "FVT_UID=${uniqueBuildId}"
+        echo "Preparing services for test ..."
+        withCredentials([
+          usernamePassword(
+            credentialsId: params.INTEGRATION_TEST_DIRECTORY_INIT_USER,
+            usernameVariable: 'USERNAME',
+            passwordVariable: 'PASSWORD'
+          )
         ]) {
-          sh "scripts/prepare-fvt.sh '${params.INTEGRATION_TEST_APIML_BUILD}'"
+          withEnv([
+            "FVT_ZOSMF_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
+            "FVT_ZOSMF_PORT=${params.INTEGRATION_TEST_ZOSMF_PORT}",
+            "FVT_SERVER_SSH_HOST=${params.INTEGRATION_TEST_ZOSMF_HOST}",
+            "FVT_SERVER_SSH_PORT=${params.INTEGRATION_TEST_SSH_PORT}",
+            "FVT_SERVER_SSH_USERNAME=${USERNAME}",
+            "FVT_SERVER_SSH_PASSWORD=${PASSWORD}",
+            "FVT_SERVER_DIRECTORY_ROOT=${params.INTEGRATION_TEST_DIRECTORY_ROOT}",
+            "FVT_UID=${uniqueBuildId}"
+          ]) {
+            sh "scripts/prepare-fvt.sh '${params.INTEGRATION_TEST_APIML_BUILD}'"
+          }
         }
-      }
-      // give it a little time to start the server
-      sleep time: 2, unit: 'MINUTES'
+        // give it a little time to start the server
+        sleep time: 2, unit: 'MINUTES'
 
-      echo "Starting test ..."
-      withCredentials([
-        usernamePassword(
-          credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
-          usernameVariable: 'USERNAME',
-          passwordVariable: 'PASSWORD'
-        )
-      ]) {
-        sh """./gradlew runIntegrationTests \
--Pserver.host=localhost \
--Pserver.port=7554 \
--Pserver.username=${USERNAME} \
--Pserver.password=${PASSWORD} \
--Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId}"""
+        echo "Starting test ..."
+        try {
+          withCredentials([
+            usernamePassword(
+              credentialsId: params.INTEGRATION_TEST_ZOSMF_CREDENTIAL,
+              usernameVariable: 'USERNAME',
+              passwordVariable: 'PASSWORD'
+            )
+          ]) {
+            echo "Testing version 1 - v1 Ltpa"
+            sh """./gradlew runIntegrationTests \
+                -Pserver.host=localhost \
+                -Pserver.port=7554 \
+                -Pserver.username=${USERNAME} \
+                -Pserver.password=${PASSWORD} \
+                -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
+                -Ptest.version=1"""
+            echo "Testing version 2 - v2 JWT"
+            sh """./gradlew runIntegrationTests \
+                -Pserver.host=localhost \
+                -Pserver.port=7554 \
+                -Pserver.username=${USERNAME} \
+                -Pserver.password=${PASSWORD} \
+                -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
+                -Ptest.version=2"""
+          }          
+        } catch (e) {
+          echo "Error with integration test: ${e}"
+          throw e
+        } finally {
+          // show logs (the folder should match the folder defined in prepare-fvt.sh)
+          sh "find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'"
         }
+
       } //end of lock
     },
-      junit         : '**/test-results/test/*.xml',
+      junit         : '**/test-results/**/*.xml',
       htmlReports   : [
-        [dir: "jobs-tests/build/reports/tests/test", files: "index.html", name: "Report: Integration Test"],
+        [dir: "jobs-tests/build/reports/tests/test-1", files: "index.html", name: "Report: Integration Test v1"],
+        [dir: "jobs-tests/build/reports/tests/test-2", files: "index.html", name: "Report: Integration Test v2"],
       ],
       timeout: [time: 30, unit: 'MINUTES']
   )

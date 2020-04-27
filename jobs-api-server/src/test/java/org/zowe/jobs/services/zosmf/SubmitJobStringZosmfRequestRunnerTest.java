@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2019, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -39,7 +39,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", jclString);
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         assertEquals(expected, new SubmitJobStringZosmfRequestRunner(jclString).run(zosmfConnector));
 
@@ -82,7 +82,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
         mockJsonResponse(HttpStatus.SC_BAD_REQUEST, loadTestFile(responsePath));
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new SubmitJobStringZosmfRequestRunner(badJcl).run(zosmfConnector));
         verifyInteractions(requestBuilder);

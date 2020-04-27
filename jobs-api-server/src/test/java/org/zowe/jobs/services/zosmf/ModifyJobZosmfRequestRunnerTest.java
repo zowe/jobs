@@ -35,7 +35,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
                 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
         new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector);
         
@@ -56,7 +56,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         body.addProperty("request", command);
         RequestBuilder requestBuilder = mockPutBuilder(String.format("restjobs/jobs/%s/%s", jobName, jobId), body);
         
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
         shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector));
         

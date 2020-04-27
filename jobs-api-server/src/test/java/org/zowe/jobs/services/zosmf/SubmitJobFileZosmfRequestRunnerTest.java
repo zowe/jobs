@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2019, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -41,7 +41,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         body.addProperty("file", "//'" + dataSet + "'");
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
 
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         assertEquals(expected, new SubmitJobFileZosmfRequestRunner(dataSet).run(zosmfConnector));
 
@@ -74,7 +74,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         JsonObject body = new JsonObject();
         body.addProperty("file", "//'" + fileName + "'");
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         shouldThrow(expectedException, () -> new SubmitJobFileZosmfRequestRunner(fileName).run(zosmfConnector));
         verifyInteractions(requestBuilder);

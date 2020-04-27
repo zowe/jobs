@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2019
+ * Copyright IBM Corporation 2019, 2020
  */
 package org.zowe.jobs.services.zosmf;
 
@@ -62,7 +62,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         
         mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponseSameOwner.json"));
         RequestBuilder requestBuilder = mockGetBuilder("restjobs/jobs?prefix=*");
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner("*", null, JobStatus.OUTPUT);
         assertEquals(new ItemsWrapper<>(Arrays.asList(job1, job4)), runner.run(zosmfConnector));
@@ -77,7 +77,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         mockJsonResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobsResponse.json"));
         RequestBuilder requestBuilder = mockGetBuilder(
                 String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix));
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
         assertEquals(new ItemsWrapper<>(expected), runner.run(zosmfConnector));
@@ -128,7 +128,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
 
         String path = String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix);
         RequestBuilder requestBuilder = mockGetBuilder(path);
-        when(zosmfConnector.request(requestBuilder)).thenReturn(response);
+        when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
         GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, JobStatus.ALL);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));

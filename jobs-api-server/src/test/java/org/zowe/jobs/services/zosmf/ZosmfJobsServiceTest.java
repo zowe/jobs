@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
+import org.zowe.api.common.connectors.zosmf.ZosmfConnectorJWTAuth;
 import org.zowe.api.common.connectors.zosmf.exceptions.DataSetNotFoundException;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
 import org.zowe.api.common.model.ItemsWrapper;
@@ -40,17 +40,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ ZosmfJobsService.class })
+@PrepareForTest({ ZosmfJobsServiceV2.class })
 public class ZosmfJobsServiceTest extends ZoweApiTest {
 
     @Mock
-    ZosmfConnector zosmfConnector;
+    ZosmfConnectorJWTAuth zosmfConnector;
 
-    ZosmfJobsService jobsService;
+    ZosmfJobsServiceV2 jobsService;
 
     @Before
     public void setUp() throws Exception {
-        jobsService = new ZosmfJobsService();
+        jobsService = new ZosmfJobsServiceV2();
         jobsService.zosmfConnector = zosmfConnector;
     }
 
