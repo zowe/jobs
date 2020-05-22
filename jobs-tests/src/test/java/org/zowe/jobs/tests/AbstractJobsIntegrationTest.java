@@ -178,7 +178,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
     }
 
     private void verifyJobIsAsExpected(Job actual, boolean inProgress) {
-        JobBuilder builder = Job.builder().owner(USER.toUpperCase()).subsystem("JES2").type("JOB").executionClass("A");
+        JobBuilder builder = Job.builder().subsystem("JES2").type("JOB").executionClass("A");
         if (!inProgress) {
             builder = builder.returnCode("CC 0000").status(JobStatus.OUTPUT);
         } else {
@@ -187,6 +187,9 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
             actual.setStatus(null);
             actual.setReturnCode(null);
         }
+        // Some systems return a username but some return null
+        assertThat(actual.getOwner(), anyOf(is(USER.toUpperCase()), null));
+        actual.setOwner(null);
 
         // We can't know these values at the moment based on input
         actual.setJobId(null);
