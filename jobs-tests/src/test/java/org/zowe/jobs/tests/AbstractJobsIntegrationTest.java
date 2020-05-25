@@ -188,7 +188,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
             actual.setReturnCode(null);
         }
         // Some systems return a username but some return null
-        assertThat(actual.getOwner(), anyOf(is(USER.toUpperCase()), null));
+        assertThat(actual.getOwner(), anyOf(is(USER.toUpperCase()), is("")));
         actual.setOwner(null);
 
         // We can't know these values at the moment based on input
