@@ -28,12 +28,12 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java -Xms16m -Xmx512m -Dibm.servers
     -Dserver.ssl.keyAlias=${KEY_ALIAS} \
     -Dserver.ssl.keyStore=${KEYSTORE} \
     -Dserver.ssl.keyStorePassword=${KEYSTORE_PASSWORD} \
-    -Dserver.ssl.keyStoreType=PKCS12 \
+    -Dserver.ssl.keyStoreType=${KEYSTORE_TYPE} \
     -Dserver.connection-timeout=60000 \
     -Dcom.ibm.jsse2.overrideDefaultTLS=true \
-    -Dserver.ssl.keyStoreType=${KEYSTORE_TYPE} \
     -Dserver.compression.enabled=true \
     -Dconnection.httpsPort=${GATEWAY_PORT} \
     -Dconnection.ipAddress=${ZOWE_EXPLORER_HOST} \
     -Dspring.main.banner-mode=off \
+    -Djava.protocol.handler.pkgs=com.ibm.crypto.provider \
     -jar {{jar_path}} &
