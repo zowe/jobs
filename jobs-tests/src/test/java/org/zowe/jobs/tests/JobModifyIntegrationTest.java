@@ -16,7 +16,9 @@ import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SimpleJob;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -25,6 +27,7 @@ import io.restassured.response.Response;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
@@ -82,5 +85,20 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         body.addProperty("command", command);
         Response response = RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put(getJobPath(job));
         return response;
+    }
+    
+    @Test
+    public void testCancelJobs() throws Exception {
+        Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        Job job2 = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
+        jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
+        jobsList.add(new SimpleJob(job2.getJobName(), job2.getJobId()));
+        modifyJobs(jobsList, "cancel").then().statusCode(HttpStatus.SC_NO_CONTENT);
+    }
+    
+    public static Response modifyJobs(ArrayList<SimpleJob> jobs, String command) throws Exception {
+        JsonArray body = convertSimpleJobArrayToJsonArray(jobs);
+        return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put();
     }
 }

@@ -36,12 +36,14 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
+import org.zowe.jobs.model.SimpleJob;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
 import java.net.URI;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -435,6 +437,44 @@ public class JobsControllerTest extends ApiControllerTest {
         doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).purgeJob(jobName, jobId);
 
         mockMvc.perform(delete(ENDPOINT_ROOT + "/{jobName}/{jobId}/", jobName, jobId))
+            .andExpect(status().isIAmATeapot()).andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
+            .andExpect(jsonPath("$.message").value(errorMessage));
+
+        verify(jobsService, times(1)).purgeJob(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+    
+    @Test
+    public void purge_jobs_calls_job_service_multiple_times() throws Exception {
+        String jobId = "jobId";
+        String jobName = "jobName";
+        ArrayList<SimpleJob> request = new ArrayList<SimpleJob>();
+        request.add(new SimpleJob(jobName, jobId));
+        request.add(new SimpleJob(jobName, jobId));
+
+        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(JsonUtils.convertToJsonString(request))).andExpect(status().isNoContent())
+            .andExpect(jsonPath("$").doesNotExist());
+
+        verify(jobsService, times(2)).purgeJob(jobName, jobId);
+        verifyNoMoreInteractions(jobsService);
+    }
+    
+    @Test
+    public void purge_multiple_jobs_with_exception_should_be_converted_to_error_message() throws Exception {
+        String errorMessage = "JobId could not be found";
+        String jobId = "jobId";
+        String jobName = "jobName";
+        ArrayList<SimpleJob> request = new ArrayList<SimpleJob>();
+        request.add(new SimpleJob(jobName, jobId));
+        request.add(new SimpleJob(jobName, jobId));
+
+        ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.I_AM_A_TEAPOT).build();
+
+        doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).purgeJob(jobName, jobId);
+
+        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(JsonUtils.convertToJsonString(request)))
             .andExpect(status().isIAmATeapot()).andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
 

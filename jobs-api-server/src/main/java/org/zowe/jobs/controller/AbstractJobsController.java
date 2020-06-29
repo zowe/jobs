@@ -27,6 +27,8 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
+import org.zowe.jobs.model.ModifyMultipleJobsRequest;
+import org.zowe.jobs.model.SimpleJob;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -34,6 +36,7 @@ import org.zowe.jobs.services.JobsService;
 import javax.validation.Valid;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -79,6 +82,16 @@ public abstract class AbstractJobsController {
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
+    @DeleteMapping(value = "", produces = { "application/json" })
+    @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
+    public ResponseEntity<Void> purgeJobs(@RequestBody ArrayList<SimpleJob> jobList) {
+        jobList.forEach((job) -> {
+            getJobsService().purgeJob(job.getJobName(), job.getJobId()); 
+        });
+        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+    }
+    
     @PutMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
     @ApiOperation(value = "Modify a job", nickname = "modifyJob", notes = "This API modifies a job (cancel, hold, release)")
     @ApiResponses(value = { 
@@ -89,6 +102,17 @@ public abstract class AbstractJobsController {
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
             @RequestBody ModifyJobRequest request) {
         getJobsService().modifyJob(jobName, jobId, request.getCommand());
+        return ResponseEntity.accepted().build();
+    }
+    
+    @PutMapping(value = "", produces = { "application/json" })
+    @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
+    public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
+        request.getJobs().forEach((job) -> { 
+            System.out.println("cancelling job: " + job.getJobId());
+            getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()); 
+        });
         return ResponseEntity.accepted().build();
     }
 
