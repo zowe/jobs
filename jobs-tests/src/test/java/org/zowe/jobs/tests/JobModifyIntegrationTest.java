@@ -90,15 +90,19 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     @Test
     public void testCancelJobs() throws Exception {
         Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
-        Job job2 = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        Job job2 = submitJobAndPoll(LONGJOB, JobStatus.INPUT);
         ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
         jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
         jobsList.add(new SimpleJob(job2.getJobName(), job2.getJobId()));
-        modifyJobs(jobsList, "cancel").then().statusCode(HttpStatus.SC_NO_CONTENT);
+        modifyJobs(jobsList, "cancel").then().statusCode(HttpStatus.SC_ACCEPTED);
     }
     
     public static Response modifyJobs(ArrayList<SimpleJob> jobs, String command) throws Exception {
-        JsonArray body = convertSimpleJobArrayToJsonArray(jobs);
+        JsonArray jobsJsonArray = convertSimpleJobArrayToJsonArray(jobs);
+        JsonObject body = new JsonObject();
+        body.addProperty("command", command);
+        body.add("jobs", jobsJsonArray);
+        RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put().then().log().all();
         return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put();
     }
 }

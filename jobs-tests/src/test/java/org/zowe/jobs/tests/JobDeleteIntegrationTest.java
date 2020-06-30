@@ -56,11 +56,12 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
     @Test
     public void testDeleteJobsOneInvalidJob() throws Exception {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
+        SimpleJob job2 = new SimpleJob("DUMMYJOB", "JOB00000");
         ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
         jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
-        jobsList.add(new SimpleJob("DUMMYNAME", "JOB00000"));
+        jobsList.add(new SimpleJob(job2.getJobName(), job2.getJobId()));
         ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
-            .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), job.getJobId()))
+            .message(String.format("No job with name '%s' and id '%s' was found", job2.getJobName(), job2.getJobId()))
             .build();
         deleteJobs(jobsList).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
