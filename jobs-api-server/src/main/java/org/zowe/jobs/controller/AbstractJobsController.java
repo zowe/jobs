@@ -107,10 +107,9 @@ public abstract class AbstractJobsController {
     
     @PutMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
-    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
+    @ApiResponses(value = { @ApiResponse(code = 202, message = "Job modifies requested") })
     public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
-        request.getJobs().forEach((job) -> { 
-            System.out.println("cancelling job: " + job.getJobId());
+        request.getJobs().forEach((job) -> {
             getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()); 
         });
         return ResponseEntity.accepted().build();
