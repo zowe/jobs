@@ -97,12 +97,25 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         modifyJobs(jobsList, "cancel").then().statusCode(HttpStatus.SC_ACCEPTED);
     }
     
+    @Test
+    public void testCancelJobsOneInvalidJob() throws Exception {
+        Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        SimpleJob job2 = new SimpleJob("DUMMYJOB", "JOB00000");
+        ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
+        jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
+        jobsList.add(job2);
+        ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .message((String.format("No job with name '%s' and id '%s' was found", job2.getJobName(), job2.getJobId()))).build();
+        modifyJobs(jobsList, "cancel").then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
+    }
+    
     public static Response modifyJobs(ArrayList<SimpleJob> jobs, String command) throws Exception {
         JsonArray jobsJsonArray = convertSimpleJobArrayToJsonArray(jobs);
         JsonObject body = new JsonObject();
         body.addProperty("command", command);
         body.add("jobs", jobsJsonArray);
-        RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put().then().log().all();
         return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put();
     }
 }

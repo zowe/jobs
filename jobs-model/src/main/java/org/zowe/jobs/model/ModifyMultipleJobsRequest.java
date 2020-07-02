@@ -9,6 +9,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ModifyMultipleJobsRequest extends ModifyJobRequest{
+public class ModifyMultipleJobsRequest extends ModifyJobRequest {
     private ArrayList<SimpleJob> jobs;
+    
+    public ModifyMultipleJobsRequest(ArrayList<SimpleJob> jobs, String command) {
+        super(command);
+        this.jobs = jobs;
+    }
 }

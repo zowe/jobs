@@ -36,6 +36,7 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
+import org.zowe.jobs.model.ModifyMultipleJobsRequest;
 import org.zowe.jobs.model.SimpleJob;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
@@ -516,6 +517,23 @@ public class JobsControllerTest extends ApiControllerTest {
             .andExpect(jsonPath("$.message").value(errorMessage));
         
         verify(jobsService, times(1)).modifyJob(jobName, jobId, request.getCommand());
+        verifyNoMoreInteractions(jobsService);
+    }
+    
+    @Test
+    public void modify_jobs_calls_job_service_multiple_times() throws Exception {        
+        String modifyCommand = "cancel";
+        String jobId = "jobId";
+        String jobName = "jobName";
+        ArrayList<SimpleJob> jobList = new ArrayList<SimpleJob>();
+        jobList.add(new SimpleJob(jobName, jobId));
+        jobList.add(new SimpleJob(jobName, jobId));
+        
+        mockMvc.perform(put(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+            .content(JsonUtils.convertToJsonString(new ModifyMultipleJobsRequest(jobList, modifyCommand))))
+            .andExpect(status().isAccepted()).andExpect(jsonPath("$").doesNotExist());
+
+        verify(jobsService, times(2)).modifyJob(jobName, jobId, modifyCommand);
         verifyNoMoreInteractions(jobsService);
     }
 
