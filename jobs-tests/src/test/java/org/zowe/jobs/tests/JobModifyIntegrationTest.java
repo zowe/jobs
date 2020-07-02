@@ -11,7 +11,7 @@
 package org.zowe.jobs.tests;
 
 import org.apache.http.HttpStatus;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
@@ -32,8 +32,8 @@ import java.util.List;
 
 public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     
-    @Before
-    public void prepareSystemForTest() throws Exception {
+    @BeforeClass
+    public static void prepareSystemForTest() throws Exception {
         //Ensure there are no existing LONGJOB jobs on the system
         List<Job> jobs = getJobs("LONGJOB", "*").then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
                 .getList("items", Job.class);
@@ -100,6 +100,7 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
     
     @Test
     public void testCancelJobsOneInvalidJob() throws Exception {
+        prepareSystemForTest();
         Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
         SimpleJob job2 = new SimpleJob("DUMMYJOB", "JOB00000");
         ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
