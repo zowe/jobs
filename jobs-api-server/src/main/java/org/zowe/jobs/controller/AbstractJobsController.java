@@ -36,7 +36,6 @@ import org.zowe.jobs.services.JobsService;
 import javax.validation.Valid;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -85,10 +84,8 @@ public abstract class AbstractJobsController {
     @DeleteMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
-    public ResponseEntity<Void> purgeJobs(@RequestBody ArrayList<SimpleJob> jobList) {
-        jobList.forEach((job) -> {
-            getJobsService().purgeJob(job.getJobName(), job.getJobId()); 
-        });
+    public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
+        jobList.forEach(job -> getJobsService().purgeJob(job.getJobName(), job.getJobId()));
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
@@ -109,9 +106,7 @@ public abstract class AbstractJobsController {
     @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 202, message = "Job modifies requested") })
     public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
-        request.getJobs().forEach((job) -> {
-            getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()); 
-        });
+        request.getJobs().forEach( job -> getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()));
         return ResponseEntity.accepted().build();
     }
 
