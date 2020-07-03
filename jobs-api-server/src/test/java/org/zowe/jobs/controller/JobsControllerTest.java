@@ -528,9 +528,10 @@ public class JobsControllerTest extends ApiControllerTest {
         ArrayList<SimpleJob> jobList = new ArrayList<SimpleJob>();
         jobList.add(new SimpleJob(jobName, jobId));
         jobList.add(new SimpleJob(jobName, jobId));
+        ModifyMultipleJobsRequest modifyRequest = new ModifyMultipleJobsRequest(modifyCommand, jobList);
         
         mockMvc.perform(put(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-            .content(JsonUtils.convertToJsonString(new ModifyMultipleJobsRequest(jobList, modifyCommand))))
+            .content(JsonUtils.convertToJsonString(modifyRequest)))
             .andExpect(status().isAccepted()).andExpect(jsonPath("$").doesNotExist());
 
         verify(jobsService, times(2)).modifyJob(jobName, jobId, modifyCommand);
