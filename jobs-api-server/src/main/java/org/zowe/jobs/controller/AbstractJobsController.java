@@ -27,6 +27,8 @@ import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.JobStep;
 import org.zowe.jobs.model.ModifyJobRequest;
+import org.zowe.jobs.model.ModifyMultipleJobsRequest;
+import org.zowe.jobs.model.SimpleJob;
 import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
@@ -79,6 +81,14 @@ public abstract class AbstractJobsController {
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
+    @DeleteMapping(value = "", produces = { "application/json" })
+    @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
+    @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
+    public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
+        jobList.forEach(job -> getJobsService().purgeJob(job.getJobName(), job.getJobId()));
+        return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+    }
+    
     @PutMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
     @ApiOperation(value = "Modify a job", nickname = "modifyJob", notes = "This API modifies a job (cancel, hold, release)")
     @ApiResponses(value = { 
@@ -89,6 +99,14 @@ public abstract class AbstractJobsController {
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
             @RequestBody ModifyJobRequest request) {
         getJobsService().modifyJob(jobName, jobId, request.getCommand());
+        return ResponseEntity.accepted().build();
+    }
+    
+    @PutMapping(value = "", produces = { "application/json" })
+    @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
+    @ApiResponses(value = { @ApiResponse(code = 202, message = "Job modifies requested") })
+    public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
+        request.getJobs().forEach( job -> getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()));
         return ResponseEntity.accepted().build();
     }
 
