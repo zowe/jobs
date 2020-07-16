@@ -10,6 +10,7 @@
 
 package org.zowe.jobs.tests;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import io.restassured.RestAssured;
@@ -22,7 +23,9 @@ import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SimpleJob;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -84,5 +87,39 @@ public class JobModifyIntegrationTest extends AbstractJobsIntegrationTest {
         Response response = RestAssured.given().header(AUTH_HEADER).contentType("application/json")
                 .body(body.toString()).when().put(getJobPath(job));
         return response;
+    }
+    
+    @Test
+    public void testCancelJobs() throws Exception {
+        Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        Job job2 = submitJobAndPoll(LONGJOB, JobStatus.INPUT);
+        ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
+        jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
+        jobsList.add(new SimpleJob(job2.getJobName(), job2.getJobId()));
+        modifyJobs(jobsList, "cancel").then().statusCode(HttpStatus.SC_ACCEPTED);
+        
+    }
+    
+    @Test
+    public void testCancelJobsOneInvalidJob() throws Exception {
+        prepareSystemForTest();
+        Job job = submitJobAndPoll(LONGJOB, JobStatus.ACTIVE);
+        SimpleJob job2 = new SimpleJob("DUMMYJOB", "JOB00000");
+        ArrayList<SimpleJob> jobsList = new ArrayList<SimpleJob>();
+        jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
+        jobsList.add(job2);
+        ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
+                .message((String.format("No job with name '%s' and id '%s' was found", job2.getJobName(), job2.getJobId()))).build();
+        modifyJobs(jobsList, "cancel").then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
+            .body("message", equalTo(expectedError.getMessage()));
+    }
+    
+    public static Response modifyJobs(ArrayList<SimpleJob> jobs, String command) throws Exception {
+        JsonArray jobsJsonArray = convertSimpleJobArrayToJsonArray(jobs);
+        JsonObject body = new JsonObject();
+        body.addProperty("command", command);
+        body.add("jobs", jobsJsonArray);
+        return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().put();
     }
 }

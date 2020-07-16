@@ -13,6 +13,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
@@ -22,9 +23,11 @@ import org.zowe.api.common.test.AbstractHttpIntegrationTest;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.Job.JobBuilder;
 import org.zowe.jobs.model.JobStatus;
+import org.zowe.jobs.model.SimpleJob;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.anyOf;
@@ -77,6 +80,22 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     public static Response deleteJob(Job job) throws Exception {
         return RestAssured.given().header(AUTH_HEADER).when().delete(getJobPath(job));
+    }
+    
+    public static Response deleteJobs(ArrayList<SimpleJob> jobs) throws Exception {
+        JsonArray body = convertSimpleJobArrayToJsonArray(jobs);
+        return RestAssured.given().header(AUTH_HEADER).contentType("application/json").body(body.toString()).when().delete();
+    }
+    
+    static JsonArray convertSimpleJobArrayToJsonArray(ArrayList<SimpleJob> jobs) {
+        JsonArray jobsArray = new JsonArray();
+        jobs.forEach(job -> {
+            JsonObject jobObject = new JsonObject();
+            jobObject.addProperty("jobName", job.getJobName());
+            jobObject.addProperty("jobId", job.getJobId());
+            jobsArray.add(jobObject);
+        });
+        return jobsArray;
     }
 
     static Response getJobs(String prefix, String owner) {
