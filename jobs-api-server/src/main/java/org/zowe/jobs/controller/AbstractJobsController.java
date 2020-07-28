@@ -16,6 +16,8 @@ import io.swagger.annotations.ApiResponses;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -42,9 +44,12 @@ import org.zowe.jobs.model.SubmitJobFileRequest;
 import org.zowe.jobs.model.SubmitJobStringRequest;
 import org.zowe.jobs.services.JobsService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -56,18 +61,32 @@ public abstract class AbstractJobsController {
     
     abstract JobsService getJobsService();
     
+    public List<Header> getIbmHeadersFromRequest(HttpServletRequest request) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        ArrayList<Header> ibmHeaders = new ArrayList<Header>();
+        while(headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement().toUpperCase();
+            if(headerName.contains("X-IBM")) {
+                Header newHeader = new BasicHeader(headerName, request.getHeader(headerName));
+                ibmHeaders.add(newHeader);
+            }
+        }
+        return ibmHeaders;
+    }
+    
     @GetMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
     public ItemsWrapper<Job> getJobs(
             @ApiParam(value = "Job name prefix. If omitted, defaults to '*'.", defaultValue = "*") @Valid @RequestParam(value = "prefix", required = false, defaultValue = "*") String prefix,
             @ApiParam(value = "Job owner. Defaults to requester's userid.") @Valid @RequestParam(value = "owner", required = false) String owner,
-            @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status) {
+            @ApiParam(value = "Job status to filter on, defaults to ALL.", allowableValues = "ACTIVE, OUTPUT, INPUT, ALL") @Valid @RequestParam(value = "status", required = false) JobStatus status,
+            HttpServletRequest request) {
 
         if (status == null) {
             status = JobStatus.ALL;
         }
-        return getJobsService().getJobs(prefix, owner, status);
+        return getJobsService().getJobs(getIbmHeadersFromRequest(request), prefix, owner, status);
     }
 
 

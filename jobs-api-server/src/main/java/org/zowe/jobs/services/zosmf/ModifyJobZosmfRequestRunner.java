@@ -30,6 +30,7 @@ public class ModifyJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<
     private String command;
 
     public ModifyJobZosmfRequestRunner(String jobName, String jobId, String command) {
+        super(null);
         this.jobName = jobName;
         this.jobId = jobId;
         this.command = command;

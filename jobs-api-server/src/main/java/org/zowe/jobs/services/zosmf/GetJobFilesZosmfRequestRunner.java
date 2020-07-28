@@ -32,6 +32,7 @@ public class GetJobFilesZosmfRequestRunner extends AbstractZosmfJobsRequestRunne
     private String jobId;
 
     public GetJobFilesZosmfRequestRunner(String jobName, String jobId) {
+        super(null);
         this.jobName = jobName;
         this.jobId = jobId;
     }

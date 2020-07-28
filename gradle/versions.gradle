@@ -43,7 +43,7 @@ ext {
 
         junit                              : "junit:junit:${junitVersion}",
 
-        explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
+        explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:1.1.3-PR-67-20200728.133800-3",
         explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}"
     ]
 }

@@ -9,6 +9,9 @@
  */
 package org.zowe.jobs.services;
 
+import java.util.List;
+
+import org.apache.http.Header;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.model.Job;
@@ -18,7 +21,7 @@ import org.zowe.jobs.model.JobStatus;
 
 public interface JobsService {
 
-    ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
+    ItemsWrapper<Job> getJobs(List<Header> headers, String prefix, String owner, JobStatus status) throws ZoweApiException;
 
     Job getJob(String jobName, String jobId);
 

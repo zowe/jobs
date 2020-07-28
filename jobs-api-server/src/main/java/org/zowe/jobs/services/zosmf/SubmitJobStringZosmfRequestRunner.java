@@ -26,6 +26,7 @@ public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestR
     private String jcl;
 
     public SubmitJobStringZosmfRequestRunner(String jcl) {
+        super(null);
         this.jcl = jcl;
     }
 

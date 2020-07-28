@@ -11,6 +11,9 @@ package org.zowe.jobs.services.zosmf;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+
+import org.apache.http.Header;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
@@ -28,8 +31,8 @@ public abstract class AbstractZosmfJobsService implements JobsService {
     abstract ZosmfConnector getZosmfConnector();
 
     @Override
-    public ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException {
-        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
+    public ItemsWrapper<Job> getJobs(List<Header> headers, String prefix, String owner, JobStatus status) throws ZoweApiException {
+        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(headers, prefix, owner, status);
         return runner.run(getZosmfConnector());
     }
 

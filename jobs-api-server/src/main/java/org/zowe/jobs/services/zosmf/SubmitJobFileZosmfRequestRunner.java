@@ -30,6 +30,7 @@ public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfJobsRequestRun
     private String fileName;
 
     public SubmitJobFileZosmfRequestRunner(String fileName) {
+        super(null);
         this.fileName = fileName;
     }
 

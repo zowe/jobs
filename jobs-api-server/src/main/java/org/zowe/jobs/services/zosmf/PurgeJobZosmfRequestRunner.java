@@ -27,6 +27,7 @@ public class PurgeJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<V
     private String jobId;
 
     public PurgeJobZosmfRequestRunner(String jobName, String jobId) {
+        super(null);
         this.jobName = jobName;
         this.jobId = jobId;
     }
