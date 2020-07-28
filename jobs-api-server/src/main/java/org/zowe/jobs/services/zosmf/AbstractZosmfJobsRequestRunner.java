@@ -11,6 +11,8 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 import org.apache.http.Header;
@@ -22,6 +24,7 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
+@NoArgsConstructor
 public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunner<T> {
 
     public AbstractZosmfJobsRequestRunner(List<Header> headers) {

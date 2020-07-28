@@ -37,51 +37,51 @@ public abstract class AbstractZosmfJobsService implements JobsService {
     }
 
     @Override
-    public Job getJob(String jobName, String jobId) {
-        GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(jobName, jobId);
+    public Job getJob(List<Header> headers, String jobName, String jobId) {
+        GetJobZosmfRequestRunner runner = new GetJobZosmfRequestRunner(headers, jobName, jobId);
         return runner.run(getZosmfConnector());
     }
 
     @Override
-    public Job submitJobString(String jcl) {
-        SubmitJobStringZosmfRequestRunner runner = new SubmitJobStringZosmfRequestRunner(jcl);
+    public Job submitJobString(List<Header> headers, String jcl) {
+        SubmitJobStringZosmfRequestRunner runner = new SubmitJobStringZosmfRequestRunner(headers, jcl);
         return runner.run(getZosmfConnector());
     }
 
     @Override
-    public Job submitJobFile(String fileName) {
-        SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(fileName);
+    public Job submitJobFile(List<Header> headers, String fileName) {
+        SubmitJobFileZosmfRequestRunner runner = new SubmitJobFileZosmfRequestRunner(headers, fileName);
         return runner.run(getZosmfConnector());
     }
 
     @Override
-    public void purgeJob(String jobName, String jobId) {
-        PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(jobName, jobId);
+    public void purgeJob(List<Header> headers, String jobName, String jobId) {
+        PurgeJobZosmfRequestRunner runner = new PurgeJobZosmfRequestRunner(headers, jobName, jobId);
         runner.run(getZosmfConnector());
     }
     
     @Override
-    public void modifyJob(String jobName, String jobId, String command) {
-        ModifyJobZosmfRequestRunner runner = new ModifyJobZosmfRequestRunner(jobName, jobId, command);
+    public void modifyJob(List<Header> headers, String jobName, String jobId, String command) {
+        ModifyJobZosmfRequestRunner runner = new ModifyJobZosmfRequestRunner(headers, jobName, jobId, command);
         runner.run(getZosmfConnector());
     }
 
     @Override
-    public ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId) {
-        GetJobFilesZosmfRequestRunner runner = new GetJobFilesZosmfRequestRunner(jobName, jobId);
+    public ItemsWrapper<JobFile> getJobFiles(List<Header> headers, String jobName, String jobId) {
+        GetJobFilesZosmfRequestRunner runner = new GetJobFilesZosmfRequestRunner(headers, jobName, jobId);
         return runner.run(getZosmfConnector());
     }
 
     @Override
-    public JobFileContent getJobFileContent(String jobName, String jobId, String fileId) {
-        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
+    public JobFileContent getJobFileContent(List<Header> headers, String jobName, String jobId, String fileId) {
+        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(headers, jobName, jobId, fileId);
         return runner.run(getZosmfConnector());
     }
 
     @Override
-    public JobFileContent getJobJcl(String jobName, String jobId) {
+    public JobFileContent getJobJcl(List<Header> headers, String jobName, String jobId) {
         try {
-            return getJobFileContent(jobName, jobId, "3");
+            return getJobFileContent(headers, jobName, jobId, "3");
         } catch (JobFileIdNotFoundException e) {
             log.error("getJobJcl", e);
             throw new JobJesjclNotFoundException(jobName, jobId);

@@ -11,6 +11,7 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
@@ -22,6 +23,7 @@ import org.zowe.jobs.model.JobFileContent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<JobFileContent> {
 
@@ -29,8 +31,8 @@ public class GetJobFileContentZosmfRequestRunner extends AbstractZosmfJobsReques
     private String jobId;
     private String fileId;
 
-    public GetJobFileContentZosmfRequestRunner(String jobName, String jobId, String fileId) {
-        super(null);
+    public GetJobFileContentZosmfRequestRunner(List<Header> headers, String jobName, String jobId, String fileId) {
+        super(headers);
         this.jobName = jobName;
         this.jobId = jobId;
         this.fileId = fileId;

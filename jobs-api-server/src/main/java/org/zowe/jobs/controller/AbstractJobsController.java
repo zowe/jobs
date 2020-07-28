@@ -95,8 +95,9 @@ public abstract class AbstractJobsController {
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = Job.class) })
     public Job getJobByNameAndId(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-        return getJobsService().getJob(jobName, jobId);
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
+            HttpServletRequest request) {
+        return getJobsService().getJob(getIbmHeadersFromRequest(request), jobName, jobId);
     }
 
     @DeleteMapping(value = "/{jobName}/{jobId}", produces = { "application/json" })
@@ -104,16 +105,19 @@ public abstract class AbstractJobsController {
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purge succesfully requested") })
     public ResponseEntity<Void> purgeJob(
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
-            @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
-        getJobsService().purgeJob(jobName, jobId);
+            @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
+            HttpServletRequest request) {
+        getJobsService().purgeJob(getIbmHeadersFromRequest(request), jobName, jobId);
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
     @DeleteMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
-    public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
-        jobList.forEach(job -> getJobsService().purgeJob(job.getJobName(), job.getJobId()));
+    public ResponseEntity<Void> purgeJobs(
+            @RequestBody List<SimpleJob> jobList,
+            HttpServletRequest request) {
+        jobList.forEach(job -> getJobsService().purgeJob(getIbmHeadersFromRequest(request), job.getJobName(), job.getJobId()));
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
@@ -125,25 +129,32 @@ public abstract class AbstractJobsController {
     public ResponseEntity<Void> modifyJob(
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId,
-            @RequestBody ModifyJobRequest request) {
-        getJobsService().modifyJob(jobName, jobId, request.getCommand());
+            @RequestBody ModifyJobRequest modifyRequest,
+            HttpServletRequest request) {
+        getJobsService().modifyJob(getIbmHeadersFromRequest(request), jobName, jobId, modifyRequest.getCommand());
         return ResponseEntity.accepted().build();
     }
     
     @PutMapping(value = "", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 202, message = "Job modifies requested") })
-    public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
-        request.getJobs().forEach( job -> getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()));
+    public ResponseEntity<Void> modifyJobs(
+            @RequestBody ModifyMultipleJobsRequest modifyRequest,
+            HttpServletRequest request) {
+        modifyRequest.getJobs().forEach( 
+                job -> getJobsService().modifyJob(getIbmHeadersFromRequest(request), job.getJobName(), job.getJobId(), modifyRequest.getCommand())
+            );
         return ResponseEntity.accepted().build();
     }
 
     @PostMapping(value = "string", produces = { "application/json" })
     @ApiOperation(value = "Submit a job given a string of JCL", nickname = "submitJob", notes = "This API submits a job given jcl as a string")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
-    public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
+    public ResponseEntity<?> submitJob(
+            @Validated @RequestBody SubmitJobStringRequest submitRequest,
+            HttpServletRequest request) {
 
-        Job job = getJobsService().submitJobString(request.getJcl());
+        Job job = getJobsService().submitJobString(getIbmHeadersFromRequest(request), submitRequest.getJcl());
 
         URI location = getJobUri(job);
         return ResponseEntity.created(location).body(job);
@@ -153,10 +164,12 @@ public abstract class AbstractJobsController {
     @ApiOperation(value = "Submit a job given a data set", nickname = "submitJob", 
         notes = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.")
     @ApiResponses(value = { @ApiResponse(code = 201, message = "Job successfully created", response = Job.class) })
-    public ResponseEntity<?> submitJob(@RequestBody SubmitJobFileRequest request) {
+    public ResponseEntity<?> submitJob(
+            @RequestBody SubmitJobFileRequest submitRequest,
+            HttpServletRequest request) {
 
-        String file = request.getFile();
-        Job job = getJobsService().submitJobFile(file);
+        String file = submitRequest.getFile();
+        Job job = getJobsService().submitJobFile(getIbmHeadersFromRequest(request), file);
 
         URI location = getJobUri(job);
         return ResponseEntity.created(location).body(job);
@@ -173,9 +186,10 @@ public abstract class AbstractJobsController {
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
     public ItemsWrapper<JobFile> getJobOutputFiles(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
+            HttpServletRequest request) {
 
-        return getJobsService().getJobFiles(jobName, jobId);
+        return getJobsService().getJobFiles(getIbmHeadersFromRequest(request), jobName, jobId);
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = { "application/json" })
@@ -185,9 +199,10 @@ public abstract class AbstractJobsController {
     public JobFileContent getJobOutputFile(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
-            @ApiParam(value = "Job file id.", required = true) @PathVariable("fileId") String fileId) {
+            @ApiParam(value = "Job file id.", required = true) @PathVariable("fileId") String fileId,
+            HttpServletRequest request) {
 
-        return getJobsService().getJobFileContent(jobName, jobId, fileId);
+        return getJobsService().getJobFileContent(getIbmHeadersFromRequest(request), jobName, jobId, fileId);
     }
     
     @GetMapping(value = "/{jobName}/{jobId}/files/content", produces = { "application/json" })
@@ -196,11 +211,12 @@ public abstract class AbstractJobsController {
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok", response = JobFileContent.class) })
     public JobFileContent getConcatenatedJobOutputFiles(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
-        ItemsWrapper<JobFile> jobFiles = getJobOutputFiles(jobName, jobId);
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
+            HttpServletRequest request) {
+        ItemsWrapper<JobFile> jobFiles = getJobOutputFiles(jobName, jobId, request);
         StringBuffer outputBuffer = new StringBuffer();
         for (JobFile file : jobFiles.getItems()) {
-            outputBuffer.append(getJobOutputFile(jobName, jobId, file.getId().toString()).getContent());
+            outputBuffer.append(getJobOutputFile(jobName, jobId, file.getId().toString(), request).getContent());
         }
         JobFileContent output = new JobFileContent();
         output.setContent(outputBuffer.toString());
@@ -215,10 +231,11 @@ public abstract class AbstractJobsController {
             @ApiResponse(code = 200, message = "Ok", response = JobStep.class, responseContainer = "List") })
     public List<JobStep> getJobSteps(
             @ApiParam(value = "Job name.", required = true) @PathVariable("jobName") String jobName,
-            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId) {
+            @ApiParam(value = "Job identifier.", required = true) @PathVariable("jobId") String jobId,
+            HttpServletRequest request) {
 
         try {
-            JobFileContent jcl = getJobsService().getJobJcl(jobName, jobId);
+            JobFileContent jcl = getJobsService().getJobJcl(getIbmHeadersFromRequest(request), jobName, jobId);
             return findJobSteps(jcl.getContent());
         } catch (JobJesjclNotFoundException e) {
             log.error("getJobSteps", e);

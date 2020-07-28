@@ -9,6 +9,7 @@
  */
 package org.zowe.jobs.services.zosmf;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
@@ -20,13 +21,14 @@ import org.zowe.jobs.model.Job;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class SubmitJobStringZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Job> {
 
     private String jcl;
 
-    public SubmitJobStringZosmfRequestRunner(String jcl) {
-        super(null);
+    public SubmitJobStringZosmfRequestRunner(List<Header> headers, String jcl) {
+        super(headers);
         this.jcl = jcl;
     }
 

@@ -11,6 +11,7 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
@@ -22,6 +23,7 @@ import org.zowe.api.common.utils.ResponseCache;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class ModifyJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Void> {
 
@@ -29,8 +31,8 @@ public class ModifyJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<
     private String jobId;
     private String command;
 
-    public ModifyJobZosmfRequestRunner(String jobName, String jobId, String command) {
-        super(null);
+    public ModifyJobZosmfRequestRunner(List<Header> headers, String jobName, String jobId, String command) {
+        super(headers);
         this.jobName = jobName;
         this.jobId = jobId;
         this.command = command;

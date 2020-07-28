@@ -23,20 +23,20 @@ public interface JobsService {
 
     ItemsWrapper<Job> getJobs(List<Header> headers, String prefix, String owner, JobStatus status) throws ZoweApiException;
 
-    Job getJob(String jobName, String jobId);
+    Job getJob(List<Header> headers, String jobName, String jobId);
 
-    void purgeJob(String jobName, String jobId);
+    void purgeJob(List<Header> headers, String jobName, String jobId);
     
-    void modifyJob(String jobName, String jobId, String command);
+    void modifyJob(List<Header> headers, String jobName, String jobId, String command);
 
-    Job submitJobString(String jclString);
+    Job submitJobString(List<Header> headers, String jclString);
 
-    Job submitJobFile(String file);
+    Job submitJobFile(List<Header> headers, String file);
 
-    ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId);
+    ItemsWrapper<JobFile> getJobFiles(List<Header> headers, String jobName, String jobId);
 
-    JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
+    JobFileContent getJobFileContent(List<Header> headers, String jobName, String jobId, String fileId);
 
-    JobFileContent getJobJcl(String jobName, String jobId);
+    JobFileContent getJobJcl(List<Header> headers, String jobName, String jobId);
 
 }
