@@ -37,7 +37,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
                 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
-        new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector);
+        new ModifyJobZosmfRequestRunner(null, jobName, jobId, command).run(zosmfConnector);
         
         verifyInteractions(requestBuilder);
     }
@@ -58,7 +58,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
-        shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector));
+        shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(null, jobName, jobId, command).run(zosmfConnector));
         
         verifyInteractions(requestBuilder);
     }

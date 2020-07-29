@@ -70,7 +70,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         GetJobsZosmfRequestRunner runner = mock(GetJobsZosmfRequestRunner.class);
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(GetJobsZosmfRequestRunner.class).withArguments(prefix, owner, status).thenReturn(runner);
-        assertEquals(expected, jobsService.getJobs(prefix, owner, status));
+        assertEquals(expected, jobsService.getJobs(null, prefix, owner, status));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(GetJobsZosmfRequestRunner.class).withArguments(prefix, owner, status).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.getJobs(prefix, owner, status));
+        shouldThrow(expectedException, () -> jobsService.getJobs(null, prefix, owner, status));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         GetJobZosmfRequestRunner runner = mock(GetJobZosmfRequestRunner.class);
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(GetJobZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
-        assertEquals(expected, jobsService.getJob(jobName, jobId));
+        assertEquals(expected, jobsService.getJob(null, jobName, jobId));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(GetJobZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.getJob(jobName, jobId));
+        shouldThrow(expectedException, () -> jobsService.getJob(null, jobName, jobId));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(SubmitJobStringZosmfRequestRunner.class).withArguments(jcl).thenReturn(runner);
 
-        assertEquals(expected, jobsService.submitJobString(jcl));
+        assertEquals(expected, jobsService.submitJobString(null, jcl));
     }
 
     @Test
@@ -139,7 +139,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(SubmitJobStringZosmfRequestRunner.class).withArguments(jcl).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.submitJobString(jcl));
+        shouldThrow(expectedException, () -> jobsService.submitJobString(null, jcl));
     }
 
     @Test
@@ -152,7 +152,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(SubmitJobFileZosmfRequestRunner.class).withArguments(fileName).thenReturn(runner);
 
-        assertEquals(expected, jobsService.submitJobFile(fileName));
+        assertEquals(expected, jobsService.submitJobFile(null, fileName));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(SubmitJobFileZosmfRequestRunner.class).withArguments(fileName).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.submitJobFile(fileName));
+        shouldThrow(expectedException, () -> jobsService.submitJobFile(null, fileName));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         PurgeJobZosmfRequestRunner runner = mock(PurgeJobZosmfRequestRunner.class);
         PowerMockito.whenNew(PurgeJobZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
-        jobsService.purgeJob(jobName, jobId);
+        jobsService.purgeJob(null, jobName, jobId);
 
         verify(runner).run(zosmfConnector);
     }
@@ -191,7 +191,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(PurgeJobZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.purgeJob(jobName, jobId));
+        shouldThrow(expectedException, () -> jobsService.purgeJob(null, jobName, jobId));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         GetJobFilesZosmfRequestRunner runner = mock(GetJobFilesZosmfRequestRunner.class);
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(GetJobFilesZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
-        assertEquals(expected, jobsService.getJobFiles(jobName, jobId));
+        assertEquals(expected, jobsService.getJobFiles(null, jobName, jobId));
     }
 
     @Test
@@ -222,7 +222,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(GetJobFilesZosmfRequestRunner.class).withArguments(jobName, jobId).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.getJobFiles(jobName, jobId));
+        shouldThrow(expectedException, () -> jobsService.getJobFiles(null, jobName, jobId));
     }
 
     @Test
@@ -237,7 +237,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenReturn(expected);
         PowerMockito.whenNew(GetJobFileContentZosmfRequestRunner.class).withArguments(jobName, jobId, fileId)
             .thenReturn(runner);
-        assertEquals(expected, jobsService.getJobFileContent(jobName, jobId, fileId));
+        assertEquals(expected, jobsService.getJobFileContent(null, jobName, jobId, fileId));
     }
 
     @Test
@@ -253,7 +253,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         PowerMockito.whenNew(GetJobFileContentZosmfRequestRunner.class).withArguments(jobName, jobId, fileId)
             .thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.getJobFileContent(jobName, jobId, fileId));
+        shouldThrow(expectedException, () -> jobsService.getJobFileContent(null, jobName, jobId, fileId));
     }
 
     @Test
@@ -270,7 +270,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         when(runner.run(zosmfConnector)).thenReturn(expected);
 
-        assertEquals(expected, jobsService.getJobJcl(jobName, jobId));
+        assertEquals(expected, jobsService.getJobJcl(null, jobName, jobId));
     }
 
     @Test
@@ -312,7 +312,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         when(runner.run(zosmfConnector)).thenThrow(subException);
 
-        shouldThrow(expectedException, () -> jobsService.getJobJcl(jobName, jobId));
+        shouldThrow(expectedException, () -> jobsService.getJobJcl(null, jobName, jobId));
     }
     
     @Test
@@ -323,7 +323,7 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
 
         ModifyJobZosmfRequestRunner runner = mock(ModifyJobZosmfRequestRunner.class);
         PowerMockito.whenNew(ModifyJobZosmfRequestRunner.class).withArguments(jobName, jobId, modifyCommand).thenReturn(runner);
-        jobsService.modifyJob(jobName, jobId, modifyCommand);
+        jobsService.modifyJob(null, jobName, jobId, modifyCommand);
 
         verify(runner).run(zosmfConnector);
     }
@@ -340,6 +340,6 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
         when(runner.run(zosmfConnector)).thenThrow(expectedException);
         PowerMockito.whenNew(ModifyJobZosmfRequestRunner.class).withArguments(jobName, jobId, modifyCommand).thenReturn(runner);
 
-        shouldThrow(expectedException, () -> jobsService.modifyJob(jobName, jobId, modifyCommand));
+        shouldThrow(expectedException, () -> jobsService.modifyJob(null, jobName, jobId, modifyCommand));
     }
 }

@@ -29,7 +29,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector);
+        new PurgeJobZosmfRequestRunner(null, jobName, jobId).run(zosmfConnector);
 
         verifyInteractions(requestBuilder);
     }
@@ -47,7 +47,7 @@ public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunn
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        shouldThrow(expectedException, () -> new PurgeJobZosmfRequestRunner(jobName, jobId).run(zosmfConnector));
+        shouldThrow(expectedException, () -> new PurgeJobZosmfRequestRunner(null, jobName, jobId).run(zosmfConnector));
         verifyInteractions(requestBuilder);
     }
 

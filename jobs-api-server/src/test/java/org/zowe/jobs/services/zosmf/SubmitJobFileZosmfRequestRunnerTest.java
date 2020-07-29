@@ -43,7 +43,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        assertEquals(expected, new SubmitJobFileZosmfRequestRunner(dataSet).run(zosmfConnector));
+        assertEquals(expected, new SubmitJobFileZosmfRequestRunner(null, dataSet).run(zosmfConnector));
 
         verifyInteractions(requestBuilder);
     }
@@ -76,7 +76,7 @@ public class SubmitJobFileZosmfRequestRunnerTest extends AbstractZosmfJobsReques
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", body);
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        shouldThrow(expectedException, () -> new SubmitJobFileZosmfRequestRunner(fileName).run(zosmfConnector));
+        shouldThrow(expectedException, () -> new SubmitJobFileZosmfRequestRunner(null, fileName).run(zosmfConnector));
         verifyInteractions(requestBuilder);
     }
 

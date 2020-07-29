@@ -42,7 +42,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
+        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(null, jobName, jobId, fileId);
 
         assertEquals(expected, runner.run(zosmfConnector));
 
@@ -94,7 +94,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
+        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(null, jobName, jobId, fileId);
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));
         verifyInteractions(requestBuilder);
     }
