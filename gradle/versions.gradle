@@ -12,7 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.12"
-    explorerApiCommonVersion = "1.1.2"
+    explorerApiCommonVersion = "1.1.3"
 
     libraries = [
         lombok                             : "org.projectlombok:lombok:${lombokVersion}",
