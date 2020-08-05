@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.zowe.api.common.connectors.zosmf.ZosmfConnector;
@@ -38,7 +39,8 @@ public class GetJobsZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<It
     private String prefix;
     private String owner;
 
-    public GetJobsZosmfRequestRunner(String prefix, String owner, JobStatus status) {
+    public GetJobsZosmfRequestRunner(String prefix, String owner, JobStatus status, List<Header> headers) {
+        super(headers);
         this.status = status;
         this.prefix = prefix;
         this.owner = owner;

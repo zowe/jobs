@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.zowe.api.common.controller.AbstractApiController;
 import org.zowe.jobs.services.JobsService;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v1/jobs")
 @Api(value = "JES Jobs APIs V1", tags = "JES job APIs V1")
@@ -27,8 +29,12 @@ public class JobsControllerV1 extends AbstractJobsController {
     @Qualifier("ZosmfJobsServiceV1")
     private JobsService jobsService;
     
+    @Autowired
+    private HttpServletRequest request;
+    
     @Override
     public JobsService getJobsService() {
+        jobsService.setRequest(request);
         return jobsService;
     }
     

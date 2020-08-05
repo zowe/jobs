@@ -9,6 +9,14 @@
  */
 package org.zowe.jobs.services;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.zowe.api.common.exceptions.ZoweApiException;
 import org.zowe.api.common.model.ItemsWrapper;
 import org.zowe.jobs.model.Job;
@@ -16,24 +24,42 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
-public interface JobsService {
+import lombok.Setter;
 
-    ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
-
-    Job getJob(String jobName, String jobId);
-
-    void purgeJob(String jobName, String jobId);
+@Setter
+public abstract class JobsService {
     
-    void modifyJob(String jobName, String jobId, String command);
+    private HttpServletRequest request;
+    
+    public List<Header> getIbmHeadersFromRequest() {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        ArrayList<Header> ibmHeaders = new ArrayList<Header>();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement().toUpperCase();
+            if (headerName.contains("X-IBM")) {
+                Header newHeader = new BasicHeader(headerName, request.getHeader(headerName));
+                ibmHeaders.add(newHeader);
+            }
+        }
+        return ibmHeaders;
+    }
 
-    Job submitJobString(String jclString);
+    public abstract ItemsWrapper<Job> getJobs(String prefix, String owner, JobStatus status) throws ZoweApiException;
 
-    Job submitJobFile(String file);
+    public abstract Job getJob(String jobName, String jobId);
 
-    ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId);
+    public abstract void purgeJob(String jobName, String jobId);
+    
+    public abstract void modifyJob(String jobName, String jobId, String command);
 
-    JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
+    public abstract Job submitJobString(String jclString);
 
-    JobFileContent getJobJcl(String jobName, String jobId);
+    public abstract Job submitJobFile(String file);
+
+    public abstract ItemsWrapper<JobFile> getJobFiles(String jobName, String jobId);
+
+    public abstract JobFileContent getJobFileContent(String jobName, String jobId, String fileId);
+
+    public abstract JobFileContent getJobJcl(String jobName, String jobId);
 
 }
