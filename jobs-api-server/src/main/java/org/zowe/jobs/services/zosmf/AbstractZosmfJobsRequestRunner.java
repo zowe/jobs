@@ -11,8 +11,6 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
-import java.util.List;
-
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.zowe.api.common.exceptions.ZoweApiRestException;
@@ -21,6 +19,8 @@ import org.zowe.jobs.exceptions.JobIdNotFoundException;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+
+import java.util.List;
 
 public abstract class AbstractZosmfJobsRequestRunner<T> extends AbstractZosmfRequestRunner<T> {
     

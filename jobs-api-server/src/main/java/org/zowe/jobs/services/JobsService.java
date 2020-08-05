@@ -9,11 +9,7 @@
  */
 package org.zowe.jobs.services;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
+import lombok.Setter;
 
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
@@ -24,7 +20,11 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
-import lombok.Setter;
+import javax.servlet.http.HttpServletRequest;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 @Setter
 public abstract class JobsService {
