@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation 2018, 2019
+ * Copyright IBM Corporation 2018, 2020
  */
 package org.zowe.jobs.services;
 
@@ -32,13 +32,15 @@ public abstract class JobsService {
     private HttpServletRequest request;
     
     public List<Header> getIbmHeadersFromRequest() {
-        Enumeration<String> headerNames = request.getHeaderNames();
         ArrayList<Header> ibmHeaders = new ArrayList<Header>();
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement().toUpperCase();
-            if (headerName.contains("X-IBM")) {
-                Header newHeader = new BasicHeader(headerName, request.getHeader(headerName));
-                ibmHeaders.add(newHeader);
+        if (request != null ) {
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement().toUpperCase();
+                if (headerName.contains("X-IBM")) {
+                    Header newHeader = new BasicHeader(headerName, request.getHeader(headerName));
+                    ibmHeaders.add(newHeader);
+                }
             }
         }
         return ibmHeaders;

@@ -19,6 +19,8 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+
 
 @PrepareForTest({ ModifyJobZosmfRequestRunner.class })
 public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
@@ -37,7 +39,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
                 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
-        new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector);
+        new ModifyJobZosmfRequestRunner(jobName, jobId, command, new ArrayList<>()).run(zosmfConnector);
         
         verifyInteractions(requestBuilder);
     }
@@ -58,7 +60,7 @@ public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRun
         
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
         
-        shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(jobName, jobId, command).run(zosmfConnector));
+        shouldThrow(expectedException, () -> new ModifyJobZosmfRequestRunner(jobName, jobId, command, new ArrayList<>()).run(zosmfConnector));
         
         verifyInteractions(requestBuilder);
     }
