@@ -14,9 +14,9 @@ import org.apache.http.client.methods.RequestBuilder;
 import org.junit.Test;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
+
+import static org.mockito.Mockito.when;
 
 public class PurgeJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
 

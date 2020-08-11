@@ -9,7 +9,8 @@
  */
 package org.zowe.jobs.services.zosmf;
 
-
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +33,16 @@ import org.zowe.jobs.model.JobFile;
 import org.zowe.jobs.model.JobFileContent;
 import org.zowe.jobs.model.JobStatus;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -346,5 +352,53 @@ public class ZosmfJobsServiceTest extends ZoweApiTest {
             .thenReturn(runner);
 
         shouldThrow(expectedException, () -> jobsService.modifyJob(jobName, jobId, modifyCommand));
+    }
+    
+    @Test
+    public void testGetIbmHeadersFromRequest() throws Exception {
+        List<Header> testHeaders = new ArrayList<Header>();
+        testHeaders.add(new BasicHeader("X-IBM-ONE", "test"));
+        testHeaders.add(new BasicHeader("X-IBM-TWO", "test2"));
+        testHeaders.add(new BasicHeader("X-TEST-TWO", "test3"));
+        
+        List<String> headerNames = new ArrayList<String>();
+        headerNames.add("X-IBM-ONE");
+        headerNames.add("X-IBM-TWO");
+        Enumeration<String> enumerationHeaderNames = Collections.enumeration(headerNames); 
+        
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        jobsService.setRequest(request);
+        
+        when(request.getHeaderNames()).thenReturn(enumerationHeaderNames);
+        request = mockRequestGetHeaders(testHeaders, request);
+        
+        List<Header> expectedHeaders = new ArrayList<Header>();
+        expectedHeaders.add(new BasicHeader("X-IBM-ONE", "test"));
+        expectedHeaders.add(new BasicHeader("X-IBM-TWO", "test2"));
+        assertTrue("Actual headers do not match Expected", testHeadersMatch(jobsService.getIbmHeadersFromRequest(), expectedHeaders));
+    }
+    
+    public HttpServletRequest mockRequestGetHeaders(List<Header> headers, HttpServletRequest request) {
+        for (Header header : headers) {
+            when(request.getHeader(header.getName())).thenReturn(header.getValue());
+        }
+        return request;
+    }
+    
+    public boolean testHeadersMatch(List<Header> list, List<Header> expectedHeaders) {
+        if (list.size() != expectedHeaders.size()) { return false; } 
+        for (int i = 0; i < list.size(); i++) {
+            BasicHeader header1 = (BasicHeader) list.get(i);
+            BasicHeader header2 = (BasicHeader) expectedHeaders.get(i);
+            if (header1.getName() != header2.getName()  || header1.getValue() != header2.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    @Test
+    public void testGetIbmHeadersFromRequestNullRequest() throws Exception {
+        assertEquals(jobsService.getIbmHeadersFromRequest(), new ArrayList<Header>());
     }
 }

@@ -17,10 +17,9 @@ import org.junit.Test;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.zowe.jobs.exceptions.JobNameNotFoundException;
 
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 
+import static org.mockito.Mockito.when;
 
 @PrepareForTest({ ModifyJobZosmfRequestRunner.class })
 public class ModifyJobZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunnerTest {
