@@ -19,6 +19,7 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -41,7 +42,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        assertEquals(expected, new SubmitJobStringZosmfRequestRunner(jclString).run(zosmfConnector));
+        assertEquals(expected, new SubmitJobStringZosmfRequestRunner(jclString, new ArrayList<>()).run(zosmfConnector));
 
         verifyInteractions(requestBuilder);
         verify(requestBuilder).addHeader("Content-type", ContentType.TEXT_PLAIN.getMimeType());
@@ -84,7 +85,7 @@ public class SubmitJobStringZosmfRequestRunnerTest extends AbstractZosmfJobsRequ
         RequestBuilder requestBuilder = mockPutBuilder("restjobs/jobs", badJcl);
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        shouldThrow(expectedException, () -> new SubmitJobStringZosmfRequestRunner(badJcl).run(zosmfConnector));
+        shouldThrow(expectedException, () -> new SubmitJobStringZosmfRequestRunner(badJcl, new ArrayList<>()).run(zosmfConnector));
         verifyInteractions(requestBuilder);
     }
 

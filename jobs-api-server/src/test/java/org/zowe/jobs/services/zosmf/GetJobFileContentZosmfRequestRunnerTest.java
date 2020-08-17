@@ -19,6 +19,7 @@ import org.zowe.jobs.exceptions.JobNameNotFoundException;
 import org.zowe.jobs.model.JobFileContent;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -42,7 +43,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
+        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId, new ArrayList<>());
 
         assertEquals(expected, runner.run(zosmfConnector));
 
@@ -94,7 +95,7 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
 
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId);
+        GetJobFileContentZosmfRequestRunner runner = new GetJobFileContentZosmfRequestRunner(jobName, jobId, fileId, new ArrayList<>());
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));
         verifyInteractions(requestBuilder);
     }

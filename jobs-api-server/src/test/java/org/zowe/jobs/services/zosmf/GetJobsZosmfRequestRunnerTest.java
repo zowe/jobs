@@ -21,6 +21,7 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -64,7 +65,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         RequestBuilder requestBuilder = mockGetBuilder("restjobs/jobs?prefix=*");
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner("*", null, JobStatus.OUTPUT);
+        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner("*", null, JobStatus.OUTPUT, new ArrayList<>());
         assertEquals(new ItemsWrapper<>(Arrays.asList(job1, job4)), runner.run(zosmfConnector));
 
         verifyInteractions(requestBuilder, true);
@@ -79,7 +80,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
                 String.format("restjobs/jobs?owner=%s&prefix=%s", owner, prefix));
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status);
+        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, status, new ArrayList<>());
         assertEquals(new ItemsWrapper<>(expected), runner.run(zosmfConnector));
 
         verifyInteractions(requestBuilder, true);
@@ -130,7 +131,7 @@ public class GetJobsZosmfRequestRunnerTest extends AbstractZosmfJobsRequestRunne
         RequestBuilder requestBuilder = mockGetBuilder(path);
         when(zosmfConnector.executeRequest(requestBuilder)).thenReturn(response);
 
-        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, JobStatus.ALL);
+        GetJobsZosmfRequestRunner runner = new GetJobsZosmfRequestRunner(prefix, owner, JobStatus.ALL, new ArrayList<>());
         shouldThrow(expectedException, () -> runner.run(zosmfConnector));
 
         verifyInteractions(requestBuilder, true);
