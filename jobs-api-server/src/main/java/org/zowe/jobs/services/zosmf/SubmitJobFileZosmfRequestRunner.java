@@ -11,6 +11,7 @@ package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
 
+import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.ContentType;
@@ -24,12 +25,14 @@ import org.zowe.jobs.model.Job;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class SubmitJobFileZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<Job> {
 
     private String fileName;
 
-    public SubmitJobFileZosmfRequestRunner(String fileName) {
+    public SubmitJobFileZosmfRequestRunner(String fileName, List<Header> headers) {
+        super(headers);
         this.fileName = fileName;
     }
 
