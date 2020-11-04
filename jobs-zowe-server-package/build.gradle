@@ -16,7 +16,7 @@ task packageJobsApiServer(type: Zip) {
     includeEmptyDirs = true
 
      into('/') {
-        from configurations.jobsApiServerJar, "$buildDir/convert/manifest.yaml", "$buildDir/convert/apiml-static-registration.yaml.template", 
+        from configurations.jobsApiServerJar, "$buildDir/convert/manifest.yaml", "$buildDir/convert/apiml-static-registration.yaml.template"
     }
 
     into('bin/') {
