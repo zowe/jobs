@@ -16,11 +16,11 @@ task packageJobsApiServer(type: Zip) {
     includeEmptyDirs = true
 
      into('/') {
-        from configurations.jobsApiServerJar
+        from configurations.jobsApiServerJar, "$buildDir/convert/manifest.yaml", "$buildDir/convert/apiml-static-registration.yaml.template", 
     }
 
-    into('scripts/') {
-        from "$buildDir/convert/manifest.yaml", "$buildDir/convert/start.sh", "$buildDir/convert/configure.sh", "$buildDir/convert/validate.sh"
+    into('bin/') {
+        from "$buildDir/convert/start.sh", "$buildDir/convert/configure.sh", "$buildDir/convert/validate.sh"
     }
 }
 
@@ -30,6 +30,7 @@ packageJobsApiServer.doFirst {
         add(file('src/main/resources/bin/start.sh'));
         add(file('src/main/resources/bin/configure.sh'));
         add(file('src/main/resources/bin/validate.sh'));
+        add(file('src/main/resources/apiml-static-registration.yaml.template'));
     }};
     for (File scriptFile : scriptFiles){
         def inputStream = new InputStreamReader(new FileInputStream(scriptFile), "ISO-8859-1");
