@@ -1,5 +1,5 @@
 ext {
-    artifactName = 'jobs-server-zowe-package'
+    artifactName = 'jobs-api-package'
 }
 
 configurations {

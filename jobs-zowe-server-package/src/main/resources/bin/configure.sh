@@ -10,6 +10,10 @@
 # Copyright IBM Corporation 2019, 2020
 ################################################################################
 
+# Source main utils script
+. ${ROOT_DIR}/bin/utils/utils.sh
+ensure_java_is_on_path
+
 # Add static definition for jobs-api
 cat <<EOF >${STATIC_DEF_CONFIG_DIR}/jobs-api.ebcidic.yml
 #
