@@ -29,4 +29,4 @@ commands:
   validate: bin/validate.sh
 apimlServices:
   static:
-    file: apiml-static-registration.yaml.template
+  - file: apiml-static-registration.yaml.template
