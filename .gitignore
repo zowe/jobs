@@ -39,3 +39,6 @@ bin/
 
 ### Temporary Certificate###
 *.p12
+
+# VS Code
+.vscode
