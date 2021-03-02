@@ -1,6 +1,6 @@
 ext {
 
-    springBootVersion = '2.1.7.RELEASE'
+    springBootVersion = '2.3.7.RELEASE'
     springFoxVersion = '3.0.0'
     lombokVersion = '1.16.20'
     mockitoCoreVersion = '2.23.4'
@@ -12,6 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.13.1"
+    javaxValidationApiVersion= "2.0.1.Final"
     explorerApiCommonVersion = "1.1.4"
 
     libraries = [
@@ -23,6 +24,7 @@ ext {
         spring_boot_starter_parent         : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
         spring_boot_starter_security       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         spring_boot_starter_web            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+        spring_boot_start_validation       : "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
         spring_boot_starter_test           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
 
         commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",

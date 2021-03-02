@@ -3,11 +3,11 @@
 
 
 ext {
-	server_host = project.hasProperty('server.host') ? project.getProperty('server.host') : "undefined"
-	server_port = project.hasProperty('server.port') ? project.getProperty('server.port') : -1
-	username = project.hasProperty('server.username') ? project.getProperty('server.username') : "undefined"
-	password = project.hasProperty('server.password') ? project.getProperty('server.password') : "undefined"
-	test_version = project.hasProperty('test.version') ? project.getProperty('test.version') : "undefined"
+    server_host = project.hasProperty('server.host') ? project.getProperty('server.host') : "undefined"
+    server_port = project.hasProperty('server.port') ? project.getProperty('server.port') : -1
+    username = project.hasProperty('server.username') ? project.getProperty('server.username') : "undefined"
+    password = project.hasProperty('server.password') ? project.getProperty('server.password') : "undefined"
+    test_version = project.hasProperty('test.version') ? project.getProperty('test.version') : "undefined"
 }
 
 dependencies {
@@ -25,6 +25,7 @@ dependencies {
     compile libraries.springFoxSwagger2
     compile libraries.springFoxSwaggerUI
     compile libraries.lombok
+    annotationProcessor libraries.lombok
     compile libraries.explorer_api_common
 
     testCompile libraries.spring_boot_starter_test
@@ -37,51 +38,53 @@ dependencies {
 }
 
 test {
-	systemProperty "server.host", server_host
-	systemProperty "server.port", server_port
-	systemProperty "server.username", username
-	systemProperty "server.password", password
-	systemProperty "test.version", test_version
+    systemProperty "server.host", server_host
+    systemProperty "server.port", server_port
+    systemProperty "server.username", username
+    systemProperty "server.password", password
+    systemProperty "test.version", test_version
 
-	reports.junitXml.destination = file(
-		file(reports.junitXml.destination).getParent() + 
-		"/test-" + 
-		test_version
-	)
-	reports.html.destination = file(
-		file(reports.html.destination).getParent() + 
-		"/test-" + 
-		test_version
-	)
+    reports.junitXml.destination = file(
+            file(reports.junitXml.destination).getParent() +
+                    "/test-" +
+                    test_version
+    )
+    reports.html.destination = file(
+            file(reports.html.destination).getParent() +
+                    "/test-" +
+                    test_version
+    )
 }
 
-task validate << {
-	checkAndThrow("server_host", "undefined", "server.host");
-	checkAndThrow("server_port", -1, "server.port");
-	checkAndThrow("username", "undefined", "server.username");
-	checkAndThrow("password", "undefined", "server.password");
-	checkAndThrow("test_version", "undefined", "test.version");
-}	
+task validate {
+    doLast {
+        checkAndThrow("server_host", "undefined", "server.host");
+        checkAndThrow("server_port", -1, "server.port");
+        checkAndThrow("username", "undefined", "server.username");
+        checkAndThrow("password", "undefined", "server.password");
+        checkAndThrow("test_version", "undefined", "test.version");
+    }
+}
 
-task runIntegrationTests(dependsOn: ['validate', 'test']){
+task runIntegrationTests(dependsOn: ['validate', 'test']) {
 
 }
 
-void checkAndThrow(String property, defaultValue, required=property) {
-	if (ext.getProperty(property).equals(defaultValue)) {
-		throw new GradleException("Missing the required property \'" + required + "\'.");
-	}
+void checkAndThrow(String property, defaultValue, required = property) {
+    if (ext.getProperty(property).equals(defaultValue)) {
+        throw new GradleException("Missing the required property \'" + required + "\'.");
+    }
 }
 
-gradle.taskGraph.whenReady { taskGraph -> 
-	if (!taskGraph.hasTask(runIntegrationTests)) {
-		def tasks = taskGraph.getAllTasks()
-		tasks.findAll { it.name == 'test' }.each { task -> 
-			if (task.getProject().getName() == 'jobs-tests') {
-		 		task.setEnabled(false) 
-			}
-		}
-	}
+gradle.taskGraph.whenReady { taskGraph ->
+    if (!taskGraph.hasTask(runIntegrationTests)) {
+        def tasks = taskGraph.getAllTasks()
+        tasks.findAll { it.name == 'test' }.each { task ->
+            if (task.getProject().getName() == 'jobs-tests') {
+                task.setEnabled(false)
+            }
+        }
+    }
 } 
 
 
