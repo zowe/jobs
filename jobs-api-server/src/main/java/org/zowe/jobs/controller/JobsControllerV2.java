@@ -11,29 +11,29 @@ package org.zowe.jobs.controller;
 
 import io.swagger.annotations.Api;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zowe.jobs.services.JobsService;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/v2/jobs")
 @Api(value = "JES Jobs APIs V2", tags = "JES job APIs V2")
 public class JobsControllerV2 extends AbstractJobsController {
 
-    @Autowired 
+    @Autowired
     @Qualifier("ZosmfJobsServiceV2")
     private JobsService jobsService;
 
     @Autowired
     private HttpServletRequest request;
-    
+
     @Override
     public JobsService getJobsService() {
-        if(request != null) {
+        if (request != null) {
             jobsService.setRequest(request);
         }
         return jobsService;
