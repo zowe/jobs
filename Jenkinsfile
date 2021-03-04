@@ -181,7 +181,14 @@ node('zowe-jenkins-agent') {
     scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
     scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
     allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
-    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
+    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD,
+    operation: {
+      withSonarQubeEnv('sonarcloud-server') {
+        sh 'JAVA_HOME=/usr/java/openjdk-11 && \
+           ./gradlew --info --scan sonarqube -x test -x compileJava -x compileTestJava \
+           -Psonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Pgradle.cache.push=true'
+      }
+    }
   )
 
   // how we packaging jars/zips
