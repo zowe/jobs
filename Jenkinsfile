@@ -12,7 +12,7 @@
 
 
 node('zowe-jenkins-agent') {
-  def lib = library("jenkins-library").org.zowe.jenkins_shared_library
+  def lib = library("jenkins-library@users/jack/sonar-scan-jdk-version").org.zowe.jenkins_shared_library
 
   def pipeline = lib.pipelines.gradle.GradlePipeline.new(this)
   def uniqueBuildId
@@ -181,14 +181,7 @@ node('zowe-jenkins-agent') {
     scannerTool     : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SCANNER_TOOL,
     scannerServer   : lib.Constants.DEFAULT_LFJ_SONARCLOUD_SERVER,
     allowBranchScan : lib.Constants.DEFAULT_LFJ_SONARCLOUD_ALLOW_BRANCH,
-    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD,
-    operation: {
-      withSonarQubeEnv('sonarcloud-server') {
-        sh 'JAVA_HOME=/usr/java/openjdk-11 && \
-     ./gradlew --info --scan sonarqube -x test -x compileJava -x compileTestJava \
-     -Psonar.host.url=${SONAR_HOST_URL} -Dsonar.login=${SONAR_AUTH_TOKEN} -Pgradle.cache.push=true'
-      }
-    }
+    failBuild       : lib.Constants.DEFAULT_LFJ_SONARCLOUD_FAIL_BUILD
   )
 
   // how we packaging jars/zips
