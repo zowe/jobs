@@ -1,18 +1,20 @@
 ext {
 
-    springBootVersion = '2.1.7.RELEASE'
-    springFoxVersion = '2.8.0'
+    springBootVersion = '2.3.7.RELEASE'
+    springFoxVersion = '3.0.0'
     lombokVersion = '1.16.20'
     mockitoCoreVersion = '2.23.4'
     powerMockVersion = "2.0.0-RC.1"
     gsonVersion = '2.8.2'
-    httpClientVersion = '4.5.3'
+    httpClientVersion = '4.5.13'
     httpCoreVersion = '4.4.10'
     commonsCodecVersion = '1.11'
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
-    junitVersion = "4.12"
-    explorerApiCommonVersion = "1.1.4"
+    junitVersion = "4.13.1"
+    restAssuredVersion = "4.3.0"
+    javaxValidationApiVersion= "2.0.1.Final"
+    explorerApiCommonVersion = "1.1.5"
 
     libraries = [
         lombok                             : "org.projectlombok:lombok:${lombokVersion}",
@@ -23,6 +25,7 @@ ext {
         spring_boot_starter_parent         : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
         spring_boot_starter_security       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         spring_boot_starter_web            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+        spring_boot_start_validation       : "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
         spring_boot_starter_test           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
 
         commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",
@@ -42,6 +45,7 @@ ext {
         mockito_core                       : "org.mockito:mockito-core:${mockitoCoreVersion}",
 
         junit                              : "junit:junit:${junitVersion}",
+        restAssured						   : "io.rest-assured:rest-assured:${restAssuredVersion}",
 
         explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
         explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}"
