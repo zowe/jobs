@@ -25,6 +25,7 @@ dependencies {
     compile libraries.springFoxSwagger2
     compile libraries.springFoxSwaggerUI
     compile libraries.explorer_api_common
+	compile libraries.restAssured
 	compile libraries.lombok
 	annotationProcessor libraries.lombok
 
