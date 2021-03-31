@@ -93,7 +93,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobs("TESTNAME", "*", JobStatus.ALL)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "?prefix={prefix}&owner={owner}", "TESTNAME", "*"))
-            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(items)));
 
         verify(jobsService, times(1)).getJobs("TESTNAME", "*", JobStatus.ALL);
@@ -113,7 +113,7 @@ public class JobsControllerTest extends ApiControllerTest {
         mockMvc
             .perform(get(ENDPOINT_ROOT + "?prefix={prefix}&owner={owner}&status={status}", "TESTNAME", "*",
                     JobStatus.ACTIVE))
-            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(items)));
 
         verify(jobsService, times(1)).getJobs("TESTNAME", "*", JobStatus.ACTIVE);
@@ -131,7 +131,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobs("TESTNAME", null, JobStatus.ALL)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "?prefix={prefix}", "TESTNAME")).andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(items)));
 
         verify(jobsService, times(1)).getJobs("TESTNAME", null, JobStatus.ALL);
@@ -146,7 +146,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobs("TESTNAME", null, JobStatus.ALL)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "?prefix={prefix}", "TESTNAME")).andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(EMPTY_ITEMS));
 
         verify(jobsService, times(1)).getJobs("TESTNAME", null, JobStatus.ALL);
@@ -180,7 +180,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJob("TESTNAME", "TESTID11")).thenReturn(dummyJob);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}", "TESTNAME", "TESTID11")).andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)));
 
         verify(jobsService, times(1)).getJob("TESTNAME", "TESTID11");
@@ -219,7 +219,7 @@ public class JobsControllerTest extends ApiControllerTest {
         doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).getJob(jobName, jobId);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/", jobName, jobId)).andExpect(status().isIAmATeapot())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
 
@@ -242,7 +242,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobFiles(jobName, jobId)).thenReturn(items);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files", jobName, jobId)).andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(items)));
 
         verify(jobsService, times(1)).getJobFiles(jobName, jobId);
@@ -282,7 +282,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobFileContent(jobName, jobId, fileId)).thenReturn(jobFileContent);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId))
-            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent)));
 
         verify(jobsService, times(1)).getJobFileContent(jobName, jobId, fileId);
@@ -325,7 +325,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobFiles(jobName, jobId)).thenReturn(items);
         
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files", jobName, jobId)).andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().string(JsonUtils.convertToJsonString(items)));
         
         JobFileContent jobFileContent1 = new JobFileContent("1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\\n");
@@ -337,16 +337,16 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.getJobFileContent(jobName, jobId, fileId2)).thenReturn(jobFileContent2);
         
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId1))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent1)));
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/{fileId}/content", jobName, jobId, fileId2))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().string(JsonUtils.convertToJsonString(jobFileContent2)));
         
         JobFileContent concatenatedContent = new JobFileContent(jobFileContent1.getContent() + jobFileContent2.getContent());
         
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/files/content", jobName, jobId))
-        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
         .andExpect(content().string(JsonUtils.convertToJsonString(concatenatedContent)));
     }
 
@@ -365,7 +365,7 @@ public class JobsControllerTest extends ApiControllerTest {
             .thenReturn(new JobFileContent(loadFile("src/test/resources/testData/JESJCL")));
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/steps", jobName, jobId)).andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(expected)));
 
         verify(jobsService, times(1)).getJobJcl(jobName, jobId);
@@ -406,7 +406,7 @@ public class JobsControllerTest extends ApiControllerTest {
         doThrow(new JobJesjclNotFoundException(jobName, jobId)).when(jobsService).getJobJcl(jobName, jobId);
 
         mockMvc.perform(get(ENDPOINT_ROOT + "/{jobName}/{jobId}/steps", jobName, jobId))
-            .andExpect(status().isIAmATeapot()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isIAmATeapot()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(expectedError.getMessage()));
 
@@ -453,7 +453,7 @@ public class JobsControllerTest extends ApiControllerTest {
         request.add(new SimpleJob(jobName, jobId));
         request.add(new SimpleJob(jobName, jobId));
 
-        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_VALUE)
+        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .content(JsonUtils.convertToJsonString(request))).andExpect(status().isNoContent())
             .andExpect(jsonPath("$").doesNotExist());
 
@@ -474,7 +474,7 @@ public class JobsControllerTest extends ApiControllerTest {
 
         doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).purgeJob(jobName, jobId);
 
-        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_VALUE)
+        mockMvc.perform(delete(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .content(JsonUtils.convertToJsonString(request)))
             .andExpect(status().isIAmATeapot()).andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
@@ -491,7 +491,7 @@ public class JobsControllerTest extends ApiControllerTest {
         ModifyJobRequest request = new ModifyJobRequest("cancel");
         
         mockMvc.perform(put(ENDPOINT_ROOT + "/{jobName}/{jobId}", jobName, jobId)
-                .contentType(MediaType.APPLICATION_JSON_VALUE).content(JsonUtils.convertToJsonString(request)))
+                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JsonUtils.convertToJsonString(request)))
                 .andExpect(status().isAccepted());
         
         verify(jobsService, times(1)).modifyJob(jobName, jobId, request.getCommand());
@@ -512,7 +512,7 @@ public class JobsControllerTest extends ApiControllerTest {
         doThrow(new ZoweApiErrorException(expectedError)).when(jobsService).modifyJob(jobName, jobId, request.getCommand());
         
         mockMvc.perform(put(ENDPOINT_ROOT + "/{jobName}/{jobId}", jobName, jobId)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(JsonUtils.convertToJsonString(request)))
+            .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(JsonUtils.convertToJsonString(request)))
             .andExpect(status().isNotFound()).andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
         
@@ -530,7 +530,7 @@ public class JobsControllerTest extends ApiControllerTest {
         jobList.add(new SimpleJob(jobName, jobId));
         ModifyMultipleJobsRequest modifyRequest = new ModifyMultipleJobsRequest(modifyCommand, jobList);
         
-        mockMvc.perform(put(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_VALUE)
+        mockMvc.perform(put(ENDPOINT_ROOT).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
             .content(JsonUtils.convertToJsonString(modifyRequest)))
             .andExpect(status().isAccepted()).andExpect(jsonPath("$").doesNotExist());
 
@@ -555,9 +555,9 @@ public class JobsControllerTest extends ApiControllerTest {
         mockJobUriConstruction(jobName, jobId, locationUri);
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(request)))
-            .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
             .andExpect(header().string("Location", locationUri.toString()));
 
@@ -573,9 +573,9 @@ public class JobsControllerTest extends ApiControllerTest {
         ApiError expectedError = ApiError.builder().message(errorMessage).status(HttpStatus.BAD_REQUEST).build();
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(""))))
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
         verifyNoMoreInteractions(jobsService);
@@ -592,7 +592,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.submitJobString(dummyJcl)).thenThrow(new ZoweApiErrorException(expectedError));
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(new SubmitJobStringRequest(dummyJcl))))
             .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));
@@ -615,9 +615,9 @@ public class JobsControllerTest extends ApiControllerTest {
         mockJobUriConstruction(jobName, jobId, locationUri);
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/dataset").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "/dataset").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(request)))
-            .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
             .andExpect(header().string("Location", locationUri.toString()));
 
@@ -635,7 +635,7 @@ public class JobsControllerTest extends ApiControllerTest {
         when(jobsService.submitJobFile(dummyDataSet)).thenThrow(new ZoweApiErrorException(expectedError));
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/dataset").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "/dataset").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .content(JsonUtils.convertToJsonString(new SubmitJobFileRequest(dummyDataSet))))
             .andExpect(jsonPath("$.status").value(expectedError.getStatus().name()))
             .andExpect(jsonPath("$.message").value(errorMessage));

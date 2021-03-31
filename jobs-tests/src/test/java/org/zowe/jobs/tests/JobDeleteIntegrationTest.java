@@ -19,9 +19,9 @@ import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
 import org.zowe.jobs.model.SimpleJob;
 
-import java.util.ArrayList;
-
 import static org.hamcrest.CoreMatchers.equalTo;
+
+import java.util.ArrayList;
 
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 

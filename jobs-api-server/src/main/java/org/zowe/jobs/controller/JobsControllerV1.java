@@ -28,22 +28,22 @@ public class JobsControllerV1 extends AbstractJobsController {
     @Autowired
     @Qualifier("ZosmfJobsServiceV1")
     private JobsService jobsService;
-
+    
     @Autowired
     private HttpServletRequest request;
-
+    
     @Override
     public JobsService getJobsService() {
-        if (request != null) {
+        if(request != null ) {
             jobsService.setRequest(request);
         }
         return jobsService;
     }
-
+    
     @RestController
     @RequestMapping("/api/v1/jobs")
     @Api(value = "JES Jobs APIs V1", tags = "JES job APIs V1")
     public class UsernameController extends AbstractApiController {
-
+        
     }
 }
