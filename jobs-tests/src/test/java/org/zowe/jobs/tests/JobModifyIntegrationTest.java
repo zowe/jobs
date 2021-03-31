@@ -10,12 +10,12 @@
 
 package org.zowe.jobs.tests;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.apache.http.HttpStatus;
 import org.junit.BeforeClass;
