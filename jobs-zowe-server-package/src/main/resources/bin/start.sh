@@ -22,14 +22,7 @@
 # - ZOWE_EXPLORER_HOST - The IP Address z/OSMF can be reached
 
 
-JAR_FILE=$(ls -1 ${LAUNCH_COMPONENT}/jobs-api-server-*.jar)
-
-stop_jobs()
-{
-  kill -15 $pid
-}
-
-trap 'stop_jobs' INT
+JAR_FILE=$(ls -or1 ${LAUNCH_COMPONENT}/jobs-api-server-*.jar | head -n 1)
 
 COMPONENT_CODE=EJ
 _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java \
@@ -50,6 +43,3 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java \
   -Dspring.main.banner-mode=off \
   -Djava.protocol.handler.pkgs=com.ibm.crypto.provider \
   -jar "${JAR_FILE}" &
-pid=$?
-
-wait
