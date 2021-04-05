@@ -14,7 +14,7 @@ spring:
         name: jobs
     output:
         ansi:
-            enabled: detect 
+            enabled: always
 
 logging:
     level:
