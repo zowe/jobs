@@ -9,17 +9,31 @@
  */
 package org.zowe.jobs;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.ComponentScan;
+
+import java.lang.management.ManagementFactory;
 
 @SpringBootApplication
 
 // @EnableApiDiscovery
 @ComponentScan({ "org.zowe" })
-public class JesJobsApplication {
+@Slf4j
+public class JesJobsApplication implements ApplicationListener<ApplicationReadyEvent> {
 
     public static void main(String[] args) {
-        SpringApplication.run(JesJobsApplication.class, args);
+        SpringApplication app = new SpringApplication(JesJobsApplication.class);
+        app.setLogStartupInfo(false);
+        app.run(args);
+    }
+
+    @Override
+    public void onApplicationEvent(final ApplicationReadyEvent event) {
+        long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
+        log.info("ZWEE0000I {} started in {} seconds", JesJobsApplication.class.getSimpleName(), uptime / 1000.0);
     }
 }
