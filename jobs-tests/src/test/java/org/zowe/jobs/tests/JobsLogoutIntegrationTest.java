@@ -11,8 +11,6 @@ package org.zowe.jobs.tests;
 
 import io.restassured.RestAssured;
 
-import static org.junit.Assume.assumeTrue;
-
 import org.apache.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -20,6 +18,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.zowe.jobs.model.Job;
 import org.zowe.jobs.model.JobStatus;
+
+import static org.junit.Assume.assumeTrue;
 
 public class JobsLogoutIntegrationTest extends AbstractJobsIntegrationTest {
 
