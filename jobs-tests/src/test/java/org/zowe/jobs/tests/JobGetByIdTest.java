@@ -49,13 +49,13 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobByNameAndId() throws Exception {
-        Job actualJob = getJob(job).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        Job actualJob = getJob(job).then().statusCode(HttpStatus.SC_OK).header("Content-Encoding", "gzip").extract().body().as(Job.class);
         verifyJobIsAsExpected(actualJob);
     }
 
     @Test
     public void testGetJobByNameWithHashAndId() throws Exception {
-        Job actualJob = getJob(jobWithHash).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        Job actualJob = getJob(jobWithHash).then().statusCode(HttpStatus.SC_OK).header("Content-Encoding", "gzip").extract().body().as(Job.class);
         verifyInProgressJobIsAsExpected(actualJob);
     }
 
@@ -63,7 +63,7 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
     public void testGetJobByNameAndNonexistingId() throws Exception {
         ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
             .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000")).build();
-        getJob(job.getJobName(), "z000000").then().statusCode(expectedError.getStatus().value())
+        getJob(job.getJobName(), "z000000").then().statusCode(expectedError.getStatus().value()).header("Content-Encoding", "gzip")
             .contentType(ContentType.JSON).body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
     }
