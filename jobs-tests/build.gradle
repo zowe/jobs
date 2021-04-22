@@ -11,29 +11,31 @@ ext {
 }
 
 dependencies {
-    compile project(':jobs-model')
-    compile project(':jobs-api-server')
-    compile libraries.spring_boot_starter_actuator
-    compile libraries.spring_boot_starter_parent
-    compile libraries.spring_boot_starter_security
-    compile libraries.spring_boot_starter_web
-    compile libraries.http_core
-    compile libraries.http_client
-    compile libraries.commons_codec
-    compile libraries.gson
-    compile libraries.springFox
-    compile libraries.springFoxSwagger2
-    compile libraries.springFoxSwaggerUI
-    compile libraries.lombok
-    compile libraries.explorer_api_common
+	compile project(':jobs-model')
+	compile project(':jobs-api-server')
+	compile libraries.spring_boot_starter_actuator
+	compile libraries.spring_boot_starter_parent
+	compile libraries.spring_boot_starter_security
+	compile libraries.spring_boot_starter_web
+	compile libraries.http_core
+	compile libraries.http_client
+	compile libraries.commons_codec
+	compile libraries.gson
+	compile libraries.springFox
+	compile libraries.springFoxSwagger2
+	compile libraries.springFoxSwaggerUI
+	compile libraries.explorer_api_common
+	compile libraries.restAssured
+	compile libraries.lombok
+	annotationProcessor libraries.lombok
 
-    testCompile libraries.spring_boot_starter_test
-    testCompile libraries.powermock_api_mockito2
-    testCompile libraries.power_mock_junit4
-    testCompile libraries.power_mock_junit4_rule
-    testCompile libraries.mockito_core
-    testCompile libraries.explorer_api_common_test
-    testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0' //TODO testCompile libraries.hamcrest
+	testCompile libraries.spring_boot_starter_test
+	testCompile libraries.powermock_api_mockito2
+	testCompile libraries.power_mock_junit4
+	testCompile libraries.power_mock_junit4_rule
+	testCompile libraries.mockito_core
+	testCompile libraries.explorer_api_common_test
+	testCompile 'org.hamcrest:hamcrest-junit:2.0.0.0' //TODO testCompile libraries.hamcrest
 }
 
 test {
@@ -44,24 +46,26 @@ test {
 	systemProperty "test.version", test_version
 
 	reports.junitXml.destination = file(
-		file(reports.junitXml.destination).getParent() + 
-		"/test-" + 
-		test_version
+			file(reports.junitXml.destination).getParent() +
+					"/test-" +
+					test_version
 	)
 	reports.html.destination = file(
-		file(reports.html.destination).getParent() + 
-		"/test-" + 
-		test_version
+			file(reports.html.destination).getParent() +
+					"/test-" +
+					test_version
 	)
 }
 
-task validate << {
-	checkAndThrow("server_host", "undefined", "server.host");
-	checkAndThrow("server_port", -1, "server.port");
-	checkAndThrow("username", "undefined", "server.username");
-	checkAndThrow("password", "undefined", "server.password");
-	checkAndThrow("test_version", "undefined", "test.version");
-}	
+task validate {
+	doLast {
+		checkAndThrow("server_host", "undefined", "server.host");
+		checkAndThrow("server_port", -1, "server.port");
+		checkAndThrow("username", "undefined", "server.username");
+		checkAndThrow("password", "undefined", "server.password");
+		checkAndThrow("test_version", "undefined", "test.version");
+	}
+}
 
 task runIntegrationTests(dependsOn: ['validate', 'test']){
 
@@ -73,15 +77,14 @@ void checkAndThrow(String property, defaultValue, required=property) {
 	}
 }
 
-gradle.taskGraph.whenReady { taskGraph -> 
+gradle.taskGraph.whenReady { taskGraph ->
 	if (!taskGraph.hasTask(runIntegrationTests)) {
 		def tasks = taskGraph.getAllTasks()
-		tasks.findAll { it.name == 'test' }.each { task -> 
+		tasks.findAll { it.name == 'test' }.each { task ->
 			if (task.getProject().getName() == 'jobs-tests') {
-		 		task.setEnabled(false) 
+				task.setEnabled(false)
 			}
 		}
 	}
-} 
-
+}
 

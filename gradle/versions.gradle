@@ -12,6 +12,7 @@ ext {
     slf4jVersion = "1.7.25"
     jsonPathVersion = "2.4.0"
     junitVersion = "4.12"
+    restAssuredVersion = "4.3.0"
     explorerApiCommonVersion = "1.1.4"
 
     libraries = [
@@ -23,6 +24,7 @@ ext {
         spring_boot_starter_parent         : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
         spring_boot_starter_security       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
         spring_boot_starter_web            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+        spring_boot_start_validation       : "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
         spring_boot_starter_test           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
 
         commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",
@@ -42,6 +44,7 @@ ext {
         mockito_core                       : "org.mockito:mockito-core:${mockitoCoreVersion}",
 
         junit                              : "junit:junit:${junitVersion}",
+        restAssured                        : "io.rest-assured:rest-assured:${restAssuredVersion}",
 
         explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
         explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}"
