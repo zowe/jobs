@@ -47,7 +47,10 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobs() {
-        List<Job> actual = getJobs(null, null).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+        List<Job> actual = getJobs(null, null).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body().jsonPath()
             .getList("items", Job.class);
 
         // We have results, they are of type job and all have owner = user
@@ -60,7 +63,10 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
     @Test
     public void testGetJobsWithUnlikelyPrefix() {
         String prefix = "12345678";
-        getJobs(prefix, null).then().statusCode(HttpStatus.SC_OK).body("items", IsEmptyCollection.empty());
+        getJobs(prefix, null).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .body("items", IsEmptyCollection.empty());
     }
 
     @Test
@@ -70,7 +76,10 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
         ApiError expectedError = expected.getApiError();
 
-        getJobs(prefix, null).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+        getJobs(prefix, null).then()
+            .statusCode(expectedError.getStatus().value())
+            .header("Content-Encoding", "gzip")
+            .contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
     }
@@ -88,7 +97,10 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
         ApiError expectedError = expected.getApiError();
 
-        getJobs(null, owner).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+        getJobs(null, owner).then()
+            .statusCode(expectedError.getStatus().value())
+            .header("Content-Encoding", "gzip")
+            .contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
     }
@@ -101,16 +113,21 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
 
         ApiError expectedError = expected.getApiError();
 
-        getJobs(null, owner).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+        getJobs(null, owner).then()
+            .statusCode(expectedError.getStatus().value())
+            .header("Content-Encoding", "gzip")
+            .contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name())).body("message",
                     equalTo("An invalid job owner of '*s23y3&lt;script&gt;alert(1)&lt;/script&gt;vpgqn' was supplied"));
     }
 
     @Test
     public void testGetJobsWithOwnerAndPrefix() {
-        String owner = USER;
         String prefix = job.getJobName();
-        List<Job> actual = getJobs(prefix, owner).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+        List<Job> actual = getJobs(prefix, USER).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body().jsonPath()
             .getList("items", Job.class);
 
         // We have results, they are of type job and all have owner = user and prefix
@@ -122,9 +139,12 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     @Test
-    public void testGetJobsWithCurrentUserAsOwnerAndSpecificPrefix() throws Exception {
+    public void testGetJobsWithCurrentUserAsOwnerAndSpecificPrefix() {
         String prefix = job.getJobName();
-        List<Job> actual = getJobs(prefix, null).then().statusCode(HttpStatus.SC_OK).extract().body().jsonPath()
+        List<Job> actual = getJobs(prefix, null).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body().jsonPath()
             .getList("items", Job.class);
 
         // We have results, they are of type job and all have owner = user and prefix
@@ -136,8 +156,11 @@ public class JobsGetIntegrationTest extends AbstractJobsIntegrationTest {
     }
 
     @Test
-    public void testGetJobsWithCurrentUserAsOwnerSpecificPrefixAndStatus() throws Exception {
-        List<Job> actual = getJobs(null, null, JobStatus.OUTPUT).then().statusCode(HttpStatus.SC_OK).extract().body()
+    public void testGetJobsWithCurrentUserAsOwnerSpecificPrefixAndStatus() {
+        List<Job> actual = getJobs(null, null, JobStatus.OUTPUT).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body()
             .jsonPath().getList("items", Job.class);
 
         // We have results, they are of type job and all have owner = user and status OUTPUT

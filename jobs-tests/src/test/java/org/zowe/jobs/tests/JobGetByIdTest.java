@@ -1,4 +1,4 @@
-/**
+/*
  * This program and the accompanying materials are made available under the terms of the
  * Eclipse Public License v2.0 which accompanies this distribution, and is available at
  * https://www.eclipse.org/legal/epl-v20.html
@@ -7,7 +7,6 @@
  *
  * Copyright IBM Corporation 2016, 2020
  */
-
 package org.zowe.jobs.tests;
 
 import io.restassured.http.ContentType;
@@ -49,13 +48,19 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testGetJobByNameAndId() throws Exception {
-        Job actualJob = getJob(job).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        Job actualJob = getJob(job).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body().as(Job.class);
         verifyJobIsAsExpected(actualJob);
     }
 
     @Test
     public void testGetJobByNameWithHashAndId() throws Exception {
-        Job actualJob = getJob(jobWithHash).then().statusCode(HttpStatus.SC_OK).extract().body().as(Job.class);
+        Job actualJob = getJob(jobWithHash).then()
+            .statusCode(HttpStatus.SC_OK)
+            .header("Content-Encoding", "gzip")
+            .extract().body().as(Job.class);
         verifyInProgressJobIsAsExpected(actualJob);
     }
 
@@ -63,8 +68,11 @@ public class JobGetByIdTest extends AbstractJobsIntegrationTest {
     public void testGetJobByNameAndNonexistingId() throws Exception {
         ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
             .message(String.format("No job with name '%s' and id '%s' was found", job.getJobName(), "z000000")).build();
-        getJob(job.getJobName(), "z000000").then().statusCode(expectedError.getStatus().value())
-            .contentType(ContentType.JSON).body("status", equalTo(expectedError.getStatus().name()))
+        getJob(job.getJobName(), "z000000").then()
+            .statusCode(expectedError.getStatus().value())
+            .header("Content-Encoding", "gzip")
+            .contentType(ContentType.JSON)
+            .body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
     }
 }

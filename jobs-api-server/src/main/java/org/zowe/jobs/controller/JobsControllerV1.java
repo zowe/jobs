@@ -34,7 +34,7 @@ public class JobsControllerV1 extends AbstractJobsController {
     
     @Override
     public JobsService getJobsService() {
-        if(request != null ) {
+        if (request != null ) {
             jobsService.setRequest(request);
         }
         return jobsService;
