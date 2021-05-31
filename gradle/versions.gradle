@@ -1,6 +1,6 @@
 ext {
 
-    springBootVersion = '2.3.9.RELEASE'
+    springBootVersion = '2.3.10.RELEASE'
     springFoxVersion = '3.0.0'
     lombokVersion = '1.16.20'
     mockitoCoreVersion = '2.23.4'
@@ -14,7 +14,7 @@ ext {
     junitVersion = "4.13.1"
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
-    explorerApiCommonVersion = "1.1.6"
+    explorerApiCommonVersion = "1.1.7-CARSON-UPGRADESPRING-SNAPSHOT"
 
     libraries = [
             lombok                             : "org.projectlombok:lombok:${lombokVersion}",
