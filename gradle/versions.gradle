@@ -14,7 +14,7 @@ ext {
     junitVersion = "4.13.1"
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
-    explorerApiCommonVersion = "1.1.7-CARSON-UPGRADESPRING-SNAPSHOT"
+    explorerApiCommonVersion = "1.1.7"
 
     libraries = [
             lombok                             : "org.projectlombok:lombok:${lombokVersion}",
