@@ -1,6 +1,6 @@
 # Jobs API Image
 
-[![Build ompzowe/jobs-api](https://github.com/zowe/jobs-api/actions/workflows/jobs-api-images.yml/badge.svg)](https://github.com/zowe/jobs-api/actions/workflows/jobs-api-images.yml)
+[![Build ompzowe/jobs-api](https://github.com/zowe/jobs/actions/workflows/jobs-api-images.yml/badge.svg)](https://github.com/zowe/jobs/actions/workflows/jobs-api-images.yml)
 
 ## General Information
 
