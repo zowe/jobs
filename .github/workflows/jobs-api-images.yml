@@ -1,6 +1,6 @@
 name: Build ompzowe/jobs-api
 on:
-  push:
+  # push:
   # pull_request:
   workflow_dispatch:
     inputs:
