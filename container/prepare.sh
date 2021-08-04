@@ -73,6 +73,13 @@ mkdir -p "${BASE_DIR}/${WORK_DIR}"
 ###############################
 echo ">>>>> build package"
 cd "${REPO_ROOT_DIR}"
+# these 2 variables are needed by packageJobsApiServer step
+if [ -n "${GITHUB_PR_ID}" ]; then
+  export BRANCH_NAME=PR-${GITHUB_PR_ID}
+else
+  export BRANCH_NAME=${GITHUB_REF#refs/heads/}
+fi
+export BUILD_NUMBER=${GITHUB_RUN_NUMBER}
 ./bootstrap_gradlew.sh
 ./gradlew packageJobsApiServer
 if [ ! -f "${REPO_ROOT_DIR}/jobs-zowe-server-package/build/distributions/jobs-api-package.zip" ]; then

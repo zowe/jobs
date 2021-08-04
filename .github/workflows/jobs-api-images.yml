@@ -17,6 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+
       - uses: zowe-actions/shared-actions/envvars-global@main
 
       - uses: zowe-actions/shared-actions/docker-prepare@main
@@ -38,6 +43,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
 
       - uses: zowe-actions/shared-actions/envvars-global@main
 
@@ -68,6 +78,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
+
       - uses: zowe-actions/shared-actions/envvars-global@main
 
       - uses: zowe-actions/shared-actions/docker-prepare@main
@@ -90,6 +105,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
 
       - uses: zowe-actions/shared-actions/envvars-global@main
 
@@ -115,6 +135,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
 
       - uses: zowe-actions/shared-actions/envvars-global@main
 
@@ -147,6 +172,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: '8'
 
       - uses: zowe-actions/shared-actions/envvars-global@main
 
