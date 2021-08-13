@@ -25,10 +25,6 @@ LABEL name="Jobs API" \
       description="This Zowe component provides RESTful APIs to interact with jobs running on z/OS"
 
 ##################################
-# environments
-ENV ZOWE_COMPONENT_ID=jobs-api
-
-##################################
 # switch context
 USER zowe
 WORKDIR /component
