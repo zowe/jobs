@@ -52,6 +52,7 @@ WORK_DIR=tmp
 echo ">>>>> prepare basic files"
 cd "${REPO_ROOT_DIR}"
 package_version=$(cat gradle.properties | grep version= | awk -F= '{print $2}')
+package_release=$(echo "${package_version}" | awk -F. '{print $1;}')
 echo "    version: ${package_version}"
 
 ###############################
@@ -63,7 +64,7 @@ if [ ! -f Dockerfile ]; then
   echo "Error: Dockerfile file is missing."
   exit 2
 fi
-cat Dockerfile | sed -e "s#0\.0\.0#${package_version}#" > "${linux_distro}/${cpu_arch}/Dockerfile"
+cat Dockerfile | sed -e "s#version=\"0\.0\.0\"#version=\"${package_version}\"#" -e "s#release=\"0\"#release=\"${package_release}\"#" > "${linux_distro}/${cpu_arch}/Dockerfile"
 
 ###############################
 echo ">>>>> clean up folder"
