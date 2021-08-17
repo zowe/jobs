@@ -7,7 +7,7 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
-# Copyright IBM Corporation 2018, 2020
+# Copyright IBM Corporation 2018, 2021
 ################################################################################
 
 # Variables required on shell:
@@ -39,7 +39,7 @@ _BPX_JOBNAME=${ZOWE_PREFIX}${COMPONENT_CODE} java \
   -Dibm.serversocket.recover=true \
   -Dfile.encoding=UTF-8 \
   -Djava.io.tmpdir=/tmp \
-  -Dserver.port=${JOBS_API_PORT:-8080} \
+  -Dserver.port=${JOBS_API_PORT:-8545} \
   -Dserver.ssl.keyAlias="${KEY_ALIAS}" \
   -Dserver.ssl.keyStore="${KEYSTORE}" \
   -Dserver.ssl.keyStorePassword="${KEYSTORE_PASSWORD}" \

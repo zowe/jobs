@@ -24,7 +24,7 @@ Image `zowe-docker-release.jfrog.io/ompzowe/jobs-api:latest` should be able to r
 
 Other environment variable(s) can be used:
 
-- `JOBS_API_PORT`: starting port, default is `8080`.
+- `JOBS_API_PORT`: starting port, default is `8545`.
 - `ZOWE_EXPLORER_HOST`: domain name to access APIML Gateway, default is `localhost`.
 - `KEYSTORE_TYPE`: type of keystore, default is `PKCS12`.
 
@@ -34,7 +34,7 @@ Example commands:
 # pull image
 docker pull zowe-docker-release.jfrog.io/ompzowe/jobs-api:latest
 # start container
-docker run -it --rm -p 8080:8080 \
+docker run -it --rm -p 8545:8545 \
     -v $(pwd)/keystore:/home/zowe/keystore \
     -e KEYSTORE=/home/zowe/keystore/localhost/localhost.keystore.p12 \
     -e KEY_ALIAS=localhost \
