@@ -13,6 +13,7 @@ package org.zowe.jobs.tests;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 import org.zowe.api.common.errors.ApiError;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
+@Slf4j
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
@@ -31,9 +33,9 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
         Response r = deleteJob(job);
 
-        System.out.println("testDeleteJob response");
-        System.out.println(r.getStatusCode());
-        System.out.println(r.getBody().prettyPrint());
+        log.info("testDeleteJob response");
+        log.info(String.valueOf(r.getStatusCode()));
+        log.info(r.getBody().prettyPrint());
 
         r.then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
     }
@@ -59,9 +61,9 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
         
         Response r = deleteJobs(jobsList);
 
-        System.out.println("testDeleteJobs response");
-        System.out.println(r.getStatusCode());
-        System.out.println(r.getBody().prettyPrint());
+        log.info("testDeleteJobs response");
+        log.info(String.valueOf(r.getStatusCode()));
+        log.info(r.getBody().prettyPrint());
 
         r.then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
     }
@@ -78,9 +80,9 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
             .build();
         Response r = deleteJobs(jobsList);
 
-        System.out.println("testDeleteJobsOneInvalidJob response");
-        System.out.println(r.getStatusCode());
-        System.out.println(r.getBody().prettyPrint());
+        log.info("testDeleteJobsOneInvalidJob response");
+        log.info(String.valueOf(r.getStatusCode()));
+        log.info(r.getBody().prettyPrint());
 
         r.then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
