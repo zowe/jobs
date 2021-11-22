@@ -86,7 +86,9 @@ public abstract class AbstractJobsController {
     public ResponseEntity<Void> purgeJob(
             @ApiParam(value = "Job name", required = true) @PathVariable("jobName") String jobName,
             @ApiParam(value = "Job identifier", required = true) @PathVariable("jobId") String jobId) {
+        System.out.println("START OF DELETE JOB ENDPOINT");
         getJobsService().purgeJob(jobName, jobId);
+        System.out.println("END OF DELETE JOB ENDPOINT");
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
@@ -94,7 +96,9 @@ public abstract class AbstractJobsController {
     @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
     public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
+        System.out.println("START OF DELETE JOBS ENDPOINT");
         jobList.forEach(job -> getJobsService().purgeJob(job.getJobName(), job.getJobId()));
+        System.out.println("END OF DELETE JOBS ENDPOINT");
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
