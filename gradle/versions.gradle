@@ -15,6 +15,7 @@ ext {
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
     explorerApiCommonVersion = "1.1.8"
+    tomcatVersion = "9.0.54"
 
     libraries = [
             lombok                             : "org.projectlombok:lombok:${lombokVersion}",
@@ -32,6 +33,10 @@ ext {
             spring_security_core               : "org.springframework.security:spring-security-core:${springSecurityVersion}",
             spring_security_crypto             : "org.springframework.security:spring-security-crypto:${springSecurityVersion}",
             spring_security_web                : "org.springframework.security:spring-security-web:${springSecurityVersion}",
+
+            tomcat_annotations_api             : "org.apache.tomcat:tomcat-annotations-api:${tomcatVersion}",
+            tomcat_embed_core                  : "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+            tomcat_embed_websocket             : "org.apache.tomcat.embed:tomcat-embed-websocket:${tomcatVersion}",
 
             commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",
             json_path                          : "com.jayway.jsonpath:json-path:${jsonPathVersion}",
