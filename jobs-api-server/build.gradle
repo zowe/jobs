@@ -40,6 +40,12 @@ dependencies {
     testCompile libraries.explorer_api_common_test
 }
 
+allprojects {
+    configurations.all {
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
+}
+
 // We need to create a regular JAR (not spring boot) to resolve dependencies in jobs-tests
 // TODO: Is there a better way to handle dependency resolution for spring-based projects?
 jar {
