@@ -307,6 +307,7 @@ java -Xms32m -Xmx256m \
     -Dapiml.service.discoveryServiceUrls="https://localhost:${FVT_DISCOVERY_PORT}/eureka/" \
     -Dapiml.service.preferIpAddress=true \
     -Dapiml.service.allowEncodedSlashes=true \
+    -Dspring.profiles.include=debug \
     -Denvironment.ipAddress=127.0.0.1 \
     -Dapiml.gateway.timeoutMillis=30000 \
     -Dapiml.security.ssl.verifySslCertificatesOfServices=false \
