@@ -10,7 +10,6 @@
 package org.zowe.jobs.services.zosmf;
 
 import com.google.gson.JsonObject;
-
 import org.apache.http.Header;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.RequestBuilder;
@@ -36,7 +35,7 @@ public class PurgeJobZosmfRequestRunner extends AbstractZosmfJobsRequestRunner<V
 
     @Override
     protected int[] getSuccessStatus() {
-        return new int[] { HttpStatus.SC_ACCEPTED };
+        return new int[]{HttpStatus.SC_ACCEPTED, HttpStatus.SC_OK};
     }
 
     @Override
