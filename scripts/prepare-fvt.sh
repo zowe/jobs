@@ -308,6 +308,7 @@ java -Xms32m -Xmx256m \
     -Dapiml.service.preferIpAddress=true \
     -Dapiml.service.allowEncodedSlashes=true \
     -Dspring.profiles.include=debug \
+    -Dapiml.security.jwtInitializerTimeout=10 \
     -Denvironment.ipAddress=127.0.0.1 \
     -Dapiml.gateway.timeoutMillis=30000 \
     -Dapiml.security.ssl.verifySslCertificatesOfServices=false \
