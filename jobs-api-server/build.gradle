@@ -25,6 +25,9 @@ dependencies {
     compile libraries.springFox
     compile libraries.springFoxSwagger2
     compile libraries.springFoxSwaggerUI
+    compile libraries.tomcat_annotations_api
+    compile libraries.tomcat_embed_core
+    compile libraries.tomcat_embed_websocket
     compile libraries.lombok
     annotationProcessor libraries.lombok
     compile libraries.explorer_api_common
@@ -35,6 +38,12 @@ dependencies {
     testCompile libraries.power_mock_junit4_rule
     testCompile libraries.mockito_core
     testCompile libraries.explorer_api_common_test
+}
+
+allprojects {
+    configurations.all {
+        exclude group: 'org.glassfish', module: 'jakarta.el'
+    }
 }
 
 // We need to create a regular JAR (not spring boot) to resolve dependencies in jobs-tests
