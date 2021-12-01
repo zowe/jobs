@@ -338,7 +338,6 @@ echo
 ################################################################################
 echo "[${SCRIPT_NAME}] start APIML gateway server"
 # Hint: assign -Dspring.profiles.include=debug if we want to show debug level APIML logs
-# -Xquickstart \
 java -Xms32m -Xmx256m \
     -Dibm.serversocket.recover=true \
     -Dfile.encoding=UTF-8 \

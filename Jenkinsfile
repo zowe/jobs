@@ -124,7 +124,7 @@ node('zowe-jenkins-agent') {
           }
         }
         // give it a little time to start the server
-        sleep time: 10, unit: 'MINUTES'
+        sleep time: 2, unit: 'MINUTES'
 
         echo "Starting test ..."
         try {
@@ -142,8 +142,7 @@ node('zowe-jenkins-agent') {
                 -Pserver.username=${USERNAME} \
                 -Pserver.password=${PASSWORD} \
                 -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-                -Ptest.version=1 \
-                -i"""
+                -Ptest.version=1"""
             echo "Testing version 2 - v2 JWT"
             sh """./gradlew runIntegrationTests \
                 -Pserver.host=localhost \
@@ -151,8 +150,7 @@ node('zowe-jenkins-agent') {
                 -Pserver.username=${USERNAME} \
                 -Pserver.password=${PASSWORD} \
                 -Pserver.test.directory=${params.INTEGRATION_TEST_DIRECTORY_ROOT}/${uniqueBuildId} \
-                -Ptest.version=2 \
-                -i"""
+                -Ptest.version=2"""
           }          
         } catch (e) {
           echo "Error with integration test: ${e}"

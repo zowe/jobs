@@ -11,9 +11,6 @@
 package org.zowe.jobs.tests;
 
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.HttpStatus;
 import org.junit.Test;
@@ -26,19 +23,12 @@ import java.util.ArrayList;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@Slf4j
 public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
 
     @Test
     public void testDeleteJob() throws Exception {
         Job job = submitJobAndPoll(JOB_IEFBR14, JobStatus.OUTPUT);
-        Response r = deleteJob(job);
-
-        log.info("testDeleteJob response");
-        log.info(String.valueOf(r.getStatusCode()));
-        log.info(r.getBody().prettyPrint());
-
-        r.then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
+        deleteJob(job).then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
     }
 
     @Test
@@ -60,13 +50,7 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
         jobsList.add(new SimpleJob(job.getJobName(), job.getJobId()));
         jobsList.add(new SimpleJob(job2.getJobName(), job2.getJobId()));
         
-        Response r = deleteJobs(jobsList);
-
-        log.info("testDeleteJobs response");
-        log.info(String.valueOf(r.getStatusCode()));
-        log.info(r.getBody().prettyPrint());
-
-        r.then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
+        deleteJobs(jobsList).then().statusCode(HttpStatus.SC_NO_CONTENT).body(equalTo(""));
     }
     
     @Test
@@ -79,13 +63,7 @@ public class JobDeleteIntegrationTest extends AbstractJobsIntegrationTest {
         ApiError expectedError = ApiError.builder().status(org.springframework.http.HttpStatus.NOT_FOUND)
             .message(String.format("No job with name '%s' and id '%s' was found", job2.getJobName(), job2.getJobId()))
             .build();
-        Response r = deleteJobs(jobsList);
-
-        log.info("testDeleteJobsOneInvalidJob response");
-        log.info(String.valueOf(r.getStatusCode()));
-        log.info(r.getBody().prettyPrint());
-
-        r.then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
+        deleteJobs(jobsList).then().statusCode(expectedError.getStatus().value()).contentType(ContentType.JSON)
             .body("status", equalTo(expectedError.getStatus().name()))
             .body("message", equalTo(expectedError.getMessage()));
     }
