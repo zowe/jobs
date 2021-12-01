@@ -42,3 +42,8 @@ bin/
 
 # VS Code
 .vscode/
+
+# FVT test files
+.fvt
+.ehcache-diskstore.lock
+invalidated*.data
