@@ -22,16 +22,9 @@ node('zowe-jenkins-agent') {
   // we have extra parameters for integration test
   pipeline.addBuildParameters(
     string(
-      name: 'INTEGRATION_TEST_APIML_BUILD',
-      description: 'APIML build for integration test',
-      defaultValue: 'libs-release-local/org/zowe/apiml/sdk/zowe-install/*/zowe-install-*.zip',
-      trim: true,
-      required: true
-    ),
-    string(
       name: 'INTEGRATION_TEST_ZOSMF_HOST',
       description: 'z/OSMF server for integration test',
-      defaultValue: 'zzow01.zowe.marist.cloud',
+      defaultValue: 'zzow04.zowe.marist.cloud',
       trim: true,
       required: true
     ),
@@ -46,7 +39,7 @@ node('zowe-jenkins-agent') {
       name: 'INTEGRATION_TEST_ZOSMF_CREDENTIAL',
       description: 'z/OSMF credential for integration test',
       credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
-      defaultValue: 'ssh-marist-server-zzow01-zowep',
+      defaultValue: 'ssh-marist-server-credentialP',
       required: true
     ),
     string(
@@ -67,7 +60,7 @@ node('zowe-jenkins-agent') {
       name: 'INTEGRATION_TEST_DIRECTORY_INIT_USER',
       description: 'z/OSMF credential to initialize integration test folders / files',
       credentialType: 'com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl',
-      defaultValue: 'ssh-marist-server-zzow01-zowep',
+      defaultValue: 'ssh-marist-server-credentialP',
       required: true
     )
   )
@@ -127,7 +120,7 @@ node('zowe-jenkins-agent') {
             "FVT_SERVER_DIRECTORY_ROOT=${params.INTEGRATION_TEST_DIRECTORY_ROOT}",
             "FVT_UID=${uniqueBuildId}"
           ]) {
-            sh "scripts/prepare-fvt.sh '${params.INTEGRATION_TEST_APIML_BUILD}'"
+            sh "scripts/prepare-fvt.sh"
           }
         }
         // give it a little time to start the server
