@@ -1,8 +1,10 @@
 name: Publish branch
 on:
   push: # run on push to any branch except master
-    branches:
-      - "!master"
+    branches-ignore:
+      - master
+
+# TODO add images here
 
 jobs:
   publish:

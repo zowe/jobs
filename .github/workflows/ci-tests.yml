@@ -1,0 +1,68 @@
+name: CI Testing
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  BuildAndTest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: ./.github/actions/setup
+
+      - name: Build with Gradle
+        run: >
+          ./gradlew build
+
+      - name: Unit test with Gradle
+        run: >
+          ./gradlew coverage
+
+      # TODO upload artifacts - see Jenkinsfile
+
+      # TODO prep integration tests
+
+      # TODO integration tests v1
+
+      # TODO integration tests v2 - can these be broken into other jobs or even workflows?
+
+      # TODO upload artifacts of integration tests - do these and unit tests in one step with if always()?
+
+      - uses: ./.github/actions/teardown
+
+  sonarQubeScan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: ./.github/actions/setup
+        with:
+          jdkVersion: 11
+
+      - name: Sonar scan with Gradle
+        run: >
+          ./gradlew --info coverage sonarqube
+          -Psonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
+          -Partifactory_user=$ARTIFACTORY_USERNAME -Partifactory_password=$ARTIFACTORY_PASSWORD
+        env:
+          ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+          ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - uses: ./.github/actions/teardown

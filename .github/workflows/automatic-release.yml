@@ -12,6 +12,8 @@ on:
         required: true
         default: 'patch'
 
+# TODO add images in each release workflow, or make each image release workflow
+
 jobs:
   release:
     runs-on: ubuntu-latest
