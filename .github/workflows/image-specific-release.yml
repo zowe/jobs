@@ -14,7 +14,12 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: ${{ github.head_ref }}
-      # TODO need to build and unit test
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Unit test with Gradle
+        run: ./gradlew coverage
 
   PublishImages:
     needs: BuildAndTest
