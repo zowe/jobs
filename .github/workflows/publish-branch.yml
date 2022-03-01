@@ -26,7 +26,7 @@ jobs:
 
       - name: Publish with Gradle
         run: >
-          ./gradlew publishAllVersions --info
+          ./gradlew packageJobsApiServer publishAllVersions
           -Pdeploy.username=$ARTIFACTORY_USERNAME -Pdeploy.password=$ARTIFACTORY_PASSWORD
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
