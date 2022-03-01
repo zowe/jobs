@@ -7,6 +7,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -14,13 +16,13 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      # TODO will need to follow the publish branch method, may be the exact same?
       - name: Release with Gradle
         run: >
-          ./gradlew publishAllVersions
+          ./gradlew packageJobsApiServer publishAllVersions
           -Pdeploy.username=$ARTIFACTORY_USERNAME -Pdeploy.password=$ARTIFACTORY_PASSWORD
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
           ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+          BUILD_NUMBER: ${{ github.run_number }}
 
       - uses: ./.github/actions/teardown
