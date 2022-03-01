@@ -1,16 +1,19 @@
-name: Specific Release
+name: Automatic release of binaries
 on:
   workflow_dispatch:
     inputs:
-      release_version:
-        description: 'The version that is going to be release'
+      scope:
+        description: 'The release scope.'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
         required: true
-      new_version:
-        description: 'The version that should be used as a new one after the release.'
-        required: true
+        default: 'patch'
 
 jobs:
-  release:
+  binary-release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,8 +25,7 @@ jobs:
       - name: Release with Gradle
         run: >
           ./gradlew release -Prelease.useAutomaticVersion=true
-          -Prelease.releaseVersion=${{ github.event.inputs.release_version }}
-          -Prelease.newVersion=${{ github.event.inputs.new_version }}
+          -Prelease.scope=${{ github.event.inputs.scope }}
           -Pdeploy.username=$ARTIFACTORY_USERNAME -Pdeploy.password=$ARTIFACTORY_PASSWORD
         env:
           ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}

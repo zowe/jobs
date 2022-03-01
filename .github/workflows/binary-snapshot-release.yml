@@ -1,4 +1,4 @@
-name: Snapshot Release
+name: Binary snapshot release
 on:
   push:
     branches:

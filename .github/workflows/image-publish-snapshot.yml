@@ -1,0 +1,20 @@
+name: Image publish snapshot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish-images:
+    needs: BuildAndTest
+    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@users/carson/migrate_to_gha # TODO change to master
+    with:
+      forceNoRelease: true
+    secrets:
+      registry-user: ${{ secrets.ARTIFACTORY_X_USERNAME }}
+      registry-password: ${{ secrets.ARTIFACTORY_X_PASSWORD }}
+      redhat-registry-user: ${{ secrets.REDHAT_DEVELOPER_USER }}
+      redhat-registry-password: ${{ secrets.REDHAT_DEVELOPER_PASSWORD }}
+      zlinux-host: ${{ secrets.ZLINUX_HOST }}
+      zlinux-ssh-user: ${{ secrets.ZLINUX_SSH_USER }}
+      zlinux-ssh-key: ${{ secrets.ZLINUX_SSH_KEY }}
+      zlinux-ssh-passphrase: ${{ secrets.ZLINUX_SSH_PASSPHRASE }}
