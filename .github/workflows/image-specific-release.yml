@@ -23,7 +23,7 @@ jobs:
 
   PublishImages:
     needs: BuildAndTest
-    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@users/carson/migrate_to_gha # TODO change to master
+    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@master
     with:
       version: ${{ github.event.inputs.release_version }}
     secrets:

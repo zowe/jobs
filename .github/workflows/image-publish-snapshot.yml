@@ -6,7 +6,7 @@ on:
 jobs:
   publish-images:
     needs: BuildAndTest
-    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@users/carson/migrate_to_gha # TODO change to master
+    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@master
     with:
       forceNoRelease: true
     secrets:
