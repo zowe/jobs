@@ -33,7 +33,7 @@ env:
   SSH_PORT: ${{ github.event.inputs.custom_ssh_port || 22 }}
   ZOSMF_HOST: ${{ github.event.inputs.custom_zosmf_host || 'zzow04.zowe.marist.cloud' }}
   ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
-  UID: jobs-integration-test-${{ github.run_id }}
+  #UID: jobs-integration-test-${{ github.run_id }}
 
 jobs:
   BuildAndTest:
@@ -43,12 +43,10 @@ jobs:
     services: # TODO use conformant containers
       discovery-service:
         image: ghcr.io/balhar-jakub/discovery-service:latest
-        volumes: # TODO need to mount with zosmf on marist registration
-          - /api-defs:/api-defs
+        volumes: # TODO need to mount with zosmf on marist registration, need to be able to change host/port for at least zosmf
+          - /__w/jobs/jobs/scripts/fvt:/api-defs
       gateway-service:
         image: ghcr.io/balhar-jakub/gateway-service:latest
-      mock-services:
-        image: ghcr.io/balhar-jakub/mock-services:latest
 
     steps:
       - uses: actions/checkout@v2
@@ -63,12 +61,8 @@ jobs:
       - name: Unit test with Gradle
         run: ./gradlew coverage
 
-      - name: Test apiml is up
-        run: |
-          echo $(curl https://gateway-service:7554/gateay/api/v1/)
-
       # TODO need a lock for integration testing? lock("jobs-integration-test-at-${params.INTEGRATION_TEST_ZOSMF_HOST}-${params.INTEGRATION_TEST_ZOSMF_PORT}") - could concurrency limitation help here?
-      # TODO run apiml in GHA not on marist? Maybe use containers in GHA to create a network? or apiml runs on marist and -Pserver.host use marist host
+      # need a lock if running apiml locally?
 #      - name: Setup APIML for integration tests
 #        run: |
 #          chmod +x scripts/prepare-fvt.sh
@@ -79,30 +73,27 @@ jobs:
 #          FVT_ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
 #          FVT_SERVER_SSH_HOST: ${{ env.ZOSMF_HOST }}
 #          FVT_SERVER_SSH_PORT: ${{ env.SSH_PORT }}
-#          FVT_SERVER_SSH_USERNAME: ${{ secrets.MARIST_USERNAME }}
-#          FVT_SERVER_SSH_PASSWORD: ${{ secrets.MARIST_PASSWORD }}
+#          FVT_SERVER_SSH_USERNAME: ${{ secrets.SSH_MARIST_USERNAMEP }}
+#          FVT_SERVER_SSH_PASSWORD: ${{ secrets.SSH_MARIST_PASSWORDP }}
 #          FVT_SERVER_DIRECTORY_ROOT: ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}
 #          FVT_UID: ${{ env.UID }}
 
-# TODO I think can remove server.test.directory? And therefore cleanup? Definitely can stop the cleanup if apiml is local
       - name: Intregration tests for v1 - LTPA
         run: >
-          ./gradlew runIntegrationTests
+          ./gradlew runIntegrationTests --info
           -Pserver.host=gateway-service
           -Pserver.port=7554
-          -Pserver.username=${{ secrets.MARIST_USERNAME }}
-          -Pserver.password=${ secrets.MARIST_PASSWORD }}
-          -Pserver.test.directory=${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${ env.UID }}
+          -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
+          -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=1
 
       - name: Intregration tests for v2 - JWT
         run: >
-          ./gradlew runIntegrationTests
+          ./gradlew runIntegrationTests --info
           -Pserver.host=gateway-service
           -Pserver.port=7554
-          -Pserver.username=${{ secrets.MARIST_USERNAME }}
-          -Pserver.password=${ secrets.MARIST_PASSWORD }}
-          -Pserver.test.directory=${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${ env.UID }}
+          -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
+          -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=2
 
       - name: Store test results
@@ -116,17 +107,17 @@ jobs:
             jobs-tests/build/reports/tests/test-1
             jobs-tests/build/reports/tests/test-2
 
-      - name: Display integration test logs
-        if: always()
-        run: |
-          find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'
+#      - name: Display integration test logs
+#        if: always()
+#        run: |
+#          find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'
 
-      - name: Clean up integration test directory
-        if: always()
-        run: |
-          SSHPASS=${{ secrets.MARIST_PASSWORD }} sshpass -e ssh -tt -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p ${{ env.SSH_PORT }} ${{ secrets.MARIST_USERNAME }}@${{ env.ZOSMF_HOST }} << EOF
-          cd ~
-          [ -d "${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}" ] && rm -fr ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}
+#      - name: Clean up integration test directory
+#        if: always()
+#        run: |
+#          SSHPASS=${{ secrets.SSH_MARIST_PASSWORDP }} sshpass -e ssh -tt -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p ${{ env.SSH_PORT }} ${{ secrets.SSH_MARIST_USERNAMEP }}@${{ env.ZOSMF_HOST }} << EOF
+#          cd ~
+#          [ -d "${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}" ] && rm -fr ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}
 
       - uses: ./.github/actions/teardown
         if: always()
