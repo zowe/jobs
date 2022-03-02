@@ -33,21 +33,10 @@ env:
   SSH_PORT: ${{ github.event.inputs.custom_ssh_port || 22 }}
   ZOSMF_HOST: ${{ github.event.inputs.custom_zosmf_host || 'zzow04.zowe.marist.cloud' }}
   ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
-  #UID: jobs-integration-test-${{ github.run_id }}
 
 jobs:
-  BuildAndTest:
+  UnitTest:
     runs-on: ubuntu-latest
-    container: ubuntu:latest
-
-    services: # TODO use conformant containers
-      discovery-service:
-        image: ghcr.io/balhar-jakub/discovery-service:latest
-        volumes: # TODO need to mount with zosmf on marist registration, need to be able to change host/port for at least zosmf
-          - /__w/jobs/jobs/scripts/fvt:/api-defs
-      gateway-service:
-        image: ghcr.io/balhar-jakub/gateway-service:latest
-
     steps:
       - uses: actions/checkout@v2
         with:
@@ -61,24 +50,42 @@ jobs:
       - name: Unit test with Gradle
         run: ./gradlew coverage
 
-      # TODO need a lock for integration testing? lock("jobs-integration-test-at-${params.INTEGRATION_TEST_ZOSMF_HOST}-${params.INTEGRATION_TEST_ZOSMF_PORT}") - could concurrency limitation help here?
-      # need a lock if running apiml locally?
-#      - name: Setup APIML for integration tests
-#        run: |
-#          chmod +x scripts/prepare-fvt.sh
-#          ./scripts/prepare-fvt.sh
-#          sleep 2m # Let setup finish
-#        env:
-#          FVT_ZOSMF_HOST: ${{ env.ZOSMF_HOST }}
-#          FVT_ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
-#          FVT_SERVER_SSH_HOST: ${{ env.ZOSMF_HOST }}
-#          FVT_SERVER_SSH_PORT: ${{ env.SSH_PORT }}
-#          FVT_SERVER_SSH_USERNAME: ${{ secrets.SSH_MARIST_USERNAMEP }}
-#          FVT_SERVER_SSH_PASSWORD: ${{ secrets.SSH_MARIST_PASSWORDP }}
-#          FVT_SERVER_DIRECTORY_ROOT: ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}
-#          FVT_UID: ${{ env.UID }}
+      - name: Store test results
+        uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: UnitTestResults
+          path: |
+            build/reports/jacoco/jacocoFullReport/html
+            jobs-api-server/build/reports/tests/test
 
-      - name: Intregration tests for v1 - LTPA
+      - uses: ./.github/actions/teardown
+
+  IntegrationTest:
+    runs-on: ubuntu-latest
+    container: ubuntu:latest
+
+    services: # TODO use conformant containers?
+      discovery-service:
+        image: ghcr.io/balhar-jakub/discovery-service:latest
+        volumes: # TODO need to mount with zosmf on marist registration, need to be able to change host/port for at least zosmf
+          - /__w/jobs/jobs/scripts/fvt:/docker/api-defs
+      gateway-service:
+        image: ghcr.io/balhar-jakub/gateway-service:latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: ./.github/actions/setup
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # TODO need a lock on marist for zosmf?
+
+      - name: Integration tests for v1 - LTPA
         run: >
           ./gradlew runIntegrationTests --info
           -Pserver.host=gateway-service
@@ -87,7 +94,7 @@ jobs:
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=1
 
-      - name: Intregration tests for v2 - JWT
+      - name: Integration tests for v2 - JWT
         run: >
           ./gradlew runIntegrationTests --info
           -Pserver.host=gateway-service
@@ -100,27 +107,12 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: TestResults
+          name: IntegrationTestResults
           path: |
-            build/reports/jacoco/jacocoFullReport/html
-            jobs-api-server/build/reports/tests/test
             jobs-tests/build/reports/tests/test-1
             jobs-tests/build/reports/tests/test-2
 
-#      - name: Display integration test logs
-#        if: always()
-#        run: |
-#          find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'
-
-#      - name: Clean up integration test directory
-#        if: always()
-#        run: |
-#          SSHPASS=${{ secrets.SSH_MARIST_PASSWORDP }} sshpass -e ssh -tt -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p ${{ env.SSH_PORT }} ${{ secrets.SSH_MARIST_USERNAMEP }}@${{ env.ZOSMF_HOST }} << EOF
-#          cd ~
-#          [ -d "${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}" ] && rm -fr ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}
-
       - uses: ./.github/actions/teardown
-        if: always()
 
   sonarQubeScan:
     runs-on: ubuntu-latest
