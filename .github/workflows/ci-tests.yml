@@ -114,7 +114,7 @@ jobs:
 
       - uses: ./.github/actions/teardown
 
-  sonarQubeScan:
+  SonarQubeScan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
