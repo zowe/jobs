@@ -45,5 +45,6 @@ bin/
 
 # FVT test files
 .fvt
+.apiml
 .ehcache-diskstore.lock
 invalidated*.data
