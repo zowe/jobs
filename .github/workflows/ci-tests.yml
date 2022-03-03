@@ -150,7 +150,8 @@ jobs:
 
       - name: Sonar scan with Gradle
         run: >
-          ./gradlew build coverage sonarqube
+          ./gradlew compileJava compileTestJava sonarqube --info
+          -x test
           -Psonar.host.url=$SONAR_HOST_URL -Dsonar.login=$SONAR_TOKEN
           -Partifactory_user=$ARTIFACTORY_USERNAME -Partifactory_password=$ARTIFACTORY_PASSWORD
         env:
