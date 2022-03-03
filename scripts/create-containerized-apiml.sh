@@ -171,10 +171,10 @@ echo "[${SCRIPT_NAME}] create static registration files"
 cd "${ROOT_DIR}"
 sed -e "s|{ZOSMF_HOST}|${ZOSMF_HOST}|g" \
   -e "s|{ZOSMF_PORT}|${ZOSMF_PORT}|g" \
-  "scripts/zosmf.yml.template" > "${WORKSPACE}/${API_DEFS_DIR}/zosmf.yml"
+  "scripts/containerized-apiml/zosmf.yml.template" > "${WORKSPACE}/${API_DEFS_DIR}/zosmf.yml"
 sed -e "s|{JOBS_HOST}|${JOBS_HOST}|g" \
   -e "s|{JOBS_PORT}|${JOBS_PORT}|g" \
-  "scripts/jobs-api.yml.template" > "${WORKSPACE}/${API_DEFS_DIR}/jobs-api.yml"
+  "scripts/containerized-apiml/jobs-api.yml.template" > "${WORKSPACE}/${API_DEFS_DIR}/jobs-api.yml"
 echo "[${SCRIPT_NAME}] - static registration files prepared:"
 ls -l "${WORKSPACE}/${API_DEFS_DIR}"
 echo
@@ -185,7 +185,7 @@ cd "${ROOT_DIR}"
 sed -e "s|{WORKSPACE}|${WORKSPACE}|g" \
   -e "s|{DISCOVERY_PORT}|${DISCOVERY_PORT}|g" \
   -e "s|{GATEWAY_PORT}|${GATEWAY_PORT}|g" \
-  "scripts/docker-compose.yml.template" > "${WORKSPACE}/docker-compose.yml"
+  "scripts/containerized-apiml/docker-compose.yml.template" > "${WORKSPACE}/docker-compose.yml"
 docker-compose -f "${WORKSPACE}/docker-compose.yml" up -d
 ###################################################################
 echo "[${SCRIPT_NAME}] done."
