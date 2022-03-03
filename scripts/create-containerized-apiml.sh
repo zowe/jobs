@@ -15,7 +15,7 @@
 # (DONE) 3. add static registration for jobs and zosmf (marist)
 # (DONE) 4. see jobs endpoint hit from containers
 # 5. get GW and DS running with generated keystore
-# 6. Run docker-compose from this script and parameterize the file so the script variables can be used
+# (DONE) 6. Run docker-compose from this script and parameterize the file so the script variables can be used
 # 7. put this into workflows, see it work in GHA - need to run this prep before using service containers, or manually start containers via this script
 ################################################################################
 # Run containerized APIML prepared for Jobs API
@@ -33,8 +33,6 @@ WORKSPACE="${ROOT_DIR}/${WORKSPACE_SHORT}"
 KEYSTORE_DIR=keystore
 API_DEFS_DIR=api-defs
 LOGS_DIR=logs
-DISCOVERY_PORT=7553
-GATEWAY_PORT=7554
 ###################################################################
 # TODO remove, setting values for testing
 ZOSMF_HOST=tvt5003.svl.ibm.com
@@ -49,6 +47,12 @@ fi
 if [ -z "${ZOSMF_PORT}" ]; then
   echo "[${SCRIPT_NAME}][error] environment variable ZOSMF_PORT is required."
   exit 1
+fi
+if [ -z "${DISCOVERY_PORT}" ]; then
+  DISCOVERY_PORT=7553
+fi
+if [ -z "${GATEWAY_PORT}" ]; then
+  GATEWAY_PORT=7554
 fi
 if [ -z "${JOBS_PORT}" ]; then
   JOBS_PORT=8443
@@ -176,8 +180,13 @@ ls -l "${WORKSPACE}/${API_DEFS_DIR}"
 echo
 ###################################################################
 #################### START APIML CONTAINERS #######################
-cd $SCRIPT_PWD
-docker-compose up &
+echo "[${SCRIPT_NAME}] create docker-compose file and run"
+cd "${ROOT_DIR}"
+sed -e "s|{WORKSPACE}|${WORKSPACE}|g" \
+  -e "s|{DISCOVERY_PORT}|${DISCOVERY_PORT}|g" \
+  -e "s|{GATEWAY_PORT}|${GATEWAY_PORT}|g" \
+  "scripts/docker-compose.yml.template" > "${WORKSPACE}/docker-compose.yml"
+docker-compose -f "${WORKSPACE}/docker-compose.yml" up -d
 ###################################################################
 echo "[${SCRIPT_NAME}] done."
 exit 0

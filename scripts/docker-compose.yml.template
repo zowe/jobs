@@ -4,26 +4,27 @@ services:
     image: zowe-docker-release.jfrog.io/ompzowe/discovery-service:latest
     volumes:
       - /Users/carson/Documents/Code/api-layer/keystore:/home/zowe/keystore
-      - /Users/carson/Documents/Code/jobs/.apiml/api-defs:/api-defs
+      - {WORKSPACE}/api-defs:/api-defs
     ports:
-      - "7553:7553"
+      - "{DISCOVERY_PORT}:{DISCOVERY_PORT}"
     environment:
-      - STATIC_DEF_CONFIG_DIR=/api-defs
       - KEYSTORE=/home/zowe/keystore/localhost/localhost.keystore.p12
       - KEY_ALIAS=localhost
       - KEYSTORE_PASSWORD=password
       - TRUSTSTORE=/home/zowe/keystore/localhost/localhost.truststore.p12
       - CMMN_LB=apiml-common-lib/bin/api-layer-lite-lib-all.jar
       - WORKSPACE_DIR=/component
-      - ZOWE_EXPLORER_HOST=discovery-service
       - APIML_DEBUG_MODE_ENABLED=true
+      - ZOWE_EXPLORER_HOST=discovery-service
+      - ZWE_DISCOVERY_SERVICES_LIST=https://discovery-service:{DISCOVERY_PORT}/eureka/
+      - STATIC_DEF_CONFIG_DIR=/api-defs
       - APIML_SERVICE_HOSTNAME=discovery-service
   gateway-service:
     image: zowe-docker-release.jfrog.io/ompzowe/gateway-service:latest
     volumes:
       - /Users/carson/Documents/Code/api-layer/keystore:/home/zowe/keystore
     ports:
-      - "7554:7554"
+      - "{GATEWAY_PORT}:{GATEWAY_PORT}"
     environment:
       - KEYSTORE=/home/zowe/keystore/localhost/localhost.keystore.p12
       - KEY_ALIAS=localhost
@@ -33,4 +34,4 @@ services:
       - WORKSPACE_DIR=/component
       - APIML_DEBUG_MODE_ENABLED=true
       - ZOWE_EXPLORER_HOST=gateway-service
-      - ZWE_DISCOVERY_SERVICES_LIST=https://discovery-service:7553/eureka/
+      - ZWE_DISCOVERY_SERVICES_LIST=https://discovery-service:{DISCOVERY_PORT}/eureka/
