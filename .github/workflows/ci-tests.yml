@@ -10,7 +10,7 @@ on:
       - master
   workflow_dispatch:
     inputs:
-      custom_zosmf_host:
+      custom_marist_host:
         description: ZOSMF host
         type: string
         required: false
@@ -18,22 +18,14 @@ on:
         description: ZOSMF port
         type: string
         required: false
-      custom_ssh_port:
-        description: SSH port
-        type: string
-        required: false
-      custom_directory_root:
-        description: Testing root directory
-        type: string
-        required: false
 
 env:
   # TODO need a way to switch the marist credentials - use a GHA environment to hold host/ports and credentials?
-  INTEGRATION_TEST_DIRECTORY_ROOT: ${{ github.event.inputs.custom_directory_root || '/ZOWE/tmp'  }}
-  SSH_PORT: ${{ github.event.inputs.custom_ssh_port || 22 }}
-  ZOSMF_HOST: ${{ github.event.inputs.custom_zosmf_host || 'zzow04.zowe.marist.cloud' }}
+  MARIST_HOST: ${{ github.event.inputs.custom_marist_host || 'zzow04.zowe.marist.cloud' }}
   ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
-  UID: jobs-integration-test-${{ github.run_id }}
+  GATEWAY_HOST: gateway-service
+  GATEWAY_PORT: 7554
+  JOBS_PORT: 8443
 
 jobs:
   UnitTest:
@@ -64,7 +56,6 @@ jobs:
 
   IntegrationTest:
     runs-on: ubuntu-latest
-    container: ubuntu:latest
 
     steps:
       - uses: actions/checkout@v2
@@ -74,29 +65,39 @@ jobs:
       - uses: ./.github/actions/setup
 
       # TODO need a lock on marist?
-      - name: Setup APIML on marist for integration tests
-        run: |
-          chmod +x scripts/prepare-fvt.sh
-          ./scripts/prepare-fvt.sh
-          sleep 2m # Let setup finish
-        env:
-          FVT_ZOSMF_HOST: ${{ env.ZOSMF_HOST }}
-          FVT_ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
-          FVT_SERVER_SSH_HOST: ${{ env.ZOSMF_HOST }}
-          FVT_SERVER_SSH_PORT: ${{ env.SSH_PORT }}
-          FVT_SERVER_SSH_USERNAME: ${{ secrets.MARIST_USERNAME }}
-          FVT_SERVER_SSH_PASSWORD: ${{ secrets.MARIST_PASSWORD }}
-          FVT_SERVER_DIRECTORY_ROOT: ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}
-          FVT_UID: ${{ env.UID }}
 
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Run APIML containers
+        run: |
+          chmod +x scripts/create-containerized-apiml.sh
+          ./scripts/create-containerized-apiml.sh
+          sleep 1m # Let containers set up
+        env:
+          ZOSMF_HOST: ${{ env.MARIST_HOST }}
+          ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
+          GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
+          JOBS_PORT: ${{ env.JOBS_PORT }}
+
+      - name: Run Jobs API server
+        run: >
+          java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8
+          -Djava.io.tmpdir=/tmp
+          -Dserver.port=${{ env.JOBS_PORT }}
+          -Dserver.ssl.keyAlias=localhost
+          -Dserver.ssl.keyStore=localhost.keystore.p12
+          -Dserver.ssl.keyStorePassword=password
+          -Dserver.ssl.keyStoreType=PKCS12
+          -Dconnection.httpsPort=${{ env.GATEWAY_PORT }}
+          -Dconnection.ipAddress=${{ env.GATEWAY_HOST }}
+          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar
+
       - name: Integration tests for v1 - LTPA
         run: >
           ./gradlew runIntegrationTests --info
-          -Pserver.host=gateway-service
-          -Pserver.port=7554
+          -Pserver.host=${{ env.GATEWAY_HOST }}
+          -Pserver.port=${{ env.GATEWAY_PORT }}
           -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=1
@@ -104,23 +105,15 @@ jobs:
       - name: Integration tests for v2 - JWT
         run: >
           ./gradlew runIntegrationTests --info
-          -Pserver.host=gateway-service
-          -Pserver.port=7554
+          -Pserver.host=${{ env.GATEWAY_HOST }}
+          -Pserver.port=${{ env.GATEWAY_PORT }}
           -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=2
 
-      - name: Display integration test logs
+      - name: Output APIML logs
         if: always()
-        run: |
-          find .fvt/logs -type f | xargs -i sh -c 'echo \">>>>>>>>>>>>>>>>>>>>>>>> {} >>>>>>>>>>>>>>>>>>>>>>>\" && cat {}'
-
-      - name: Clean up integration test directory
-        if: always()
-        run: |
-          SSHPASS=${{ secrets.MARIST_PASSWORD }} sshpass -e ssh -tt -o StrictHostKeyChecking=no -o PubkeyAuthentication=no -p ${{ env.SSH_PORT }} ${{ secrets.MARIST_USERNAME }}@${{ env.ZOSMF_HOST }} << EOF
-          cd ~
-          [ -d "${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}" ] && rm -fr ${{ env.INTEGRATION_TEST_DIRECTORY_ROOT }}/${{ env.UID }}
+        run: docker-compose -f .apiml/docker-compose.yml logs
 
       - name: Store test results
         uses: actions/upload-artifact@v2
