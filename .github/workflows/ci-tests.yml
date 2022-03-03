@@ -23,7 +23,6 @@ env:
   # TODO need a way to switch the marist credentials - use a GHA environment to hold host/ports and credentials?
   MARIST_HOST: ${{ github.event.inputs.custom_marist_host || 'zzow04.zowe.marist.cloud' }}
   ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
-  GATEWAY_HOST: gateway-service
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443
 
@@ -73,7 +72,6 @@ jobs:
         run: |
           chmod +x scripts/create-containerized-apiml.sh
           ./scripts/create-containerized-apiml.sh
-          sleep 1m # Let containers set up
         env:
           ZOSMF_HOST: ${{ env.MARIST_HOST }}
           ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
@@ -86,17 +84,28 @@ jobs:
           -Djava.io.tmpdir=/tmp
           -Dserver.port=${{ env.JOBS_PORT }}
           -Dserver.ssl.keyAlias=localhost
-          -Dserver.ssl.keyStore=localhost.keystore.p12
+          -Dserver.ssl.keyStore=.apiml/keystore/localhost.keystore.p12
           -Dserver.ssl.keyStorePassword=password
           -Dserver.ssl.keyStoreType=PKCS12
           -Dconnection.httpsPort=${{ env.GATEWAY_PORT }}
-          -Dconnection.ipAddress=${{ env.GATEWAY_HOST }}
-          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar
+          -Dconnection.ipAddress=localhost
+          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar &
+
+      - name: Validate APIML setup
+        run: |
+          sleep 2m # let APIML finish setting up
+          gwHealth=$(curl -k -sS https://localhost:${{ env.GATEWAY_PORT }}/application/health)
+          echo $gwHealth
+          gatewayUp=$(echo $gwHealth | awk -F{\"status\":\" '{print $2}' | awk -F\" '{print $1}')
+          if [ "$gatewayUp" != "UP" ]; then
+            echo ">>>>>Gateway is not up"
+            exit 1
+          fi
 
       - name: Integration tests for v1 - LTPA
         run: >
           ./gradlew runIntegrationTests --info
-          -Pserver.host=${{ env.GATEWAY_HOST }}
+          -Pserver.host=localhost
           -Pserver.port=${{ env.GATEWAY_PORT }}
           -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
@@ -105,7 +114,7 @@ jobs:
       - name: Integration tests for v2 - JWT
         run: >
           ./gradlew runIntegrationTests --info
-          -Pserver.host=${{ env.GATEWAY_HOST }}
+          -Pserver.host=localhost
           -Pserver.port=${{ env.GATEWAY_PORT }}
           -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
