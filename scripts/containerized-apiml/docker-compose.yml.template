@@ -3,15 +3,15 @@ services:
   discovery-service:
     image: zowe-docker-release.jfrog.io/ompzowe/discovery-service:latest
     volumes:
-      - /Users/carson/Documents/Code/api-layer/keystore:/home/zowe/keystore
+      - {WORKSPACE}/keystore:/home/zowe/keystore
       - {WORKSPACE}/api-defs:/api-defs
     ports:
       - "{DISCOVERY_PORT}:{DISCOVERY_PORT}"
     environment:
-      - KEYSTORE=/home/zowe/keystore/localhost/localhost.keystore.p12
+      - KEYSTORE=/home/zowe/keystore/localhost.keystore.p12
       - KEY_ALIAS=localhost
       - KEYSTORE_PASSWORD=password
-      - TRUSTSTORE=/home/zowe/keystore/localhost/localhost.truststore.p12
+      - TRUSTSTORE=/home/zowe/keystore/localhost.truststore.p12
       - CMMN_LB=apiml-common-lib/bin/api-layer-lite-lib-all.jar
       - WORKSPACE_DIR=/component
       - APIML_DEBUG_MODE_ENABLED=true
@@ -22,14 +22,14 @@ services:
   gateway-service:
     image: zowe-docker-release.jfrog.io/ompzowe/gateway-service:latest
     volumes:
-      - /Users/carson/Documents/Code/api-layer/keystore:/home/zowe/keystore
+      - {WORKSPACE}/keystore:/home/zowe/keystore
     ports:
       - "{GATEWAY_PORT}:{GATEWAY_PORT}"
     environment:
-      - KEYSTORE=/home/zowe/keystore/localhost/localhost.keystore.p12
+      - KEYSTORE=/home/zowe/keystore/localhost.keystore.p12
       - KEY_ALIAS=localhost
       - KEYSTORE_PASSWORD=password
-      - TRUSTSTORE=/home/zowe/keystore/localhost/localhost.truststore.p12
+      - TRUSTSTORE=/home/zowe/keystore/localhost.truststore.p12
       - CMMN_LB=apiml-common-lib/bin/api-layer-lite-lib-all.jar
       - WORKSPACE_DIR=/component
       - APIML_DEBUG_MODE_ENABLED=true

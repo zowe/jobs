@@ -9,14 +9,6 @@
 #
 # Copyright IBM Corporation 2020
 ###################################################################
-# TODO THE PLAN
-# (DONE) 1. rip out the cert generation from this script into another with appropriate temp default values for the above
-# (DONE) 2. add to that script the commands to run the GW and DS conformant containers using api-layer keystore
-# (DONE) 3. add static registration for jobs and zosmf (marist)
-# (DONE) 4. see jobs endpoint hit from containers
-# 5. get GW and DS running with generated keystore
-# (DONE) 6. Run docker-compose from this script and parameterize the file so the script variables can be used
-# 7. put this into workflows, see it work in GHA - need to run this prep before using service containers, or manually start containers via this script
 ################################################################################
 # Run containerized APIML prepared for Jobs API
 #
@@ -32,12 +24,7 @@ WORKSPACE_SHORT=.apiml
 WORKSPACE="${ROOT_DIR}/${WORKSPACE_SHORT}"
 KEYSTORE_DIR=keystore
 API_DEFS_DIR=api-defs
-LOGS_DIR=logs
 ###################################################################
-# TODO remove, setting values for testing
-ZOSMF_HOST=tvt5003.svl.ibm.com
-ZOSMF_PORT=443
-JOBS_HOST=host.docker.internal # used for host networking on mac, linux may not use this and instead want a host network, affecting docker compose
 ###################### VALIDATE PARAMETERS ########################
 echo "[${SCRIPT_NAME}] validate parameters"
 if [ -z "${ZOSMF_HOST}" ]; then
@@ -60,7 +47,7 @@ fi
 if [ -z "${JOBS_HOST}" ]; then
   JOBS_HOST=localhost
 fi
-if [ -z command -v docker-compose ]; then
+if [ -z $(command -v docker-compose) ]; then
   echo "[${SCRIPT_NAME}][error] docker-compose is required."
   exit 1
 fi
@@ -70,7 +57,6 @@ echo "[${SCRIPT_NAME}] prepare FVT workspace"
 rm -rf "${WORKSPACE}"
 mkdir -p "${WORKSPACE}/${KEYSTORE_DIR}"
 mkdir -p "${WORKSPACE}/${API_DEFS_DIR}"
-mkdir -p "${WORKSPACE}/${LOGS_DIR}"
 echo
 ###################################################################
 ################ PREPARE CERTIFICATES AND KEYSTORE ################
@@ -123,7 +109,7 @@ keytool -gencert -v \
   -keypass local_ca_password \
   -storepass local_ca_password \
   -storetype PKCS12 \
-  -ext "SAN=dns:localhost,ip:127.0.0.1" \
+  -ext "SAN=dns:localhost,dns:gateway-service,dns:discovery-service" \
   -ext "KeyUsage:critical=keyEncipherment,digitalSignature,nonRepudiation,dataEncipherment" \
   -ext "ExtendedKeyUsage=clientAuth,serverAuth" \
   -rfc \
@@ -152,16 +138,6 @@ keytool -importcert -v \
   -keystore "${WORKSPACE}/${KEYSTORE_DIR}/localhost.truststore.p12" \
   -storepass password \
   -storetype PKCS12
-echo "[${SCRIPT_NAME}] - Generates key pair for JWT token secret and exports the public key"
-keytool -genkeypair -v \
-  -alias jwtsecret \
-  -keyalg RSA -keysize 2048 \
-  -keystore "${WORKSPACE}/${KEYSTORE_DIR}/localhost.keystore.p12" \
-  -dname "CN=Zowe Service, OU=API Mediation Layer, O=Zowe Sample, L=Prague, S=Prague, C=CZ" \
-  -keypass password \
-  -storepass password \
-  -storetype PKCS12 \
-  -validity 3650
 echo "[${SCRIPT_NAME}] - certificates prepared:"
 ls -l "${WORKSPACE}/${KEYSTORE_DIR}"
 echo
