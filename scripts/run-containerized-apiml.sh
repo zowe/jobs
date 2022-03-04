@@ -44,8 +44,8 @@ fi
 if [ -z "${JOBS_PORT}" ]; then
   JOBS_PORT=8443
 fi
-if [ -z "${OS}" ]; then
-  OS="not-linux"
+if [ -z "${HOST_OS}" ]; then
+  HOST_OS="not-linux"
 fi
 if [ -z $(command -v docker-compose) ]; then
   echo "[${SCRIPT_NAME}][error] docker-compose is required."
