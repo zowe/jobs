@@ -4,11 +4,12 @@ on:
     branches-ignore:
       - master
 
+env:
+  BRANCH_NAME: ${{ github.ref_name }}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    env:
-      BRANCH_NAME: ${{ github.ref_name }}
     steps:
       - uses: actions/checkout@v2
         with:

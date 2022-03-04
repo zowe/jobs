@@ -2,10 +2,9 @@ name: Image publish snapshot
 
 on:
   workflow_dispatch:
-
+# TODO allow for a certain branch, need to set version
 jobs:
   publish-images:
-    needs: BuildAndTest
     uses: zowe/explorer-jobs/.github/workflows/build-images.yml@master
     with:
       forceNoRelease: true
