@@ -1,0 +1,15 @@
+{
+  "lockAcquiredTime": "Fri Mar 04 2022 21:07:49 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1646428069954275860",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "users/carson/migrate_to_gha",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "CarsonCook",
+  "runId": 1935847137,
+  "runNumber": 72,
+  "link": "https://github.com/zowe/jobs/actions/runs/1935847137"
+}
