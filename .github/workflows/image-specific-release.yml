@@ -15,11 +15,15 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
+      - uses: ./.github/actions/setup
+
       - name: Build with Gradle
         run: ./gradlew build
 
       - name: Unit test with Gradle
         run: ./gradlew coverage
+
+      - uses: ./.github/actions/teardown
 
   PublishImages:
     needs: BuildAndTest
