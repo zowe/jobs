@@ -101,10 +101,13 @@ jobs:
             exit 1
           fi
 
+      - uses: zowe-actions/shared-actions/prepare-workflow@main
+
       - name: Lock marist server
         uses: zowe-actions/shared-actions/lock-resource@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
           lock-resource-name: jobs-integration-tests-${{ env.MARIST_HOST }}-lock
           lock-avg-retry-interval: 60
 
