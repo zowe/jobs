@@ -63,8 +63,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      # TODO need a lock on marist?
-
       - name: Build with Gradle
         run: ./gradlew build
 
@@ -102,6 +100,14 @@ jobs:
             echo ">>>>>Gateway is not up"
             exit 1
           fi
+
+      - name: Lock marist server
+        uses: zowe-actions/shared-actions/lock-resource@main
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lock-resource-name: jobs-integration-tests-${{ env.MARIST_HOST }}-lock
+          lock-avg-retry-interval: 60
+
 
       - name: Integration tests for v1 - LTPA
         run: >
