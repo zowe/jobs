@@ -70,13 +70,14 @@ jobs:
 
       - name: Run APIML containers
         run: |
-          chmod +x scripts/create-containerized-apiml.sh
-          ./scripts/create-containerized-apiml.sh
+          chmod +x scripts/run-containerized-apiml.sh
+          ./scripts/run-containerized-apiml.sh
         env:
           ZOSMF_HOST: ${{ env.MARIST_HOST }}
           ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
           GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
           JOBS_PORT: ${{ env.JOBS_PORT }}
+          HOST_OS: linux
 
       - name: Run Jobs API server
         run: >

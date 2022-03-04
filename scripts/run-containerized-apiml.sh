@@ -44,12 +44,19 @@ fi
 if [ -z "${JOBS_PORT}" ]; then
   JOBS_PORT=8443
 fi
-if [ -z "${JOBS_HOST}" ]; then
-  JOBS_HOST=localhost
+if [ -z "${OS}" ]; then
+  OS="not-linux"
 fi
 if [ -z $(command -v docker-compose) ]; then
   echo "[${SCRIPT_NAME}][error] docker-compose is required."
   exit 1
+fi
+
+JOBS_HOST="host.docker.internal"
+dockerComposeTemplate="docker-compose.yml.template"
+if [ "$HOST_OS" == "linux" ]; then
+  dockerComposeTemplate="docker-compose.yml.linux.template"
+  JOBS_HOST="localhost"
 fi
 ###################################################################
 ######################## CREATE WORKSPACE #########################
@@ -157,11 +164,12 @@ echo
 ###################################################################
 #################### START APIML CONTAINERS #######################
 echo "[${SCRIPT_NAME}] create docker-compose file and run"
+echo "[${SCRIPT_NAME}] creating docker-compose file for '$HOST_OS' operating system using template $dockerComposeTemplate"
 cd "${ROOT_DIR}"
 sed -e "s|{WORKSPACE}|${WORKSPACE}|g" \
   -e "s|{DISCOVERY_PORT}|${DISCOVERY_PORT}|g" \
   -e "s|{GATEWAY_PORT}|${GATEWAY_PORT}|g" \
-  "scripts/containerized-apiml/docker-compose.yml.template" > "${WORKSPACE}/docker-compose.yml"
+  "scripts/containerized-apiml/$dockerComposeTemplate" > "${WORKSPACE}/docker-compose.yml"
 docker-compose -f "${WORKSPACE}/docker-compose.yml" up -d
 ###################################################################
 echo "[${SCRIPT_NAME}] done."
