@@ -3,10 +3,21 @@ name: Image publish branch
 on:
   workflow_dispatch:
 
-env:
-  BRANCH_NAME: ${{ github.ref_name }}
-
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+
+      - uses: ./.github/actions/setup
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - uses: ./.github/actions/teardown
+
   get-version:
     runs-on: ubuntu-latest
     outputs:
@@ -16,12 +27,13 @@ jobs:
         id: outputVersion
         run: |
           # Replace / and _ with - in branch name
-          cleanBranchName=$(echo "$BRANCH_NAME" | sed -e "s/\//-/g" | sed "s/_/-/g")
-          gradlePropertiesVersion=$(cat ./gradlew.properties | grep version= | awk -Fversion= '{print$2}')
-          echo "::set-output name=version::$gradlePropertiesVersion$cleanBranchName"
+          cleanBranchName=$(echo "${{ github.ref_name }}" | sed -e "s/\//-/g" | sed "s/_/-/g")
+          echo "::set-output name=version::$cleanBranchName"
 
   publish-images:
-    needs: get-version
+    needs:
+      - build
+      - get-version
     uses: zowe/explorer-jobs/.github/workflows/build-images.yml@master
     with:
       forceNoRelease: true
