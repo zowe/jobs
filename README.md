@@ -58,7 +58,7 @@ This script has the following optional environment variables:
 
 1. Ensure you have generated a test certificate as described above.
 2. Ensure you are running the APIML as described above.
-3. Start test server;
+3. Start test server:
 
   ```
   java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8 \

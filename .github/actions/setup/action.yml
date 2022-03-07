@@ -1,5 +1,5 @@
 name: "Setup action"
-description: "Prepares for execution - set up Java, Node, npm, Gradle"
+description: "Prepares for execution - set up Java and Gradle"
 
 inputs:
     jdkVersion:

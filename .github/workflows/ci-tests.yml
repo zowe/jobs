@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - users/carson/migrate_to_gha # TODO remove after done dev
   pull_request:
     branches:
       - master
@@ -20,7 +19,6 @@ on:
         required: false
 
 env:
-  # TODO need a way to switch the marist credentials - use a GHA environment to hold host/ports and credentials?
   MARIST_HOST: ${{ github.event.inputs.custom_marist_host || 'zzow04.zowe.marist.cloud' }}
   ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
   GATEWAY_PORT: 7554

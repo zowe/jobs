@@ -60,7 +60,7 @@ if [ "$HOST_OS" == "linux" ]; then
 fi
 ###################################################################
 ######################## CREATE WORKSPACE #########################
-echo "[${SCRIPT_NAME}] prepare FVT workspace"
+echo "[${SCRIPT_NAME}] prepare workspace"
 rm -rf "${WORKSPACE}"
 mkdir -p "${WORKSPACE}/${KEYSTORE_DIR}"
 mkdir -p "${WORKSPACE}/${API_DEFS_DIR}"
