@@ -8,19 +8,10 @@ on:
     branches:
       - master
   workflow_dispatch:
-    inputs:
-      custom_marist_host:
-        description: ZOSMF host
-        type: string
-        required: false
-      custom_zosmf_port:
-        description: ZOSMF port
-        type: string
-        required: false
 
 env:
-  MARIST_HOST: ${{ github.event.inputs.custom_marist_host || 'zzow04.zowe.marist.cloud' }}
-  ZOSMF_PORT: ${{ github.event.inputs.custom_zosmf_port || 10443 }}
+  MARIST_HOST: 'zzow04.zowe.marist.cloud'
+  ZOSMF_PORT: 10443
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443
 
