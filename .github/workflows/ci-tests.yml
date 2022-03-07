@@ -14,6 +14,7 @@ env:
   ZOSMF_PORT: 10443
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443
+  JOBS_LOG_DIR: .apiml/jobs-api.log
 
 jobs:
   UnitTest:
@@ -77,7 +78,7 @@ jobs:
           -Dserver.ssl.keyStoreType=PKCS12
           -Dconnection.httpsPort=${{ env.GATEWAY_PORT }}
           -Dconnection.ipAddress=localhost
-          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar &
+          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar > ${{ env.JOBS_LOG_DIR }} &
 
       - name: Validate APIML setup
         run: |
@@ -100,7 +101,6 @@ jobs:
           lock-resource-name: jobs-integration-tests-${{ env.MARIST_HOST }}-lock
           lock-avg-retry-interval: 60
 
-
       - name: Integration tests for v1 - LTPA
         run: >
           ./gradlew runIntegrationTests --info
@@ -118,6 +118,16 @@ jobs:
           -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
           -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
           -Ptest.version=2
+
+      - name: Output Jobs API logs
+        if: always()
+        run: >
+          if [ -f ${{ env.JOBS_LOG_DIR }} ]; then
+            echo ">>>>>Jobs API logs"
+            cat ${{ env.JOBS_LOG_DIR }}
+          else
+            echo ">>>>>No Jobs API logs"
+          fi
 
       - name: Output APIML logs
         if: always()
