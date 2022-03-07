@@ -108,7 +108,7 @@ This is done in two steps:
     * `release_version` is the version that will be released. This should be a new patch version. For example, if `master` is currently on version 1.0.13-SNAPSHOT, `release_version` would be 1.0.14.
     * `new_version` should be a `SNAPSHOT` version with a new patch version. For example, if `master` is currently on version 1.0.13-SNAPSHOT, `new_version` would be 1.0.14-SNAPSHOT.
 
-2. Release the images with the [image specific release workflow](https://github.com/zowe/api-layer/actions/workflows/image-specific-release.yml).
+2. Release the images with the [image specific release workflow](https://github.com/zowe/jobs/actions/workflows/image-specific-release.yml).
     * `release_version` is the version that will be released. This should be the same value as used in step `1`.
 
 After this release is finished the new version must be added to the [release candidate manifest](https://github.com/zowe/zowe-install-packaging/blob/rc/manifest.json.template).
