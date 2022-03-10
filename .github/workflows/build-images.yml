@@ -55,7 +55,7 @@ jobs:
 
         - uses: ./.github/actions/setup
 
-        - uses: ./.github/actions/image-publish-setup
+        - uses: ./.github/actions/image-setup
           id: setup
           with:
             versionOverride: ${{ inputs.versionOverride }}
@@ -92,7 +92,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - uses: ./.github/actions/image-publish-setup
+      - uses: ./.github/actions/image-setup
         id: setup
         with:
           versionOverride: ${{ inputs.versionOverride }}
