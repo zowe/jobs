@@ -34,7 +34,7 @@ jobs:
     needs:
       - build
       - get-version
-    uses: zowe/explorer-jobs/.github/workflows/build-images.yml@master
+    uses: zowe/jobs/.github/workflows/build-images.yml@master
     with:
       forceNoRelease: true
       versionOverride: ${{ needs.get-version.outputs.imageVersion }}
