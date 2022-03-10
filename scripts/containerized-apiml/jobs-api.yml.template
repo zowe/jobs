@@ -5,7 +5,7 @@ services:
     description: IBM z/OS Jobs REST API service
     catalogUiTileId: jobs
     instanceBaseUrls:
-      - https://localhost:{API_PORT}/
+      - https://{JOBS_HOST}:{JOBS_PORT}/
     homePageRelativeUrl:  # Home page is at the same URL
     routedServices:
       - gatewayUrl: api/v1
@@ -16,13 +16,13 @@ services:
       - apiId: org.zowe.jobs.v1
         gatewayUrl: api/v1
         version: 1.0.0
-        swaggerUrl: https://localhost:{API_PORT}/v2/api-docs
-        documentationUrl: https://localhost:{API_PORT}/swagger-ui.html
+        swaggerUrl: https://{JOBS_HOST}:{JOBS_PORT}/v2/api-docs
+        documentationUrl: https://{JOBS_HOST}:{JOBS_PORT}/swagger-ui.html
       - apiId: org.zowe.jobs.v2
         gatewayUrl: api/v2
         version: 2.0.0
-        swaggerUrl: https://localhost:{API_PORT}/v2/api-docs
-        documentationUrl: https://localhost:{API_PORT}/swagger-ui.html
+        swaggerUrl: https://{JOBS_HOST}:{JOBS_PORT}/v2/api-docs
+        documentationUrl: https://{JOBS_HOST}:{JOBS_PORT}/swagger-ui.html
     customMetadata:
       apiml:
         enableUrlEncodedCharacters: true

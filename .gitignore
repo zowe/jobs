@@ -42,3 +42,8 @@ bin/
 
 # VS Code
 .vscode/
+
+# Test files
+.apiml
+.ehcache-diskstore.lock
+invalidated*.data
