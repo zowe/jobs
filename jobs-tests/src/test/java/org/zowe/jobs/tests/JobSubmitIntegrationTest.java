@@ -42,7 +42,7 @@ public class JobSubmitIntegrationTest extends AbstractJobsIntegrationTest {
         String jobId = actual.getJobId();
 
         verifyInProgressJobIsAsExpected(actual);
-        response.header("Location", endsWith(JOBS_ROOT_ENDPOINT + "/" + jobName + "/" + jobId));
+        response.header("Location", endsWith(JOBS_SERVICE_ID + "/" + jobName + "/" + jobId));
     }
 
     @Test
