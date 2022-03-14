@@ -112,7 +112,7 @@ release {
     failOnUpdateNeeded = false
     revertOnFail = true
     preCommitText = '[Gradle Release plugin]'
-    preTagCommitMessage = 'Before tag commit'
+    preTagCommitMessage = '[skip ci] Before tag commit'
     tagCommitMessage = 'Release:'
     tagTemplate = '${version}'
     newVersionCommitMessage = 'Create new version:'
@@ -138,10 +138,10 @@ release {
     ]
 
     git {
-        requireBranch = 'master'
+        requireBranch = ''
         pushToRemote = 'origin'
         pushToBranchPrefix = ''
-        commitVersionFileOnly = false
+        commitVersionFileOnly = true
         signTag = false
     }
 }

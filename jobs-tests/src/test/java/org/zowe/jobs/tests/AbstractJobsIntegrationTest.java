@@ -37,7 +37,7 @@ import static org.junit.Assert.assertThat;
 
 public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
-    static final String JOBS_ROOT_ENDPOINT = "jobs";
+    static final String JOBS_SERVICE_ID = "jobs";
 
     static final String JOB_IEFBR14 = "IEFBR14";
     static final String JOB_WITH_STEPS = "JOB1DD";
@@ -46,7 +46,7 @@ public class AbstractJobsIntegrationTest extends AbstractHttpIntegrationTest {
 
     @BeforeClass
     public static void setUpEndpoint() throws Exception {
-        RestAssured.basePath = JOBS_ROOT_ENDPOINT;
+        RestAssured.baseURI = AbstractHttpIntegrationTest.getBaseUrl(JOBS_SERVICE_ID);
     }
 
     static Job submitJobAndPoll(String testJobName) throws Exception {
