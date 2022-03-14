@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Mon Mar 14 2022 21:06:07 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1647291967883720556",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "refs/pull/156/merge",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "CarsonCook",
+  "runId": 1983125087,
+  "runNumber": 111,
+  "link": "https://github.com/zowe/jobs/actions/runs/1983125087"
+}
