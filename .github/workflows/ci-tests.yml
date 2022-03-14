@@ -20,6 +20,7 @@ env:
 
 jobs:
   UnitTest:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -47,7 +48,7 @@ jobs:
 
   IntegrationTest:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
         with:
@@ -99,7 +100,6 @@ jobs:
         uses: zowe-actions/shared-actions/lock-resource@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
           lock-resource-name: jobs-integration-tests-${{ env.MARIST_HOST }}-lock
           lock-avg-retry-interval: 60
 
