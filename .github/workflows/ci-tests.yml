@@ -17,9 +17,11 @@ env:
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443
   JOBS_LOG_DIR: .apiml/jobs-api.log
+  JOB_ID: ${{ github.run_id }}-${{ github.run_number }}
 
 jobs:
   UnitTest:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -38,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: UnitTestResults
+          name: UnitTestResults-${{ env.JOB_ID }}
           path: |
             build/reports/jacoco/jacocoFullReport/html
             jobs-api-server/build/reports/tests/test
@@ -47,7 +49,7 @@ jobs:
 
   IntegrationTest:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
         with:
@@ -99,7 +101,6 @@ jobs:
         uses: zowe-actions/shared-actions/lock-resource@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
           lock-resource-name: jobs-integration-tests-${{ env.MARIST_HOST }}-lock
           lock-avg-retry-interval: 60
 
@@ -139,7 +140,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: always()
         with:
-          name: IntegrationTestResults
+          name: IntegrationTestResults-${{ env.JOB_ID }}
           path: |
             jobs-tests/build/reports/tests/test-1
             jobs-tests/build/reports/tests/test-2
