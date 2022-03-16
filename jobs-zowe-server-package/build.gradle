@@ -12,7 +12,7 @@ dependencies {
 }
 
 task packageJobsApiServer(type: Zip) {
-    archiveName = artifactName + ".zip"
+    archiveFileName = artifactName + ".zip"
     includeEmptyDirs = true
     def resourceDir = 'src/main/resources/'
 
@@ -55,6 +55,7 @@ packageJobsApiServer.doFirst {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId "${artifactName}"
             artifact("$buildDir/distributions/$artifactName" + ".zip")
         }
     }
