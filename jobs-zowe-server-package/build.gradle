@@ -55,6 +55,7 @@ packageJobsApiServer.doFirst {
 publishing {
     publications {
         mavenJava(MavenPublication) {
+            artifactId "${artifactName}"
             artifact("$buildDir/distributions/$artifactName" + ".zip")
         }
     }
