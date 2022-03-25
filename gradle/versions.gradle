@@ -19,7 +19,7 @@ ext {
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
     explorerApiCommonVersion = "1.1.10"
-    tomcatVersion = "9.0.54"
+    tomcatVersion = "9.0.58"
 
     libraries = [
             lombok                             : "org.projectlombok:lombok:${lombokVersion}",
