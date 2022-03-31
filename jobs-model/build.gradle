@@ -12,6 +12,7 @@ dependencies {
     compile libraries.http_core
     compile libraries.http_client
     compile libraries.commons_codec
+    compile libraries.jackson_databind
     compile libraries.gson
     compile libraries.logback_classic
     compile libraries.logback_core
