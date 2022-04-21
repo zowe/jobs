@@ -71,9 +71,12 @@ jobs:
 
       - name: Run Jobs API server
         run: |
-          # start.sh expects jar in package bin folder
-          cp jobs-api-server/build/libs/jobs-api-server-*.jar jobs-zowe-server-package/src/main/resources/bin
+          # start.sh uses $(pwd)/bin to locate jar file
+          mkdir ./bin
+          cp jobs-api-server/build/libs/jobs-api-server-*.jar ./bin
+          chmod +x ./bin/jobs-api-server-*.jar
           chmod +x jobs-zowe-server-package/src/main/resources/bin/start.sh
+          echo "~~~~~~~~~~"
           ./jobs-zowe-server-package/src/main/resources/bin/start.sh > ${{ env.JOBS_LOG_DIR }} &
         env:
           ZWE_configs_debug: true
