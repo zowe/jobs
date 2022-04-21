@@ -27,11 +27,10 @@
 # - ZWE_GATEWAY_HOST
 # - ZWE_haInstance_hostname
 # - ZWE_zowe_certificate_keystore_type - The default keystore type to use for SSL certificates
-echo "$(pwd)"
 JAR_FILE=$(ls -1 $(pwd)/bin/jobs-api-server-*.jar | head -n 1)
 
 LOG_LEVEL=
-if [[ ! -z ${ZWE_configs_debug} && ${ZWE_configs_debug} == true ]]
+if [ "${ZWE_configs_debug}" = true ]
 then
   LOG_LEVEL="debug"
 fi
