@@ -61,13 +61,9 @@ jobs:
       - name: Run APIML containers
         run: |
           chmod +x scripts/run-containerized-apiml.sh
-          ./scripts/run-containerized-apiml.sh
+          ./scripts/run-containerized-apiml.sh -h ${{ env.MARIST_HOST }} -p ${{ env.ZOSMF_PORT }} -f ${{ env.JOBS_PORT }} -l
         env:
-          ZOSMF_HOST: ${{ env.MARIST_HOST }}
-          ZOSMF_PORT: ${{ env.ZOSMF_PORT }}
           GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
-          JOBS_PORT: ${{ env.JOBS_PORT }}
-          HOST_OS: linux
 
       - name: Run Jobs API server
         run: >
@@ -83,11 +79,21 @@ jobs:
           -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar > ${{ env.JOBS_LOG_DIR }} &
 
       - name: Validate APIML setup
+        # poll for 2 minutes, if GW not healthy after 2 minutes then exit
         run: |
-          sleep 2m # let APIML finish setting up
-          gwHealth=$(curl -k -sS https://localhost:${{ env.GATEWAY_PORT }}/application/health)
-          echo $gwHealth
-          gatewayUp=$(echo $gwHealth | awk -F{\"status\":\" '{print $2}' | awk -F\" '{print $1}')
+          attemptCounter=0
+          maxAttempts=12
+          until [ $attemptCounter -gt $maxAttempts ]; do
+            gwHealth=$(curl -k -sS https://localhost:${{ env.GATEWAY_PORT }}/application/health)
+            gatewayUp=$(echo $gwHealth | awk -F{\"status\":\" '{print $2}' | awk -F\" '{print $1}')
+
+            if [ "$gatewayUp" = "UP" ]; then
+              attemptCounter=$((maxAttempts)) # will exit until loop
+            fi
+            attemptCounter=$((attemptCounter+1))
+            sleep 10
+          done
+
           if [ "$gatewayUp" != "UP" ]; then
             echo ">>>>>Gateway is not up"
             exit 1
