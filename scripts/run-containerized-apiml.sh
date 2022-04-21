@@ -9,13 +9,9 @@
 #
 # Copyright IBM Corporation 2020
 ###################################################################
-################################################################################
+
 # Run containerized APIML prepared for Jobs API
-#
-# This script requires these environment variables:
-# - ZOSMF_HOST
-# - ZOSMF_PORT
-################################################################################
+
 ######################## DEFINE CONSTANTS #########################
 SCRIPT_NAME=$(basename "$0")
 SCRIPT_PWD=$(cd "$(dirname "$0")" && pwd)
@@ -26,6 +22,16 @@ KEYSTORE_DIR=keystore
 API_DEFS_DIR=api-defs
 ###################################################################
 ###################### VALIDATE PARAMETERS ########################
+while getopts h:p:f:l arg
+do
+  case "${arg}" in
+    h) ZOSMF_HOST=${OPTARG};;
+    p) ZOSMF_PORT=${OPTARG};;
+    f) FILES_PORT=${OPTARG};;
+    l) HOST_OS="linux";;
+  esac
+done
+
 echo "[${SCRIPT_NAME}] validate parameters"
 if [ -z "${ZOSMF_HOST}" ]; then
   echo "[${SCRIPT_NAME}][error] environment variable ZOSMF_HOST is required."
