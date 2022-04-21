@@ -83,17 +83,21 @@ jobs:
       - name: Validate APIML setup
         # poll for 2 minutes, if GW not healthy after 2 minutes then exit
         run: |
-          attemptCounter=0
+          set +e # curl -s doesn't swallow the error alone
+          attemptCounter=1
           maxAttempts=12
           until [ $attemptCounter -gt $maxAttempts ]; do
-            gwHealth=$(curl -k -sS https://localhost:${{ env.GATEWAY_PORT }}/application/health)
+            sleep 10
+            gwHealth=$(curl -k -s https://localhost:${{ env.GATEWAY_PORT }}/application/health)
+            echo "Polling for GW health: $attemptCounter"
+            echo $gwHealth
             gatewayUp=$(echo $gwHealth | awk -F{\"status\":\" '{print $2}' | awk -F\" '{print $1}')
 
             if [ "$gatewayUp" = "UP" ]; then
-              attemptCounter=$((maxAttempts)) # will exit until loop
+              echo ">>>>>Gateway is up"
+              attemptCounter=$maxAttempts # will exit until loop
             fi
             attemptCounter=$((attemptCounter+1))
-            sleep 10
           done
 
           if [ "$gatewayUp" != "UP" ]; then
