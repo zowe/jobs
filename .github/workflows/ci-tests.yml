@@ -70,17 +70,18 @@ jobs:
           HOST_OS: linux
 
       - name: Run Jobs API server
-        run: >
-          java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8
-          -Djava.io.tmpdir=/tmp
-          -Dserver.port=${{ env.JOBS_PORT }}
-          -Dserver.ssl.keyAlias=localhost
-          -Dserver.ssl.keyStore=.apiml/keystore/localhost.keystore.p12
-          -Dserver.ssl.keyStorePassword=password
-          -Dserver.ssl.keyStoreType=PKCS12
-          -Dconnection.httpsPort=${{ env.GATEWAY_PORT }}
-          -Dconnection.ipAddress=localhost
-          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar > ${{ env.JOBS_LOG_DIR }} &
+        run: |
+          # start.sh expects jar in package bin folder
+          cp jobs-api-server/build/libs/jobs-api-server-*.jar jobs-zowe-server-package/src/main/resources/bin
+          chmod +x jobs-zowe-server-package/src/main/resources/bin/start.sh
+          ./jobs-zowe-server-package/src/main/resources/bin/start.sh > ${{ env.JOBS_LOG_DIR }} &
+        env:
+          ZWE_configs_debug: true
+          ZWE_configs_port: ${{ env.JOBS_PORT }}
+          ZWE_configs_certificate_keystore_alias: localhost
+          ZWE_configs_certificate_keystore_file: .apiml/keystore/localhost.keystore.p12
+          ZWE_configs_certificate_keystore_password: password
+          ZWE_components_gateway_port: ${{ env.GATEWAY_PORT }}
 
       - name: Validate APIML setup
         run: |
