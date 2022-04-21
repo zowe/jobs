@@ -76,7 +76,7 @@ jobs:
           chmod +x jobs-zowe-server-package/src/main/resources/bin/start.sh
           ./jobs-zowe-server-package/src/main/resources/bin/start.sh > ${{ env.JOBS_LOG_DIR }} &
         env:
-          JAR_FILE: jobs-api-server/build/libs # point start.sh to jar file directory
+          LAUNCH_COMPONENT: jobs-api-server/build/libs # point start.sh to jar file directory
           EXPLORER_API_LOG_LEVEL: debug
           JOBS_API_PORT: ${{ env.JOBS_PORT }}
           KEY_ALIAS: localhost
