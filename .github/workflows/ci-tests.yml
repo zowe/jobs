@@ -68,17 +68,17 @@ jobs:
           GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
 
       - name: Run Jobs API server
-        run: >
-          java -Xms16m -Xmx512m -Dibm.serversocket.recover=true -Dfile.encoding=UTF-8
-          -Djava.io.tmpdir=/tmp
-          -Dserver.port=${{ env.JOBS_PORT }}
-          -Dserver.ssl.keyAlias=localhost
-          -Dserver.ssl.keyStore=.apiml/keystore/localhost.keystore.p12
-          -Dserver.ssl.keyStorePassword=password
-          -Dserver.ssl.keyStoreType=PKCS12
-          -Dconnection.httpsPort=${{ env.GATEWAY_PORT }}
-          -Dconnection.ipAddress=localhost
-          -jar jobs-api-server/build/libs/jobs-api-server-*-boot.jar > ${{ env.JOBS_LOG_DIR }} &
+        run: |
+          chmod +x jobs-zowe-server-package/src/main/resources/bin/start.sh
+          ./jobs-zowe-server-package/src/main/resources/bin/start.sh > ${{ env.JOBS_LOG_DIR }} &
+        env:
+          LAUNCH_COMPONENT: jobs-api-server/build/libs # point start.sh to jar file directory
+          EXPLORER_API_LOG_LEVEL: debug
+          JOBS_API_PORT: ${{ env.JOBS_PORT }}
+          KEY_ALIAS: localhost
+          KEYSTORE: .apiml/keystore/localhost.keystore.p12
+          KEYSTORE_PASSWORD: password
+          GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
 
       - name: Validate APIML setup
         # poll for 3 minutes, if GW not healthy after 2 minutes then exit
