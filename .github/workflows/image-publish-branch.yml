@@ -21,7 +21,7 @@ jobs:
   publish-images:
     needs:
       - build
-    uses: zowe/jobs/.github/workflows/build-images.yml@master
+    uses: zowe/jobs/.github/workflows/build-images.yml@v2.x/master
     with:
       forceNoRelease: true
     secrets:
