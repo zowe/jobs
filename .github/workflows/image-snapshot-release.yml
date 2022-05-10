@@ -11,7 +11,7 @@ env:
 
 jobs:
   publish-images:
-    uses: zowe/jobs/.github/workflows/build-images.yml@master
+    uses: zowe/jobs/.github/workflows/build-images.yml@v1.x/master
     with:
       forceNoRelease: true
     secrets:
