@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Thu May 12 2022 18:54:24 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1652381664265240016",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "refs/pull/184/merge",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "jackjia-ibm",
+  "runId": 2315409300,
+  "runNumber": 214,
+  "link": "https://github.com/zowe/jobs/actions/runs/2315409300"
+}
