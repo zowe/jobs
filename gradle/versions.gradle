@@ -1,7 +1,7 @@
 ext {
     springBootVersion = '2.3.12.RELEASE'
     springSecurityVersion = '5.3.11.RELEASE!!'
-    springFrameworkVersion = '5.2.21.RELEASE!!'
+    springFrameworkVersion = '5.3.20!!'
     springFoxVersion = '2.9.2'
     guavaVersion = '31.0.1-jre'
     logbackVersion = '1.2.9'
@@ -20,7 +20,7 @@ ext {
     junitVersion = "4.13.1"
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
-    explorerApiCommonVersion = "2.0.7"
+    explorerApiCommonVersion = "2.0.8"
     tomcatVersion = "9.0.58"
 
     libraries = [
