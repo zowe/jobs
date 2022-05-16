@@ -56,7 +56,7 @@ public abstract class AbstractJobsController {
     
     abstract JobsService getJobsService();
     
-    @GetMapping(value = "", produces = { "application/json" })
+    @GetMapping(value = "/", produces = { "application/json" })
     @ApiOperation(value = "Get a list of jobs", nickname = "getJobs", notes = "This API returns the a list of jobs for a given prefix and owner.", response = Job.class, responseContainer = "List")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Ok") })
     public ItemsWrapper<Job> getJobs(
@@ -90,7 +90,7 @@ public abstract class AbstractJobsController {
         return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
     }
     
-    @DeleteMapping(value = "", produces = { "application/json" })
+    @DeleteMapping(value = "/", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs Cancel and Purge them all", nickname = "purgeJobs", notes = "This API purges all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 204, message = "Job purges succesfully requested") })
     public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
@@ -111,7 +111,7 @@ public abstract class AbstractJobsController {
         return ResponseEntity.accepted().build();
     }
     
-    @PutMapping(value = "", produces = { "application/json" })
+    @PutMapping(value = "/", produces = { "application/json" })
     @ApiOperation(value = "Given a list of jobs issue a Modify command for each", nickname = "modifyJobs", notes = "This API modifies all jobs provided")
     @ApiResponses(value = { @ApiResponse(code = 202, message = "Job modifies requested") })
     public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
