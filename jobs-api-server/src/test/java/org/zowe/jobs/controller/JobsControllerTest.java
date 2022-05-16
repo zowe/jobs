@@ -68,7 +68,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @PrepareForTest({ ServletUriComponentsBuilder.class })
 public class JobsControllerTest extends ApiControllerTest {
 
-    private static final String ENDPOINT_ROOT = "/api/v2/jobs";
+    private static final String ENDPOINT_ROOT = "/api/v2/jobs/";
 
     @Mock
     private JobsService jobsService;
@@ -555,7 +555,7 @@ public class JobsControllerTest extends ApiControllerTest {
         mockJobUriConstruction(jobName, jobId, locationUri);
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/string").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "string").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(JsonUtils.convertToJsonString(request)))
             .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
@@ -615,7 +615,7 @@ public class JobsControllerTest extends ApiControllerTest {
         mockJobUriConstruction(jobName, jobId, locationUri);
 
         mockMvc
-            .perform(post(ENDPOINT_ROOT + "/dataset").contentType(MediaType.APPLICATION_JSON_VALUE)
+            .perform(post(ENDPOINT_ROOT + "dataset").contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(JsonUtils.convertToJsonString(request)))
             .andExpect(status().isCreated()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(content().string(JsonUtils.convertToJsonString(dummyJob)))
@@ -649,7 +649,7 @@ public class JobsControllerTest extends ApiControllerTest {
         PowerMockito.mockStatic(ServletUriComponentsBuilder.class);
         when(ServletUriComponentsBuilder.fromCurrentContextPath()).thenReturn(servletUriBuilder);
         UriComponentsBuilder uriBuilder = mock(UriComponentsBuilder.class);
-        when(servletUriBuilder.path(ENDPOINT_ROOT + "/{jobName}/{jobID}")).thenReturn(uriBuilder);
+        when(servletUriBuilder.path(ENDPOINT_ROOT + "{jobName}/{jobID}")).thenReturn(uriBuilder);
         UriComponents uriComponents = mock(UriComponents.class);
         when(uriBuilder.buildAndExpand(jobName, jobId)).thenReturn(uriComponents);
         when(uriComponents.toUri()).thenReturn(uriValue);
