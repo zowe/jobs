@@ -27,12 +27,39 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("all")
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.regex("/api.*"))
                 .build()
                 .apiInfo(
-                    new ApiInfo("JES Jobs API", "REST API for the JES Jobs Service", "1.0", null, null, null, null, Collections.emptyList())
+                    new ApiInfo("JES Jobs API", "REST API for the JES Jobs Service", "2.0", null, null, null, null, Collections.emptyList())
+                );
+    }
+
+    @Bean
+    public Docket apiV1() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("v1")
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.regex("/api/v1.*"))
+                .build()
+                .apiInfo(
+                        new ApiInfo("JES Jobs API", "REST API for the JES Jobs Service", "1.0", null, null, null, null, Collections.emptyList())
+                );
+    }
+
+    @Bean
+    public Docket apiv2() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("v2")
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.regex("/api/v2.*"))
+                .build()
+                .apiInfo(
+                        new ApiInfo("JES Jobs API", "REST API for the JES Jobs Service", "2.0", null, null, null, null, Collections.emptyList())
                 );
     }
 }
