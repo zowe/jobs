@@ -10,6 +10,8 @@
 
 #TODO Pass in keystore details - share with Mfaas?
 spring:
+    config:
+        useLegacyProcessing: true
     application:
         name: jobs
     output:
