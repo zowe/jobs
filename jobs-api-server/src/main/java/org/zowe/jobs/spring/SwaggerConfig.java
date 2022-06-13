@@ -20,10 +20,11 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
     private static final String TITLE = "JES Jobs API";
     private static final String DESCRIPTION = "REST API for the JES Jobs Service";
+    private static final String VERSION = "2.0.0";
 
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().info(new Info().title(TITLE).description(DESCRIPTION).version("2.0.0"));
+        return new OpenAPI().info(new Info().title(TITLE).description(DESCRIPTION).version(VERSION));
     }
 
     @Bean
@@ -31,7 +32,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("all")
                 .pathsToMatch("/api/**")
-                .addOpenApiCustomiser(openApi -> openApi.setInfo(openApi.getInfo().version("2.0.0")))
+                .addOpenApiCustomiser(openApi -> openApi.setInfo(openApi.getInfo().version(VERSION)))
                 .build();
     }
 
@@ -49,7 +50,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("v2")
                 .pathsToMatch("/api/v2/**")
-                .addOpenApiCustomiser(openApi -> openApi.setInfo(openApi.getInfo().version("2.0.0")))
+                .addOpenApiCustomiser(openApi -> openApi.setInfo(openApi.getInfo().version(VERSION)))
                 .build();
     }
 }
