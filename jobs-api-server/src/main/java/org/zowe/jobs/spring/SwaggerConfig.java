@@ -11,8 +11,10 @@ package org.zowe.jobs.spring;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 
 import org.springdoc.core.GroupedOpenApi;
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,10 +23,27 @@ public class SwaggerConfig {
     private static final String TITLE = "JES Jobs API";
     private static final String DESCRIPTION = "REST API for the JES Jobs Service";
     private static final String VERSION = "2.0.0";
+    private static final GenericApiResponseCustomizer GENERIC_API_RESPONSE_CUSTOMIZER = new GenericApiResponseCustomizer();
 
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI().info(new Info().title(TITLE).description(DESCRIPTION).version(VERSION));
+    }
+
+    private static class GenericApiResponseCustomizer implements OpenApiCustomiser {
+        private static final ApiResponse response401 = new ApiResponse().description("Unauthorized");
+        private static final ApiResponse response403 = new ApiResponse().description("Forbidden");
+        private static final ApiResponse response404 = new ApiResponse().description("Not Found");
+
+        @Override
+        public void customise(OpenAPI openApi) {
+            openApi.getPaths().forEach((key, pathEntry) -> pathEntry.readOperations().forEach(op -> {
+                        op.getResponses().addApiResponse("401", response401);
+                        op.getResponses().addApiResponse("403", response403);
+                        op.getResponses().addApiResponse("404", response404);
+                    }
+            ));
+        }
     }
 
     @Bean
@@ -33,6 +52,7 @@ public class SwaggerConfig {
                 .group("all")
                 .pathsToMatch("/api/**")
                 .addOpenApiCustomiser(openApi -> openApi.setInfo(openApi.getInfo().version(VERSION)))
+                .addOpenApiCustomiser(GENERIC_API_RESPONSE_CUSTOMIZER)
                 .build();
     }
 
