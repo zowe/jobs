@@ -9,7 +9,7 @@
  */
 package org.zowe.jobs.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModifyMultipleJobsRequest {
-    @ApiModelProperty(value = "The modify command, e.g. cancel, hold, release", dataType = "string", required = true, example = "cancel")
+    @Schema(description = "The modify command, e.g. cancel, hold, release", required = true, example = "cancel")
     private String command;
-    @ApiModelProperty(value = "The list of jobs to receive the modify command", dataType = "string", required = true, example = "[{\"jobId\":\"job1234\", \"jobName\":\"TestJob\"}]")
+    @Schema(description = "The list of jobs to receive the modify command", type = "string", required = true, example = "[{\"jobId\":\"job1234\", \"jobName\":\"TestJob\"}]")
     private ArrayList<SimpleJob> jobs;
 }
