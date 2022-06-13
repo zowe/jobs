@@ -22,6 +22,7 @@ logging:
     level:
         ROOT: INFO
         org.springframework: INFO
+        org.springdoc: WARN
         org.zowe: INFO
 
 apiml:
