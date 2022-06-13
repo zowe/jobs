@@ -43,7 +43,7 @@ public abstract class AbstractJobsController {
     abstract JobsService getJobsService();
 
     @GetMapping(value = "/", produces = {"application/json"})
-    @Operation(summary = "Get a list of jobs", tags = "getJobs", description = "This API returns the a list of jobs for a given prefix and owner.")
+    @Operation(summary = "Get a list of jobs", operationId = "getJobs", description = "This API returns the a list of jobs for a given prefix and owner.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Ok")})
     public ItemsWrapper<Job> getJobs(
             @Parameter(description = "Job name prefix. If omitted, defaults to '*'.", schema = @Schema(defaultValue = "*")) @Valid @RequestParam(value = "prefix", required = false, defaultValue = "*") String prefix,
@@ -58,7 +58,7 @@ public abstract class AbstractJobsController {
 
 
     @GetMapping(value = "/{jobName}/{jobId}", produces = {"application/json"})
-    @Operation(summary = "Get the details of a job for a given job name and identifier", tags = "getJobByNameAndId", description = "This API returns the details of a job for a given job name and identifier.")
+    @Operation(summary = "Get the details of a job for a given job name and identifier", operationId = "getJobByNameAndId", description = "This API returns the details of a job for a given job name and identifier.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Ok")})
     public Job getJobByNameAndId(
             @Parameter(description = "Job name.", required = true) @PathVariable("jobName") String jobName,
@@ -67,7 +67,7 @@ public abstract class AbstractJobsController {
     }
 
     @DeleteMapping(value = "/{jobName}/{jobId}", produces = {"application/json"})
-    @Operation(summary = "Cancel a Job and Purge it's associated files", tags = "purgeJob", description = "This API purges a Job")
+    @Operation(summary = "Cancel a Job and Purge it's associated files", operationId = "purgeJob", description = "This API purges a Job")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Job purge succesfully requested")})
     public ResponseEntity<Void> purgeJob(
             @Parameter(description = "Job name", required = true) @PathVariable("jobName") String jobName,
@@ -77,7 +77,7 @@ public abstract class AbstractJobsController {
     }
 
     @DeleteMapping(value = "/", produces = {"application/json"})
-    @Operation(summary = "Given a list of jobs Cancel and Purge them all", tags = "purgeJobs", description = "This API purges all jobs provided")
+    @Operation(summary = "Given a list of jobs Cancel and Purge them all", operationId = "purgeJobs", description = "This API purges all jobs provided")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "Job purges succesfully requested")})
     public ResponseEntity<Void> purgeJobs(@RequestBody List<SimpleJob> jobList) {
         jobList.forEach(job -> getJobsService().purgeJob(job.getJobName(), job.getJobId()));
@@ -85,7 +85,7 @@ public abstract class AbstractJobsController {
     }
 
     @PutMapping(value = "/{jobName}/{jobId}", produces = {"application/json"})
-    @Operation(summary = "Modify a job", tags = "modifyJob", description = "This API modifies a job (cancel, hold, release)")
+    @Operation(summary = "Modify a job", operationId = "modifyJob", description = "This API modifies a job (cancel, hold, release)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Job modify requested"),
             @ApiResponse(responseCode = "200", description = "Job modified")})
@@ -98,7 +98,7 @@ public abstract class AbstractJobsController {
     }
 
     @PutMapping(value = "/", produces = {"application/json"})
-    @Operation(summary = "Given a list of jobs issue a Modify command for each", tags = "modifyJobs", description = "This API modifies all jobs provided")
+    @Operation(summary = "Given a list of jobs issue a Modify command for each", operationId = "modifyJobs", description = "This API modifies all jobs provided")
     @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "Job modifies requested")})
     public ResponseEntity<Void> modifyJobs(@RequestBody ModifyMultipleJobsRequest request) {
         request.getJobs().forEach(job -> getJobsService().modifyJob(job.getJobName(), job.getJobId(), request.getCommand()));
@@ -106,7 +106,7 @@ public abstract class AbstractJobsController {
     }
 
     @PostMapping(value = "string", produces = {"application/json"})
-    @Operation(summary = "Submit a job given a string of JCL", tags = "submitJob", description = "This API submits a job given jcl as a string")
+    @Operation(summary = "Submit a job given a string of JCL", operationId = "submitJob", description = "This API submits a job given jcl as a string")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Job successfully created")})
     public ResponseEntity<?> submitJob(@Validated @RequestBody SubmitJobStringRequest request) {
 
@@ -117,7 +117,7 @@ public abstract class AbstractJobsController {
     }
 
     @PostMapping(value = "dataset", produces = {"application/json"})
-    @Operation(summary = "Submit a job given a data set", tags = "submitJob",
+    @Operation(summary = "Submit a job given a data set", operationId = "submitJob",
             description = "This API submits a partitioned data set member or Unix file. For fully qualified data set members use 'MYJOBS.TEST.CNTL(TESTJOBX)'. For Unix files use /u/myjobs/job1.")
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "Job successfully created")})
     public ResponseEntity<?> submitJob(@RequestBody SubmitJobFileRequest request) {
@@ -135,7 +135,7 @@ public abstract class AbstractJobsController {
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files", produces = {"application/json"})
-    @Operation(summary = "Get a list of output file names for a job", tags = "getJobOutputFiles",
+    @Operation(summary = "Get a list of output file names for a job", operationId = "getJobOutputFiles",
             description = "This API returns the output file names for a given job.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Ok")})
     public ItemsWrapper<JobFile> getJobOutputFiles(
@@ -146,7 +146,7 @@ public abstract class AbstractJobsController {
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files/{fileId}/content", produces = {"application/json"})
-    @Operation(summary = "Get content from a specific job output file", tags = "getJobOutputFile",
+    @Operation(summary = "Get content from a specific job output file", operationId = "getJobOutputFile",
             description = "This API reads content from a specific job output file. The API can read all output, or a relative record range.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Ok")})
     public JobFileContent getJobOutputFile(
@@ -158,7 +158,7 @@ public abstract class AbstractJobsController {
     }
 
     @GetMapping(value = "/{jobName}/{jobId}/files/content", produces = {"application/json"})
-    @Operation(summary = "Get the contents of all job output files for a given job", tags = "getConcatenatedJobOutputFiles",
+    @Operation(summary = "Get the contents of all job output files for a given job", operationId = "getConcatenatedJobOutputFiles",
             description = "This API reads the contents of all job files of a given job.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Ok")})
     public JobFileContent getConcatenatedJobOutputFiles(
@@ -176,7 +176,7 @@ public abstract class AbstractJobsController {
 
 
     @GetMapping(value = "/{jobName}/{jobId}/steps", produces = {"application/json"})
-    @Operation(summary = "Get job steps for a given job", tags = "getJobSteps",
+    @Operation(summary = "Get job steps for a given job", operationId = "getJobSteps",
             description = "This API returns the step name and executed program for each job step for a given job name and identifier.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok")})
