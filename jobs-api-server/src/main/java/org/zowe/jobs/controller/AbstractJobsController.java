@@ -5,7 +5,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- * Copyright IBM Corporation "201"6, 2020
+ * Copyright IBM Corporation 2016, 2020
  */
 package org.zowe.jobs.controller;
 
