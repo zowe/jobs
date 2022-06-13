@@ -9,7 +9,7 @@
  */
 package org.zowe.jobs.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SubmitJobStringRequest {
 
-    @ApiModelProperty(value = "The jcl to be submitted, with \\n for new lines", dataType = "string", required = true, example = "//TESTJOBX JOB (),MSGCLASS=H\n// EXEC PGM=IEFBR14")
+    @Schema(description = "The jcl to be submitted, with \\n for new lines", required = true, example = "//TESTJOBX JOB (),MSGCLASS=H\n// EXEC PGM=IEFBR14")
     @ValidJclString
     private String jcl;
 }

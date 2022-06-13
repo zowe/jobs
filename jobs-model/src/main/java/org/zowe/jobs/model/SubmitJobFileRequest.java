@@ -9,7 +9,7 @@
  */
 package org.zowe.jobs.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +20,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SubmitJobFileRequest {
 
-    @ApiModelProperty(value = "The data set, or z/OS unix file to submit in form: in the form: 'ATLAS.TEST.JCL(TSTJ0001)' for a data set, or /u/myjobs/job1 for z/OS unix file", dataType = "string", required = true, example = "'ATLAS.TEST.JCL(TSTJ0001)'")
+    @Schema(description = "The data set, or z/OS unix file to submit in form: in the form: 'ATLAS.TEST.JCL(TSTJ0001)' for a data set, or /u/myjobs/job1 for z/OS unix file", required = true, example = "'ATLAS.TEST.JCL(TSTJ0001)'")
     private String file;
 }
