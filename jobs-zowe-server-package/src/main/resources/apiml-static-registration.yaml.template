@@ -15,12 +15,12 @@ services:
       - apiId: com.ibm.jobs.v1
         gatewayUrl: api/v1
         version: 1.0.0
-        swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v2/api-docs
+        swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v3/api-docs
         documentationUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/swagger-ui.html
       - apiId: com.ibm.jobs.v2
         gatewayUrl: api/v2
         version: 2.0.0
-        swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v2/api-docs
+        swaggerUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/v3/api-docs
         documentationUrl: https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/swagger-ui.html
 catalogUiTiles:
   jobs:
