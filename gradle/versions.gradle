@@ -2,7 +2,7 @@ ext {
     springBootVersion = '2.5.13'
     springSecurityVersion = '5.7.1!!'
     springFrameworkVersion = '5.3.20!!'
-    springFoxVersion = '2.9.2'
+    springDocVersion = '1.6.9'
     guavaVersion = '31.0.1-jre'
     logbackVersion = '1.2.9'
     lombokVersion = '1.18.20'
@@ -20,7 +20,7 @@ ext {
     junitVersion = "4.13.1"
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
-    explorerApiCommonVersion = "1.1.14"
+    explorerApiCommonVersion = "1.1.15"
     tomcatVersion = "9.0.63"
 
     libraries = [
@@ -63,9 +63,7 @@ ext {
             json_path                          : "com.jayway.jsonpath:json-path:${jsonPathVersion}",
             logback_classic                    : "ch.qos.logback:logback-classic:${logbackVersion}",
             logback_core                       : "ch.qos.logback:logback-core:${logbackVersion}",
-            springFox                          : "io.springfox:springfox-swagger2:${springFoxVersion}",
-            springFoxSwagger2                  : "io.springfox:springfox-swagger2:${springFoxVersion}",
-            springFoxSwaggerUI                 : "io.springfox:springfox-swagger-ui:${springFoxVersion}",
+            spring_doc                         : "org.springdoc:springdoc-openapi-ui:${springDocVersion}",
 
             http_core                          : "org.apache.httpcomponents:httpcore:${httpCoreVersion}",
             http_client                        : "org.apache.httpcomponents:httpclient:${httpClientVersion}",

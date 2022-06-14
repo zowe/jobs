@@ -9,7 +9,7 @@
  */
 package org.zowe.jobs.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,6 +19,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyJobRequest {
-    @ApiModelProperty(value = "The modify command, e.g. cancel, hold, release", dataType = "string", required = true, example = "cancel")
+    @Schema(description = "The modify command, e.g. cancel, hold, release", required = true, example = "cancel")
     private String command;
 }
