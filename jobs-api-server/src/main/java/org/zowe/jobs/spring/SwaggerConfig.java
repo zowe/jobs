@@ -9,30 +9,36 @@
  */
 package org.zowe.jobs.spring;
 
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+
+import org.springdoc.core.customizers.OpenApiCustomiser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.Collections;
-
-import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.service.ApiInfo;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
-
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
+    private static final ApiResponse response401 = new ApiResponse().description("Unauthorized");
+    private static final ApiResponse response403 = new ApiResponse().description("Forbidden");
+    private static final ApiResponse response404 = new ApiResponse().description("Not Found");
+
     @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.regex("/api.*"))
-                .build()
-                .apiInfo(
-                    new ApiInfo("JES Jobs API", "REST API for the JES Jobs Service", "1.0", null, null, null, null, Collections.emptyList())
-                );
+    public OpenAPI openAPI() {
+        return new OpenAPI().info(new Info()
+                .title("JES Jobs API")
+                .description("REST API for the JES Jobs Service")
+                .version("1.0.0")
+        );
+    }
+
+    @Bean
+    public OpenApiCustomiser genericApiResponsesCustomizer() {
+        return openApi -> openApi.getPaths().forEach((key, pathEntry) -> pathEntry.readOperations().forEach(op -> {
+                    op.getResponses().addApiResponse("401", response401);
+                    op.getResponses().addApiResponse("403", response403);
+                    op.getResponses().addApiResponse("404", response404);
+                }
+        ));
     }
 }
