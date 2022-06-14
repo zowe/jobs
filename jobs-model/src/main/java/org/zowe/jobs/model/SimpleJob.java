@@ -9,7 +9,7 @@
  */
 package org.zowe.jobs.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleJob {
-    @ApiModelProperty(value = "The name of a job", dataType = "string", required = true, example = "TESTJOB")
+    @Schema(description = "The name of a job", required = true, example = "TESTJOB")
     private String jobName;
-    @ApiModelProperty(value = "The id of a job", dataType = "string", required = true, example = "JOB00001")
+    @Schema(description = "The id of a job", required = true, example = "JOB00001")
     private String jobId;
 }
