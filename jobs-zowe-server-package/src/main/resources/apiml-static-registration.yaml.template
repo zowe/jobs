@@ -6,6 +6,8 @@ services:
     instanceBaseUrls:
       - https://${ZOWE_EXPLORER_HOST}:${JOBS_API_PORT}/
     homePageRelativeUrl:
+    authentication:
+      scheme: zoweJwt
     routedServices:
       - gatewayUrl: api/v1
         serviceRelativeUrl: api/v1/jobs
