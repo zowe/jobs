@@ -20,7 +20,9 @@ dependencies {
 	compile libraries.spring_security_core
 	compile libraries.spring_security_crypto
 	compile libraries.spring_security_web
-	compile libraries.spring_boot_starter_web
+	implementation(libraries.spring_boot_starter_web) {
+		exclude group: "org.apache.tomcat.embed", module: "tomcat-embed-el"
+	}
 	compile libraries.http_core
 	compile libraries.http_client
 	compile libraries.commons_codec
@@ -28,6 +30,7 @@ dependencies {
 	compile libraries.spring_messaging
 	compile libraries.tomcat_annotations_api
 	compile libraries.tomcat_embed_core
+	compile libraries.tomcat_embed_el
 	compile libraries.tomcat_embed_websocket
 	compile libraries.explorer_api_common
 	compile libraries.restAssured
