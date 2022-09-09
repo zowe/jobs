@@ -28,6 +28,7 @@ dependencies {
 	compile libraries.commons_codec
 	compile libraries.gson
 	compile libraries.spring_messaging
+	compile libraries.snakeyaml
 	compile libraries.tomcat_annotations_api
 	compile libraries.tomcat_embed_core
 	compile libraries.tomcat_embed_el
