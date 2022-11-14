@@ -45,9 +45,9 @@ jobs:
         arch: [ amd64, s390x ]
         include:
           - os: ubuntu
-            BUILD_ARG_LIST: ZOWE_BASE_IMAGE=latest-ubuntu
+            BUILD_ARG_LIST: ZOWE_BASE_IMAGE=2.0.2-ubuntu
           - os: ubi
-            BUILD_ARG_LIST: ZOWE_BASE_IMAGE=latest-ubi
+            BUILD_ARG_LIST: ZOWE_BASE_IMAGE=2.0.2-ubi
     steps:
         - uses: actions/checkout@v2
           with:
