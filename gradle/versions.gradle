@@ -21,7 +21,7 @@ ext {
     junitVersion = "4.13.1"
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
-    explorerApiCommonVersion = "2.0.19"
+    explorerApiCommonVersion = "2.0.20"
     tomcatVersion = "9.0.73"
 
     libraries = [
