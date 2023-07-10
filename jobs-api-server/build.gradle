@@ -35,7 +35,6 @@ dependencies {
     compile libraries.jackson_core
     compile libraries.jackson_databind
     compile libraries.gson
-    compile libraries.guava
     compile libraries.logback_classic
     compile libraries.logback_core
     compile libraries.snakeyaml
@@ -69,6 +68,6 @@ jar {
 }
 
 bootJar {
-    mainClassName = 'org.zowe.jobs.JesJobsApplication'
-    classifier = 'boot'
+    mainClass = 'org.zowe.jobs.JesJobsApplication'
+    archiveClassifier = 'boot'
 }
