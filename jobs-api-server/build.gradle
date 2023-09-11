@@ -71,6 +71,6 @@ jar {
 }
 
 bootJar {
-    mainClassName = 'org.zowe.jobs.JesJobsApplication'
-    classifier = 'boot'
+    mainClass = 'org.zowe.jobs.JesJobsApplication'
+    archiveClassifier = 'boot'
 }
