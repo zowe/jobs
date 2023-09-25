@@ -1,6 +1,6 @@
 ext {
     springBootVersion = '2.7.12'
-    springSecurityVersion = '5.7.8!!'
+    springSecurityVersion = '5.7.11!!'
     springFrameworkVersion = '5.3.20!!'
     springDocVersion = '1.6.9'
     guavaVersion = '32.0.1-jre'
@@ -13,7 +13,7 @@ ext {
     httpCoreVersion = '4.4.10'
     commonsCodecVersion = '1.15'
     slf4jVersion = "1.7.25"
-    snakeYaml = "1.33"
+    snakeYaml = "2.0"
     jacksonCoreVersion = '2.13.2'
     jacksonDatabindVersion = '2.14.0'
     jsonPathVersion = "2.4.0"
@@ -21,7 +21,7 @@ ext {
     restAssuredVersion = "4.3.0"
     javaxValidationApiVersion= "2.0.1.Final"
     explorerApiCommonVersion = "1.1.19"
-    tomcatVersion = "9.0.75"
+    tomcatVersion = "9.0.80"
 
     libraries = [
             lombok                             : "org.projectlombok:lombok:${lombokVersion}",
