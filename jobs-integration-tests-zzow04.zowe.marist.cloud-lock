@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Thu Oct 19 2023 20:27:59 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1697747279827363369",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "refs/pull/256/merge",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "AmandaDErrico",
+  "runId": 6579836620,
+  "runNumber": 410,
+  "link": "https://github.com/zowe/jobs/actions/runs/6579836620"
+}
