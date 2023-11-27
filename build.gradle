@@ -80,7 +80,10 @@ allprojects {
 subprojects {
     license {
         header = rootProject.file('.license/LICENSE_HEADER')
-        ext.year = Calendar.getInstance().get(Calendar.YEAR)
+        properties {
+            name = 'Contributors to the Zowe Project'
+            year = Calendar.getInstance().get(Calendar.YEAR)
+        }
         exclude "**/*.yml", "**/*.yaml", "**/*.json", "**/static", "**/*.sh", "**/*.txt", "**/*.p12", "**/*.xml", "**/*.jsp", "**/*.html", "**/*.jks"
         skipExistingHeaders = true
     }
