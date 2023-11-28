@@ -75,6 +75,12 @@ allprojects {
         }
     }
 
+    configurations.all {
+        exclude group: 'org.junit.jupiter'
+
+        resolutionStrategy.force libraries.mockito_core
+    }
+
 }
 
 subprojects {

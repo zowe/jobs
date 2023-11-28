@@ -50,6 +50,7 @@ dependencies {
     testImplementation libraries.powermock_api_mockito2
     testImplementation libraries.power_mock_junit4
     testImplementation libraries.power_mock_junit4_rule
+    testImplementation libraries.hamcrest
     testImplementation libraries.mockito_core
     testImplementation libraries.explorer_api_common_test
 }

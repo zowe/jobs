@@ -41,13 +41,14 @@ dependencies {
 	implementation libraries.tomcat_embed_websocket
 	implementation libraries.explorer_api_common
 	implementation libraries.restAssured
-	compileOnly libraries.lombok
+    compileOnly libraries.lombok
 	annotationProcessor libraries.lombok
 
 	testImplementation libraries.spring_boot_starter_test
 	testImplementation libraries.powermock_api_mockito2
 	testImplementation libraries.power_mock_junit4
 	testImplementation libraries.power_mock_junit4_rule
+	testImplementation libraries.hamcrest
 	testImplementation libraries.mockito_core
 	testImplementation libraries.explorer_api_common_test
 	testImplementation 'org.hamcrest:hamcrest-junit:2.0.0.0'

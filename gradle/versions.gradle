@@ -19,12 +19,13 @@
         jsonPathVersion = "2.8.0"
         junitVersion = "4.13.2"
         restAssuredVersion = "4.5.1"
-        explorerApiCommonVersion = "2.0.27"
+        explorerApiCommonVersion = "2.0.28"
         tomcatVersion = "9.0.83"
 
         activationApiVersion = "1.2.2"
         xmlBindApiVersion = "2.3.3"
         hamcrestVersion = "2.2"
+        commonsLang3Version = "3.14.0"
 
         libraries = [
                 lombok                             : "org.projectlombok:lombok:${lombokVersion}",
@@ -88,6 +89,7 @@
 
                 activation_api                     : "jakarta.activation:jakarta.activation-api:${activationApiVersion}",
                 xml_bind_api                       : "jakarta.xml.bind:jakarta.xml.bind-api:${xmlBindApiVersion}",
-                hamcrest                           : "org.hamcrest:hamcrest:${hamcrestVersion}"
+                hamcrest                           : "org.hamcrest:hamcrest:${hamcrestVersion}",
+                commonsLang3                       : "org.apache.commons:commons-lang3:${commonsLang3Version}"
         ]
     }
