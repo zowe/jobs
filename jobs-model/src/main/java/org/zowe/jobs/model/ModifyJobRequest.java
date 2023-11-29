@@ -20,6 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModifyJobRequest {
-    @Schema(description = "The modify command, e.g. cancel, hold, release", required = true, example = "cancel")
+    @Schema(description = "The modify command, e.g. cancel, hold, release", requiredMode = Schema.RequiredMode.REQUIRED, example = "cancel")
     private String command;
 }
