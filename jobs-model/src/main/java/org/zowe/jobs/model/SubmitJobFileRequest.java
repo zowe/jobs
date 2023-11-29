@@ -11,7 +11,6 @@
 package org.zowe.jobs.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +20,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SubmitJobFileRequest {
 
-    @Schema(description = "The data set, or z/OS unix file to submit in form: in the form: 'ATLAS.TEST.JCL(TSTJ0001)' for a data set, or /u/myjobs/job1 for z/OS unix file", required = true, example = "'ATLAS.TEST.JCL(TSTJ0001)'")
+    @Schema(description = "The data set, or z/OS unix file to submit in form: in the form: 'ATLAS.TEST.JCL(TSTJ0001)' for a data set, or /u/myjobs/job1 for z/OS unix file", requiredMode = Schema.RequiredMode.REQUIRED, example = "'ATLAS.TEST.JCL(TSTJ0001)'")
     private String file;
 }
