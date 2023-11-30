@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2019, 2020
  */
+
 package org.zowe.jobs.services.zosmf;
 
 import org.apache.http.HttpStatus;
@@ -33,8 +34,10 @@ public class GetJobFileContentZosmfRequestRunnerTest extends AbstractZosmfReques
         String fileId = "3";
 
         JobFileContent expected = new JobFileContent(
-                "        1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849\n"
-                        + "          //*        TEST JOB\n        2 //UNIT     EXEC PGM=IEFBR14\n" + "");
+                "        1 //ATLJ0000 JOB (ADL),'ATLAS',MSGCLASS=X,CLASS=A,TIME=1440               JOB21849" + System.lineSeparator() +
+                "          //*        TEST JOB" + System.lineSeparator() +
+                "        2 //UNIT     EXEC PGM=IEFBR14" + System.lineSeparator()
+        );
 
         mockTextResponse(HttpStatus.SC_OK, loadTestFile("zosmf_getJobFileRecordsResponse.txt"));
 

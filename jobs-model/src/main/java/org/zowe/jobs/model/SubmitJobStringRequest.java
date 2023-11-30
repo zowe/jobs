@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2018
  */
+
 package org.zowe.jobs.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SubmitJobStringRequest {
 
-    @Schema(description = "The jcl to be submitted, with \\n for new lines", required = true, example = "//TESTJOBX JOB (),MSGCLASS=H\n// EXEC PGM=IEFBR14")
+    @Schema(description = "The jcl to be submitted, with \\n for new lines", requiredMode = Schema.RequiredMode.REQUIRED, example = "//TESTJOBX JOB (),MSGCLASS=H\n// EXEC PGM=IEFBR14")
     @ValidJclString
     private String jcl;
 }

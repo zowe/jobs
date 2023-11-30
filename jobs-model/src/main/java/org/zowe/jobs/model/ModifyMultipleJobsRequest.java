@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
+
 package org.zowe.jobs.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,8 +22,8 @@ import java.util.ArrayList;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModifyMultipleJobsRequest {
-    @Schema(description = "The modify command, e.g. cancel, hold, release", required = true, example = "cancel")
+    @Schema(description = "The modify command, e.g. cancel, hold, release", requiredMode = Schema.RequiredMode.REQUIRED, example = "cancel")
     private String command;
-    @Schema(description = "The list of jobs to receive the modify command", type = "string", required = true, example = "[{\"jobId\":\"job1234\", \"jobName\":\"TestJob\"}]")
+    @Schema(description = "The list of jobs to receive the modify command", type = "string", requiredMode = Schema.RequiredMode.REQUIRED, example = "[{\"jobId\":\"job1234\", \"jobName\":\"TestJob\"}]")
     private ArrayList<SimpleJob> jobs;
 }

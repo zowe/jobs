@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2018
  */
+
 package org.zowe.jobs.exceptions;
 
 import org.springframework.http.HttpStatus;

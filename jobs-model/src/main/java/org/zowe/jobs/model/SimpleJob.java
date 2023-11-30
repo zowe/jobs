@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2019
  */
+
 package org.zowe.jobs.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,8 +22,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SimpleJob {
-    @Schema(description = "The name of a job", required = true, example = "TESTJOB")
+    @Schema(description = "The name of a job", requiredMode = Schema.RequiredMode.REQUIRED, example = "TESTJOB")
     private String jobName;
-    @Schema(description = "The id of a job", required = true, example = "JOB00001")
+    @Schema(description = "The id of a job", requiredMode = Schema.RequiredMode.REQUIRED, example = "JOB00001")
     private String jobId;
 }

@@ -1,84 +1,95 @@
-ext {
-    springBootVersion = '2.7.12'
-    springSecurityVersion = '5.7.11!!'
-    springFrameworkVersion = '5.3.30!!'
-    springDocVersion = '1.6.9'
-    logbackVersion = '1.2.9'
-    lombokVersion = '1.18.20'
-    mockitoCoreVersion = '2.23.4'
-    powerMockVersion = "2.0.0-RC.1"
-    gsonVersion = '2.9.0'
-    guavaVersion = '32.0.1-jre'
-    httpClientVersion = '4.5.13'
-    httpCoreVersion = '4.4.14'
-    commonsCodecVersion = '1.15'
-    slf4jVersion = "1.7.25"
-    snakeYaml = "2.0"
-    jacksonCoreVersion = '2.14.1'
-    jacksonDatabindVersion = '2.14.1'
-    jsonPathVersion = "2.4.0"
-    junitVersion = "4.13.1"
-    restAssuredVersion = "4.3.0"
-    explorerApiCommonVersion = "2.0.26"
-    tomcatVersion = "9.0.82"
+    ext {
+        springBootVersion = '2.7.18'
+        springSecurityVersion = '5.8.8'
+        springFrameworkVersion = '5.3.31'
+        springDocVersion = '1.6.15'
+        logbackVersion = '1.2.12'
+        lombokVersion = '1.18.30'
+        mockitoCoreVersion = '2.28.2'
+        powerMockVersion = "2.0.9"
+        gsonVersion = '2.10.1'
+        guavaVersion = '32.1.3-jre'
+        httpClientVersion = '4.5.14'
+        httpCoreVersion = '4.4.16'
+        commonsCodecVersion = '1.16.0'
+        slf4jVersion = "1.7.36"
+        snakeYaml = "2.2"
+        jacksonCoreVersion = '2.16.0'
+        jacksonDatabindVersion = '2.16.0'
+        jsonPathVersion = "2.8.0"
+        junitVersion = "4.13.2"
+        restAssuredVersion = "4.5.1"
+        explorerApiCommonVersion = "2.0.28"
+        tomcatVersion = "9.0.83"
 
-    libraries = [
-            lombok                             : "org.projectlombok:lombok:${lombokVersion}",
-            slf4j_simple                       : "org.slf4j:slf4j-simple:${slf4jVersion}",
-            slf4j_api                          : "org.slf4j:slf4j-api:${slf4jVersion}",
-            snakeyaml                          : "org.yaml:snakeyaml:${snakeYaml}",
-            spring_boot_gradle_plugin          : "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}",
-            spring_boot_starter_actuator       : "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
-            spring_boot_starter_parent         : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
-            spring_boot_starter_security       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
-            spring_boot_starter_web            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
-            spring_boot_start_validation       : "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
-            spring_boot_starter_test           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+        activationApiVersion = "1.2.2"
+        xmlBindApiVersion = "2.3.3"
+        hamcrestVersion = "2.2"
+        commonsLang3Version = "3.14.0"
 
-            spring_security_config             : "org.springframework.security:spring-security-config:${springSecurityVersion}",
-            spring_security_core               : "org.springframework.security:spring-security-core:${springSecurityVersion}",
-            spring_security_crypto             : "org.springframework.security:spring-security-crypto:${springSecurityVersion}",
-            spring_security_web                : "org.springframework.security:spring-security-web:${springSecurityVersion}",
+        libraries = [
+                lombok                             : "org.projectlombok:lombok:${lombokVersion}",
+                slf4j_simple                       : "org.slf4j:slf4j-simple:${slf4jVersion}",
+                slf4j_api                          : "org.slf4j:slf4j-api:${slf4jVersion}",
+                snakeyaml                          : "org.yaml:snakeyaml:${snakeYaml}",
+                spring_boot_gradle_plugin          : "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}",
+                spring_boot_starter_actuator       : "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}",
+                spring_boot_starter_parent         : "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}",
+                spring_boot_starter_security       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
+                spring_boot_starter_web            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+                spring_boot_start_validation       : "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
+                spring_boot_starter_test           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
 
-            spring_aop                         : "org.springframework:spring-aop:${springFrameworkVersion}",
-            spring_beans                       : "org.springframework:spring-beans:${springFrameworkVersion}",
-            spring_context                     : "org.springframework:spring-context:${springFrameworkVersion}",
-            spring_core                        : "org.springframework:spring-core:${springFrameworkVersion}",
-            spring_expression                  : "org.springframework:spring-expression:${springFrameworkVersion}",
-            spring_messaging                   : "org.springframework:spring-messaging:${springFrameworkVersion}",
-            spring_jcl                         : "org.springframework:spring-jcl:${springFrameworkVersion}",
-            spring_test                        : "org.springframework:spring-test:${springFrameworkVersion}",
-            spring_web                         : "org.springframework:spring-web:${springFrameworkVersion}",
-            spring_webmvc                      : "org.springframework:spring-webmvc:${springFrameworkVersion}",
+                spring_security_config             : "org.springframework.security:spring-security-config:${springSecurityVersion}",
+                spring_security_core               : "org.springframework.security:spring-security-core:${springSecurityVersion}",
+                spring_security_crypto             : "org.springframework.security:spring-security-crypto:${springSecurityVersion}",
+                spring_security_web                : "org.springframework.security:spring-security-web:${springSecurityVersion}",
 
-            tomcat_annotations_api             : "org.apache.tomcat:tomcat-annotations-api:${tomcatVersion}",
-            tomcat_embed_core                  : "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
-            tomcat_embed_el                    : "org.apache.tomcat.embed:tomcat-embed-el:${tomcatVersion}",
-            tomcat_embed_websocket             : "org.apache.tomcat.embed:tomcat-embed-websocket:${tomcatVersion}",
+                spring_aop                         : "org.springframework:spring-aop:${springFrameworkVersion}",
+                spring_beans                       : "org.springframework:spring-beans:${springFrameworkVersion}",
+                spring_context                     : "org.springframework:spring-context:${springFrameworkVersion}",
+                spring_core                        : "org.springframework:spring-core:${springFrameworkVersion}",
+                spring_expression                  : "org.springframework:spring-expression:${springFrameworkVersion}",
+                spring_messaging                   : "org.springframework:spring-messaging:${springFrameworkVersion}",
+                spring_jcl                         : "org.springframework:spring-jcl:${springFrameworkVersion}",
+                spring_test                        : "org.springframework:spring-test:${springFrameworkVersion}",
+                spring_web                         : "org.springframework:spring-web:${springFrameworkVersion}",
+                spring_webmvc                      : "org.springframework:spring-webmvc:${springFrameworkVersion}",
 
-            commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",
-            jackson_annotations                : "com.fasterxml.jackson.core:jackson-annotations:${jacksonCoreVersion}",
-            jackson_core                       : "com.fasterxml.jackson.core:jackson-core:${jacksonCoreVersion}",
-            jackson_databind                   : "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}",
-            json_path                          : "com.jayway.jsonpath:json-path:${jsonPathVersion}",
-            logback_classic                    : "ch.qos.logback:logback-classic:${logbackVersion}",
-            logback_core                       : "ch.qos.logback:logback-core:${logbackVersion}",
-            spring_doc                         : "org.springdoc:springdoc-openapi-ui:${springDocVersion}",
+                tomcat_annotations_api             : "org.apache.tomcat:tomcat-annotations-api:${tomcatVersion}",
+                tomcat_embed_core                  : "org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}",
+                tomcat_embed_el                    : "org.apache.tomcat.embed:tomcat-embed-el:${tomcatVersion}",
+                tomcat_embed_websocket             : "org.apache.tomcat.embed:tomcat-embed-websocket:${tomcatVersion}",
 
-            http_core                          : "org.apache.httpcomponents:httpcore:${httpCoreVersion}",
-            http_client                        : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
+                commons_codec                      : "commons-codec:commons-codec:${commonsCodecVersion}",
+                jackson_annotations                : "com.fasterxml.jackson.core:jackson-annotations:${jacksonCoreVersion}",
+                jackson_core                       : "com.fasterxml.jackson.core:jackson-core:${jacksonCoreVersion}",
+                jackson_databind                   : "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}",
+                json_path                          : "com.jayway.jsonpath:json-path:${jsonPathVersion}",
+                logback_classic                    : "ch.qos.logback:logback-classic:${logbackVersion}",
+                logback_core                       : "ch.qos.logback:logback-core:${logbackVersion}",
+                spring_doc                         : "org.springdoc:springdoc-openapi-ui:${springDocVersion}",
 
-            powermock_api_mockito2             : "org.powermock:powermock-api-mockito2:${powerMockVersion}",
-            power_mock_junit4                  : "org.powermock:powermock-module-junit4:${powerMockVersion}",
-            power_mock_junit4_rule             : "org.powermock:powermock-module-junit4-rule:${powerMockVersion}",
+                http_core                          : "org.apache.httpcomponents:httpcore:${httpCoreVersion}",
+                http_client                        : "org.apache.httpcomponents:httpclient:${httpClientVersion}",
+                http_client                        : "org.apache.httpcomponents:httpmime:${httpClientVersion}",
 
-            gson                               : "com.google.code.gson:gson:${gsonVersion}",
-            mockito_core                       : "org.mockito:mockito-core:${mockitoCoreVersion}",
+                powermock_api_mockito2             : "org.powermock:powermock-api-mockito2:${powerMockVersion}",
+                power_mock_junit4                  : "org.powermock:powermock-module-junit4:${powerMockVersion}",
+                power_mock_junit4_rule             : "org.powermock:powermock-module-junit4-rule:${powerMockVersion}",
 
-            junit                              : "junit:junit:${junitVersion}",
-            restAssured						   : "io.rest-assured:rest-assured:${restAssuredVersion}",
+                gson                               : "com.google.code.gson:gson:${gsonVersion}",
+                mockito_core                       : "org.mockito:mockito-core:${mockitoCoreVersion}",
 
-            explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
-            explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}"
-    ]
-}
+                junit                              : "junit:junit:${junitVersion}",
+                restAssured						   : "io.rest-assured:rest-assured:${restAssuredVersion}",
+
+                explorer_api_common                : "org.zowe.explorer.api:explorer-api-common:${explorerApiCommonVersion}",
+                explorer_api_common_test           : "org.zowe.explorer.api:explorer-api-common-test:${explorerApiCommonVersion}",
+
+                activation_api                     : "jakarta.activation:jakarta.activation-api:${activationApiVersion}",
+                xml_bind_api                       : "jakarta.xml.bind:jakarta.xml.bind-api:${xmlBindApiVersion}",
+                hamcrest                           : "org.hamcrest:hamcrest:${hamcrestVersion}",
+                commonsLang3                       : "org.apache.commons:commons-lang3:${commonsLang3Version}"
+        ]
+    }

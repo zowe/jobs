@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  MARIST_HOST: 'zzow04.zowe.marist.cloud'
+  MARIST_HOST: ${{ secrets.SSH_MARIST_RACF_HOST }}
   ZOSMF_PORT: 10443
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443

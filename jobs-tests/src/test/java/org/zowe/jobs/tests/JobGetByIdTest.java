@@ -7,6 +7,7 @@
  *
  * Copyright IBM Corporation 2016, 2020
  */
+
 package org.zowe.jobs.tests;
 
 import io.restassured.http.ContentType;
