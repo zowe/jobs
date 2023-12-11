@@ -3,7 +3,7 @@
         springSecurityVersion = '5.8.8'
         springFrameworkVersion = '5.3.31'
         springDocVersion = '1.6.15'
-        logbackVersion = '1.2.12'
+        logbackVersion = '1.2.13'
         lombokVersion = '1.18.30'
         mockitoCoreVersion = '2.28.2'
         powerMockVersion = "2.0.9"
@@ -19,7 +19,7 @@
         jsonPathVersion = "2.8.0"
         junitVersion = "4.13.2"
         restAssuredVersion = "4.5.1"
-        explorerApiCommonVersion = "2.0.28"
+        explorerApiCommonVersion = "2.0.29"
         tomcatVersion = "9.0.83"
 
         activationApiVersion = "1.2.2"
