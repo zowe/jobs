@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Tue Apr 02 2024 08:40:56 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1712047256612135373",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "refs/pull/263/merge",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "achmelo",
+  "runId": 8519877140,
+  "runNumber": 441,
+  "link": "https://github.com/zowe/jobs/actions/runs/8519877140"
+}
