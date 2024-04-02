@@ -14,6 +14,7 @@ on:
 env:
   MARIST_HOST: 'zzow04.zowe.marist.cloud'
   ZOSMF_PORT: 10443
+  ZOSMF_HOST: zzow08.zowe.marist.cloud
   GATEWAY_PORT: 7554
   JOBS_PORT: 8443
   JOBS_LOG_DIR: .apiml/jobs-api.log
@@ -63,7 +64,7 @@ jobs:
       - name: Run APIML containers
         run: |
           chmod +x scripts/run-containerized-apiml.sh
-          ./scripts/run-containerized-apiml.sh -h ${{ env.MARIST_HOST }} -p ${{ env.ZOSMF_PORT }} -f ${{ env.JOBS_PORT }} -l
+          ./scripts/run-containerized-apiml.sh -h ${{ env.ZOSMF_HOST }} -p ${{ env.ZOSMF_PORT }} -f ${{ env.JOBS_PORT }} -l
         env:
           GATEWAY_PORT: ${{ env.GATEWAY_PORT }}
 
