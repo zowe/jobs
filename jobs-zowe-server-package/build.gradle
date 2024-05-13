@@ -12,7 +12,7 @@ dependencies {
 }
 
 task packageJobsApiServer(type: Zip) {
-    archiveFileName = artifactName + ".zip"
+    archiveName = artifactName + ".zip"
     includeEmptyDirs = true
     def resourceDir = 'src/main/resources/'
 
