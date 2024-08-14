@@ -1,15 +1,1 @@
-{
-  "lockAcquiredTime": "Wed Aug 14 2024 16:32:41 GMT+0000 (Coordinated Universal Time)",
-  "uid": "1723653161666312539",
-  "repository": {
-    "owner": "zowe",
-    "repo": "jobs"
-  },
-  "branch": "v2.x/master",
-  "workflow": "CI Testing",
-  "job": "IntegrationTest",
-  "actor": "Shobhajayanna",
-  "runId": 10391378831,
-  "runNumber": 458,
-  "link": "https://github.com/zowe/jobs/actions/runs/10391378831"
-}
+""
