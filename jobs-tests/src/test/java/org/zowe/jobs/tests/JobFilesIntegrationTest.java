@@ -36,7 +36,7 @@ public class JobFilesIntegrationTest extends AbstractJobsIntegrationTest {
     private static Job job;
     private static String expectedContentRegexJESMSGLG = ".*J E S 2  J O B  L O G.*------ JES2 JOB STATISTICS ------.*3 CARDS READ.*"
             + "-           .* SYSOUT PRINT RECORDS.*-            0 SYSOUT PUNCH RECORDS.*"
-            + "-            5 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
+            + "-            6 SYSOUT SPOOL KBYTES.*-         0.00 MINUTES EXECUTION TIME.*";
 
     @BeforeClass
     public static void submitJob() throws Exception {
