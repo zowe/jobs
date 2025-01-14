@@ -35,7 +35,7 @@ jobs:
         run: ./gradlew coverage
 
       - name: Store test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: UnitTestResults
@@ -151,7 +151,7 @@ jobs:
         run: docker compose -f .apiml/docker-compose.yml logs
 
       - name: Store test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: always()
         with:
           name: IntegrationTestResults
