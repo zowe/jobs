@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Wed May 21 2025 14:35:39 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1747838139292140926",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "refs/tags/2.0.38",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "richard-salac",
+  "runId": 15164999548,
+  "runNumber": 495,
+  "link": "https://github.com/zowe/jobs/actions/runs/15164999548"
+}
