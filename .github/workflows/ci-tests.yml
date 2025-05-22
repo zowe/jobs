@@ -127,8 +127,8 @@ jobs:
           ./gradlew runIntegrationTests --info
           -Pserver.host=localhost
           -Pserver.port=${{ env.GATEWAY_PORT }}
-          -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
-          -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
+          -Pserver.username=${{ secrets.SSH_MARIST_USERNAME }}
+          -Pserver.password=${{ secrets.SSH_MARIST_RACF_PASSWORD }}
           -Ptest.version=1
 
       - name: Integration tests for v2 - JWT
@@ -136,8 +136,8 @@ jobs:
           ./gradlew runIntegrationTests --info
           -Pserver.host=localhost
           -Pserver.port=${{ env.GATEWAY_PORT }}
-          -Pserver.username=${{ secrets.SSH_MARIST_USERNAMEP }}
-          -Pserver.password=${{ secrets.SSH_MARIST_PASSWORDP }}
+          -Pserver.username=${{ secrets.SSH_MARIST_USERNAME }}
+          -Pserver.password=${{ secrets.SSH_MARIST_RACF_PASSWORD }}
           -Ptest.version=2
 
       - name: Output Jobs API logs
