@@ -1,1 +1,15 @@
-""
+{
+  "lockAcquiredTime": "Mon Oct 27 2025 11:46:59 GMT+0000 (Coordinated Universal Time)",
+  "uid": "1761565619460943994",
+  "repository": {
+    "owner": "zowe",
+    "repo": "jobs"
+  },
+  "branch": "v2.x/master",
+  "workflow": "CI Testing",
+  "job": "IntegrationTest",
+  "actor": "pavel-jares-bcm",
+  "runId": 18839784332,
+  "runNumber": 512,
+  "link": "https://github.com/zowe/jobs/actions/runs/18839784332"
+}
